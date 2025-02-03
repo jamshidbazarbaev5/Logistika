@@ -1,0 +1,30 @@
+{
+  "createFirm": {
+    "title": "Yangi Firma Yaratish",
+    "subtitle": "Yangi firmani ro'yxatdan o'tkazish uchun barcha ma'lumotlarni to'ldiring",
+    "companyInfo": {
+      "title": "Kompaniya Ma'lumotlari",
+      "inn": "STIR",
+      "innPlaceholder": "STIR raqamini kiriting",
+      "firmName": "Firma Nomi",
+      "firmNamePlaceholder": "Firma nomini kiriting",
+      "phoneNumber": "Kompaniya Telefon Raqami",
+      "phonePlaceholder": "+998 90 123 45 67"
+    },
+    "directorInfo": {
+      "title": "Direktor Ma'lumotlari",
+      "fullName": "Direktor To'liq Ismi",
+      "fullNamePlaceholder": "Direktor to'liq ismini kiriting",
+      "phoneNumber": "Direktor Telefon Raqami",
+      "phonePlaceholder": "+998 90 987 65 43"
+    },
+    "trusteeInfo": {
+      "title": "Ishonchli Vakil Ma'lumotlari",
+      "fullName": "Ishonchli Vakil To'liq Ismi",
+      "fullNamePlaceholder": "Ishonchli vakil to'liq ismini kiriting",
+      "phoneNumber": "Ishonchli Vakil Telefon Raqami",
+      "phonePlaceholder": "+998 93 321 09 87"
+    },
+    "submit": "Firma Yaratish"
+  }
+} 

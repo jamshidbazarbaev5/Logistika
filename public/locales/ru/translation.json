@@ -1,0 +1,30 @@
+{
+  "createFirm": {
+    "title": "Создать Новую Компанию",
+    "subtitle": "Пожалуйста, заполните всю необходимую информацию для регистрации новой компании",
+    "companyInfo": {
+      "title": "Информация о Компании",
+      "inn": "ИНН",
+      "innPlaceholder": "Введите номер ИНН",
+      "firmName": "Название Компании",
+      "firmNamePlaceholder": "Введите название компании",
+      "phoneNumber": "Телефон Компании",
+      "phonePlaceholder": "+998 90 123 45 67"
+    },
+    "directorInfo": {
+      "title": "Информация о Директоре",
+      "fullName": "ФИО Директора",
+      "fullNamePlaceholder": "Введите ФИО директора",
+      "phoneNumber": "Телефон Директора",
+      "phonePlaceholder": "+998 90 987 65 43"
+    },
+    "trusteeInfo": {
+      "title": "Информация о Доверенном Лице",
+      "fullName": "ФИО Доверенного Лица",
+      "fullNamePlaceholder": "Введите ФИО доверенного лица",
+      "phoneNumber": "Телефон Доверенного Лица",
+      "phonePlaceholder": "+998 93 321 09 87"
+    },
+    "submit": "Создать Компанию"
+  }
+} 

@@ -1,0 +1,30 @@
+{
+  "createFirm": {
+    "title": "Жаңа Фирма Жаратыў",
+    "subtitle": "Жаңа фирманы дизимнен өткизиў ушын барлық мағлыўматларды толтырың",
+    "companyInfo": {
+      "title": "Компания Мағлыўматлары",
+      "inn": "СТИР",
+      "innPlaceholder": "СТИР номерин киритиң",
+      "firmName": "Фирма Аты",
+      "firmNamePlaceholder": "Фирма атын киритиң",
+      "phoneNumber": "Компания Телефон Номери",
+      "phonePlaceholder": "+998 90 123 45 67"
+    },
+    "directorInfo": {
+      "title": "Директор Мағлыўматлары",
+      "fullName": "Директор Толық Аты",
+      "fullNamePlaceholder": "Директор толық атын киритиң",
+      "phoneNumber": "Директор Телефон Номери",
+      "phonePlaceholder": "+998 90 987 65 43"
+    },
+    "trusteeInfo": {
+      "title": "Исеним Ўәкили Мағлыўматлары",
+      "fullName": "Исеним Ўәкили Толық Аты",
+      "fullNamePlaceholder": "Исеним ўәкили толық атын киритиң",
+      "phoneNumber": "Исеним Ўәкили Телефон Номери",
+      "phonePlaceholder": "+998 93 321 09 87"
+    },
+    "submit": "Фирма Жаратыў"
+  }
+} 

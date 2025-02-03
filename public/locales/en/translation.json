@@ -1,0 +1,30 @@
+{
+  "createFirm": {
+    "title": "Create New Firm",
+    "subtitle": "Please fill in all the required information to register a new firm",
+    "companyInfo": {
+      "title": "Company Information",
+      "inn": "INN",
+      "innPlaceholder": "Enter INN number",
+      "firmName": "Firm Name",
+      "firmNamePlaceholder": "Enter firm name",
+      "phoneNumber": "Company Phone Number",
+      "phonePlaceholder": "+998 90 123 45 67"
+    },
+    "directorInfo": {
+      "title": "Director Information",
+      "fullName": "Director Full Name",
+      "fullNamePlaceholder": "Enter director's full name",
+      "phoneNumber": "Director Phone Number",
+      "phonePlaceholder": "+998 90 987 65 43"
+    },
+    "trusteeInfo": {
+      "title": "Trustee Information",
+      "fullName": "Trustee Full Name",
+      "fullNamePlaceholder": "Enter trustee's full name",
+      "phoneNumber": "Trustee Phone Number",
+      "phonePlaceholder": "+998 93 321 09 87"
+    },
+    "submit": "Create Firm"
+  }
+}
