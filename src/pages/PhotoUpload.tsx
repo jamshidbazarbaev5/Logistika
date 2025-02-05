@@ -9,7 +9,7 @@ export default function PhotoUpload() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [, setSuccessMessage] = useState<string>("");
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
