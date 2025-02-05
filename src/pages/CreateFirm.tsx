@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { apiService } from "../api/api";
+import SuccessModal from "../components/SuccessModal";
 
 interface FirmFormData {
   INN: string;
@@ -22,11 +24,40 @@ export default function CreateFirm() {
     firm_trustee: "",
     phoneNumber_trustee: "",
   });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData);
-    // Handle form submission here
+    try {
+      const response = await apiService.createFirm(formData);
+      
+      if (response.status === 201 || response.status === 200) {
+        setFormData({
+          INN: "",
+          firm_name: "",
+          phoneNumber_firm: "",
+          full_name_director: "",
+          phoneNumber_director: "",
+          firm_trustee: "",
+          phoneNumber_trustee: "",
+        });
+        setShowSuccessModal(true);
+      }
+    } catch (error: any) {
+      console.error('Error creating firm:', error);
+      let errorMessage = t('createFirm.errorMessage', 'Failed to create firm. Please try again.');
+      
+      if (error.response?.data) {
+        // If there's detailed error information from the server
+        const serverError = error.response.data;
+        errorMessage = typeof serverError === 'object' 
+          ? Object.entries(serverError).map(([key, value]) => `${key}: ${value}`).join('\n')
+          : serverError.toString();
+      }
+      
+      // You might want to replace this with a proper error modal component
+      alert(errorMessage);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -37,21 +68,25 @@ export default function CreateFirm() {
   };
 
   return (
-    <div className="p-6">
-      <div className="mb-8">
-        <h1 className="text-xl font-semibold text-gray-900">{t('createFirm.title')}</h1>
-        <p className="mt-2 text-sm text-gray-600">
+    <div className="p-4 sm:p-6">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+          {t('createFirm.title')}
+        </h1>
+        <p className="mt-1 sm:mt-2 text-sm text-gray-600 dark:text-gray-400">
           {t('createFirm.subtitle')}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-4xl">
         {/* Company Information Section */}
-        <div className="bg-white p-6 rounded-lg border border-gray-100">
-          <h2 className="text-sm font-medium text-gray-900 mb-4">{t('createFirm.companyInfo.title')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-100 dark:border-gray-700">
+          <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
+            {t('createFirm.companyInfo.title')}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <label htmlFor="INN" className="block text-sm font-medium text-gray-600">
+              <label htmlFor="INN" className="block text-sm font-medium text-gray-600 dark:text-gray-300">
                 {t('createFirm.companyInfo.inn')}
               </label>
               <input
@@ -60,12 +95,14 @@ export default function CreateFirm() {
                 id="INN"
                 value={formData.INN}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder={t('createFirm.companyInfo.innPlaceholder')}
               />
             </div>
             <div>
-              <label htmlFor="firm_name" className="block text-sm font-medium text-gray-600">
+              <label htmlFor="firm_name" className="block text-sm font-medium text-gray-600 dark:text-gray-300">
                 {t('createFirm.companyInfo.firmName')}
               </label>
               <input
@@ -74,12 +111,14 @@ export default function CreateFirm() {
                 id="firm_name"
                 value={formData.firm_name}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder={t('createFirm.companyInfo.firmNamePlaceholder')}
               />
             </div>
             <div>
-              <label htmlFor="phoneNumber_firm" className="block text-sm font-medium text-gray-600">
+              <label htmlFor="phoneNumber_firm" className="block text-sm font-medium text-gray-600 dark:text-gray-300">
                 {t('createFirm.companyInfo.phoneNumber')}
               </label>
               <input
@@ -88,7 +127,9 @@ export default function CreateFirm() {
                 id="phoneNumber_firm"
                 value={formData.phoneNumber_firm}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder={t('createFirm.companyInfo.phonePlaceholder')}
               />
             </div>
@@ -96,11 +137,13 @@ export default function CreateFirm() {
         </div>
 
         {/* Director Information Section */}
-        <div className="bg-white p-6 rounded-lg border border-gray-100">
-          <h2 className="text-sm font-medium text-gray-900 mb-4">{t('createFirm.directorInfo.title')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-100 dark:border-gray-700">
+          <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
+            {t('createFirm.directorInfo.title')}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <label htmlFor="full_name_director" className="block text-sm font-medium text-gray-600">
+              <label htmlFor="full_name_director" className="block text-sm font-medium text-gray-600 dark:text-gray-300">
                 {t('createFirm.directorInfo.fullName')}
               </label>
               <input
@@ -109,12 +152,14 @@ export default function CreateFirm() {
                 id="full_name_director"
                 value={formData.full_name_director}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder={t('createFirm.directorInfo.fullNamePlaceholder')}
               />
             </div>
             <div>
-              <label htmlFor="phoneNumber_director" className="block text-sm font-medium text-gray-600">
+              <label htmlFor="phoneNumber_director" className="block text-sm font-medium text-gray-600 dark:text-gray-300">
                 {t('createFirm.directorInfo.phoneNumber')}
               </label>
               <input
@@ -123,7 +168,9 @@ export default function CreateFirm() {
                 id="phoneNumber_director"
                 value={formData.phoneNumber_director}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder={t('createFirm.directorInfo.phonePlaceholder')}
               />
             </div>
@@ -131,11 +178,13 @@ export default function CreateFirm() {
         </div>
 
         {/* Trustee Information Section */}
-        <div className="bg-white p-6 rounded-lg border border-gray-100">
-          <h2 className="text-sm font-medium text-gray-900 mb-4">{t('createFirm.trusteeInfo.title')}</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-100 dark:border-gray-700">
+          <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
+            {t('createFirm.trusteeInfo.title')}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             <div>
-              <label htmlFor="firm_trustee" className="block text-sm font-medium text-gray-600">
+              <label htmlFor="firm_trustee" className="block text-sm font-medium text-gray-600 dark:text-gray-300">
                 {t('createFirm.trusteeInfo.fullName')}
               </label>
               <input
@@ -144,12 +193,14 @@ export default function CreateFirm() {
                 id="firm_trustee"
                 value={formData.firm_trustee}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder={t('createFirm.trusteeInfo.fullNamePlaceholder')}
               />
             </div>
             <div>
-              <label htmlFor="phoneNumber_trustee" className="block text-sm font-medium text-gray-600">
+              <label htmlFor="phoneNumber_trustee" className="block text-sm font-medium text-gray-600 dark:text-gray-300">
                 {t('createFirm.trusteeInfo.phoneNumber')}
               </label>
               <input
@@ -158,7 +209,9 @@ export default function CreateFirm() {
                 id="phoneNumber_trustee"
                 value={formData.phoneNumber_trustee}
                 onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder={t('createFirm.trusteeInfo.phonePlaceholder')}
               />
             </div>
@@ -168,12 +221,20 @@ export default function CreateFirm() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className="bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2"
+            className="w-full sm:w-auto bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
+            hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
+            dark:focus:ring-offset-gray-800"
           >
             {t('createFirm.submit')}
           </button>
         </div>
       </form>
+
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        message={t('createFirm.successMessage', 'Firm has been created successfully!')}
+      />
     </div>
   );
 }
