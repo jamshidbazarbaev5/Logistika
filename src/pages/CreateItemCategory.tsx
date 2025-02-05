@@ -52,48 +52,56 @@ export default function CreateItemCategory() {
   };
 
   return (
-    <div className="p-4 sm:p-6">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-lg sm:text-xl font-semibold text-gray-900">
+    <div className="min-h-screen p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
+      <div className="mb-6 md:mb-8 lg:mb-10">
+        <h1 className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 dark:text-white">
           {t('createItemCategory.title', 'Create Item Category')}
         </h1>
-        <p className="mt-1 sm:mt-2 text-sm text-gray-600">
+        <p className="mt-2 text-sm md:text-base text-gray-600 dark:text-gray-400">
           {t('createItemCategory.subtitle', 'Create a new category for items')}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-4xl">
-        <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-100">
-          <h2 className="text-sm font-medium text-gray-900 mb-3 sm:mb-4">
+      <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8 w-full max-w-4xl">
+        <div className="bg-white dark:bg-gray-800 p-4 md:p-6 lg:p-8 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+          <h2 className="text-base md:text-lg font-medium text-gray-900 dark:text-white mb-4 md:mb-6">
             {t('createItemCategory.categoryInfo', 'Category Information')}
           </h2>
           
-          <div>
-            <label 
-              htmlFor="name" 
-              className="block text-sm font-medium text-gray-600"
-            >
-              {t('createItemCategory.name', 'Category Name')}
-            </label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              value={formData.name}
-              onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm 
-                focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
-              placeholder={t('createItemCategory.namePlaceholder', 'Enter category name')}
-              required
-            />
+          <div className="space-y-4 md:space-y-6">
+            <div>
+              <label 
+                htmlFor="name" 
+                className="block text-sm md:text-base font-medium text-gray-700 dark:text-gray-300 mb-2"
+              >
+                {t('createItemCategory.name', 'Category Name')}
+              </label>
+              <input
+                type="text"
+                name="name"
+                id="name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 
+                  px-4 py-2.5 text-sm md:text-base bg-white dark:bg-gray-700 
+                  text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500
+                  focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                  transition-colors duration-200"
+                placeholder={t('createItemCategory.namePlaceholder', 'Enter category name')}
+                required
+              />
+            </div>
           </div>
         </div>
 
-        <div className="flex justify-end">
+        <div className="flex justify-end pt-4 md:pt-6">
           <button
             type="submit"
-            className="w-full sm:w-auto bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
-              hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2"
+            className="w-full sm:w-auto min-w-[150px] bg-[#6C5DD3] text-white px-6 py-3 
+              text-sm md:text-base rounded-lg hover:bg-[#5c4eb3] 
+              focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2 
+              dark:focus:ring-offset-gray-800 transition-colors duration-200
+              disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('createItemCategory.submit', 'Create Category')}
           </button>

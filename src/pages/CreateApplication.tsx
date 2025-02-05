@@ -173,24 +173,23 @@ export default function CreateApplication() {
   };
 
   return (
-    <div className="p-4 sm:p-6">
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+    <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto">
+      <div className="mb-6 md:mb-8 lg:mb-10">
+        <h1 className="text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 dark:text-white">
           {t('createApplication.title', 'Create Application')}
         </h1>
-        <p className="mt-1 sm:mt-2 text-sm text-gray-600 dark:text-gray-400">
+        <p className="mt-2 text-sm md:text-base text-gray-600 dark:text-gray-400">
           {t('createApplication.subtitle', 'Fill in the application details below')}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-4xl">
-        {/* Basic Information */}
-        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
+      <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8 w-full">
+        <div className="bg-white dark:bg-gray-800 p-4 md:p-6 lg:p-8 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+          <h2 className="text-base md:text-lg font-medium text-gray-900 dark:text-white mb-4 md:mb-6">
             {t('createApplication.basicInfo', 'Basic Information')}
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             <div>
               <label htmlFor="brutto" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('createApplication.brutto', 'Brutto')}
@@ -257,13 +256,12 @@ export default function CreateApplication() {
           </div>
         </div>
 
-        {/* Declaration Information */}
-        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
+        <div className="bg-white dark:bg-gray-800 p-4 md:p-6 lg:p-8 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+          <h2 className="text-base md:text-lg font-medium text-gray-900 dark:text-white mb-4 md:mb-6">
             {t('createApplication.declarationInfo', 'Declaration Information')}
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
             <div>
               <label htmlFor="decloration_number" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('createApplication.declarationNumber', 'Declaration Number')}
@@ -316,13 +314,12 @@ export default function CreateApplication() {
           </div>
         </div>
 
-        {/* Quantities and Services */}
-        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
+        <div className="bg-white dark:bg-gray-800 p-4 md:p-6 lg:p-8 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+          <h2 className="text-base md:text-lg font-medium text-gray-900 dark:text-white mb-4 md:mb-6">
             {t('createApplication.quantitiesAndServices', 'Quantities and Services')}
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             <div>
               <label htmlFor="unloading_quantity" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('createApplication.unloadingQuantity', 'Unloading Quantity')}
@@ -357,13 +354,13 @@ export default function CreateApplication() {
           </div>
         </div>
 
-        {/* Submit Button */}
-        <div className="flex justify-end">
+        <div className="flex justify-end mt-6 md:mt-8">
           <button
             type="submit"
-            className="w-full sm:w-auto bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
-            hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
-            dark:focus:ring-offset-gray-800 dark:hover:bg-[#5c4eb3] transition-colors duration-200"
+            className="w-full sm:w-auto min-w-[150px] bg-[#6C5DD3] text-white px-6 py-3 text-sm md:text-base 
+            rounded-lg hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] 
+            focus:ring-offset-2 dark:focus:ring-offset-gray-800 dark:hover:bg-[#5c4eb3] 
+            transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {t('createApplication.submit', 'Create Application')}
           </button>

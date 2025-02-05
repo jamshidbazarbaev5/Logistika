@@ -79,21 +79,27 @@ const toggleDarkMode = () => {
 
   return (
     <div className="flex min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
-      {/* Update the language and theme selectors header */}
-      <div className="fixed top-0 right-16 lg:right-0 p-4 z-40 flex items-center gap-2">
-      <button
-                                onClick={toggleDarkMode}
-                                className="p-2 rounded-md text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200"
-                            >
-                                {isDarkMode ? <Sun className="h-6 w-6" /> : <Moon className="h-6 w-6" />}
-                            </button>   
+      {/* Update the language and theme selectors header - hide when mobile menu is open */}
+      <div className={`${isMobileMenuOpen ? 'hidden' : 'fixed'} 
+        top-0  p-4 z-50 flex righ-1 items-center gap-2
+        lg:right-8`}>
+        <button
+          onClick={toggleDarkMode}
+          className="p-2 rounded-md text-gray-600 ml-10 dark:text-gray-400 hover:text-gray-900 
+            dark:hover:text-gray-200 bg-white  dark:bg-gray-800"
+        >
+          {isDarkMode ? <Sun className="h-5 w-5 md:h-6 md:w-6" /> : <Moon className="h-5 w-5 md:h-6 md:w-6" />}
+        </button>   
         
         <select
           onChange={(e) => changeLanguage(e.target.value)}
           value={i18n.language}
-          className="rounded-md border border-gray-300 dark:border-gray-600 px-2 py-1 lg:px-3 lg:py-2 text-xs lg:text-sm 
-          focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-          bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200"
+          className="rounded-md border border-gray-300 dark:border-gray-600 
+            px-1.5 py-1 text-xs
+            md:px-2 md:py-1.5 md:text-sm
+            lg:px-3 lg:py-2 ml-10
+            focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+            bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200"
         >
           {languages.map((lang) => (
             <option key={lang.code} value={lang.code}>
@@ -103,6 +109,14 @@ const toggleDarkMode = () => {
         </select>
       </div>
 
+      {/* Update mobile menu button position - move it before the selectors */}
+      <button
+        className="fixed right-4 top-4 z-50 lg:hidden"
+        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+      >
+        <Menu className="h-5 w-5 md:h-6 md:w-6 text-gray-600 dark:text-gray-200 mr-12 mt-2" />
+      </button>
+
       {/* Mobile menu overlay */}
       {isMobileMenuOpen && (
         <div
@@ -111,25 +125,17 @@ const toggleDarkMode = () => {
         />
       )}
 
-      {/* Mobile menu button */}
-      <button
-        className="fixed right-4 top-4 z-30 lg:hidden"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-      >
-        <Menu className="h-6 w-6 text-gray-600 dark:text-gray-200" />
-      </button>
-
       {/* Sidebar */}
       <div
         className={`${
-          isOpen ? "w-64" : "w-70"
+          isOpen ? "w-64" : "w-[240px] md:w-70"
         } h-screen bg-white dark:bg-gray-800 fixed left-0 top-0 transition-all duration-300 
-        border-r border-gray-200 dark:border-gray-700 z-30 overflow-hidden
+        border-r border-gray-200  dark:border-gray-700 z-30
         ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"} 
         lg:translate-x-0`}
       >
         {/* Logo */}
-        <div className="flex items-center p-4 border-b border-gray-200 dark:border-gray-700 min-w-[256px]">
+        <div className="flex items-center p-4 border-b border-gray-200 dark:border-gray-700 min-w-[223px]">
           <div className="flex items-center gap-3">
             <div className="bg-[#6C5DD3] p-2 rounded-lg">
               <Truck className="h-6 w-6 text-white" />
@@ -143,7 +149,7 @@ const toggleDarkMode = () => {
         {/* Navigation */}
         <nav className="px-4 py-6">
           <div className="space-y-6">
-            <div className="min-w-[256px]">
+            <div className="min-w-[223px]">
               <p className="px-2 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
                 MAIN MENU
               </p>
@@ -224,9 +230,10 @@ const toggleDarkMode = () => {
 
       {/* Main content - update to use Outlet */}
       <main
-        className={`flex-1 transition-all duration-300 pt-16
-          ${isOpen ? "lg:ml-64" : "lg:ml-70"}
-          ml-80 mb-40 w-full
+        className={`flex-1 transition-all duration-300
+          pt-16 px-4 md:px-6 lg:px-8
+          ${isOpen ? "lg:ml-64" : "lg:ml-[240px] xl:ml-70"}
+          mb-20 w-full
           bg-white dark:bg-gray-900 dark:text-gray-100`}
       >
         <Outlet />
