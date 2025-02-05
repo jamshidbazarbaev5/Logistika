@@ -26,5 +26,119 @@
       "phonePlaceholder": "+998 93 321 09 87"
     },
     "submit": "Firma Yaratish"
+  },
+  "createApplication": {
+    "title": "Ariza Yaratish",
+    "subtitle": "Yangi ariza yaratish uchun formani to'ldiring",
+    "comingDate": "Kelish Sanasi",
+    "declarationInfo": "Deklaratsiya Ma'lumotlari",
+    "declarationNumber": "Deklaratsiya Raqami",
+    "declarationFile": "Deklaratsiya Fayli",
+    "declarationDate": "Deklaratsiya Sanasi",
+    "unloadingQuantity": "Tushirish Miqdori",
+    "submit": "Ariza Yaratish",
+    "successMessage": "Ariza muvaffaqiyatli yaratildi!"
+  },
+  "photoUpload": {
+    "title": "Rasm Yuklash",
+    "subtitle": "Ariza uchun rasmlarni yuklang",
+    "applicationId": "Ariza",
+    "selectApplication": "Arizani tanlang",
+    "preview": "Oldindan ko'rish",
+    "errorFileType": "Iltimos, rasm faylini tanlang",
+    "errorNoFile": "Iltimos, yuklash uchun fayl tanlang",
+    "errorNoApplication": "Iltimos, arizani tanlang",
+    "uploading": "Yuklanmoqda...",
+    "submit": "Rasm Yuklash",
+    "successMessage": "Rasm muvaffaqiyatli yuklandi!"
+  },
+  "createKeepingService": {
+    "title": "Saqlash Xizmatini Yaratish",
+    "subtitle": "Yangi saqlash xizmatini qo'shish",
+    "serviceInfo": {
+      "name": "Xizmat Nomi",
+      "baseDay": "Asosiy Kunlar",
+      "basePrice": "Asosiy Narx",
+      "extraPrice": "Qo'shimcha Narx"
+    },
+    "submit": "Xizmat Yaratish",
+    "successMessage": "Saqlash xizmati muvaffaqiyatli yaratildi!"
+  },
+  "createWorkingService": {
+    "title": "Ish Xizmatini Yaratish",
+    "subtitle": "Yangi ish xizmatini qo'shish",
+    "serviceInfo": {
+      "name": "Xizmat Nomi",
+      "price": "Narx",
+      "baseDay": "Asosiy Kunlar",
+      "basePrice": "Asosiy Narx",
+      "extraPrice": "Qo'shimcha Narx",
+      "units": "O'lchov Birliklari"
+    },
+    "submit": "Xizmat Yaratish",
+    "successMessage": "Ish xizmati muvaffaqiyatli yaratildi!"
+  },
+  "createItemCategory": {
+    "title": "Kategoriya Yaratish",
+    "subtitle": "Mahsulotlar uchun yangi kategoriya yaratish",
+    "categoryInfo": "Kategoriya Ma'lumotlari",
+    "name": "Kategoriya Nomi",
+    "submit": "Kategoriya Yaratish",
+    "successMessage": "Kategoriya muvaffaqiyatli yaratildi!"
+  },
+  "createTransportNumber": {
+    "title": "Transport Raqamini Yaratish",
+    "subtitle": "Yangi transport raqamini qo'shish",
+    "number": "Transport Raqami",
+    "type": "Transport Turi",
+    "applicationId": "Ariza ID",
+    "submit": "Transport Raqamini Yaratish",
+    "successMessage": "Transport raqami muvaffaqiyatli yaratildi!"
+  },
+  "createStorage": {
+    "title": "Ombor Yaratish",
+    "subtitle": "Yangi ombor qo'shish",
+    "storageInfo": {
+      "title": "Ombor Ma'lumotlari",
+      "name": "Ombor Nomi",
+      "location": "Ombor Joylashuvi"
+    },
+    "submit": "Ombor Yaratish",
+    "successMessage": "Ombor muvaffaqiyatli yaratildi!"
+  },
+  "createProductQuantity": {
+    "title": "Mahsulot Miqdorini Yaratish",
+    "subtitle": "Saqlash va arizalar uchun mahsulot miqdorini tayinlash",
+    "quantityInfo": "Miqdor Ma'lumotlari",
+    "product": "Mahsulot",
+    "storage": "Ombor",
+    "application": "Ariza",
+    "quantity": "Miqdori",
+    "submit": "Mahsulot Miqdorini Yaratish",
+    "successMessage": "Mahsulot miqdori muvaffaqiyatli yaratildi!"
+  },
+  "mode": {
+    "title": "Rejim Yaratish",
+    "subtitle": "Yangi rejim qo'shish",
+    "name": "Rejim Nomi",
+    "code": "Rejim Kodi",
+    "creating": "Yaratilmoqda...",
+    "create": "Rejim Yaratish",
+    "successMessage": "Rejim muvaffaqiyatli yaratildi!"
+  },
+  "common": {
+    "success": "Muvaffaqiyatli!",
+    "ok": "OK",
+    "error": "Xatolik!"
+  },
+  "login": {
+    "title": "Hisobingizga kiring",
+    "subtitle": "Hisobingizga kirish uchun ma'lumotlaringizni kiriting",
+    "username": "Foydalanuvchi nomi",
+    "usernamePlaceholder": "Foydalanuvchi nomini kiriting",
+    "password": "Parol",
+    "passwordPlaceholder": "Parolni kiriting",
+    "signIn": "Kirish",
+    "error": "Noto'g'ri foydalanuvchi nomi yoki parol"
   }
 } 

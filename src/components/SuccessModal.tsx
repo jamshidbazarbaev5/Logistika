@@ -1,4 +1,5 @@
 import { CheckCircle2, X } from "lucide-react"
+import { useTranslation } from "react-i18next"
 
 interface SuccessModalProps {
   isOpen: boolean
@@ -7,7 +8,9 @@ interface SuccessModalProps {
   title?: string
 }
 
-export default function SuccessModal({ isOpen, onClose, message, title = "Success!" }: SuccessModalProps) {
+export default function SuccessModal({ isOpen, onClose, message, title }: SuccessModalProps) {
+  const { t } = useTranslation()
+  
   if (!isOpen) return null
 
   return (
@@ -36,7 +39,7 @@ export default function SuccessModal({ isOpen, onClose, message, title = "Succes
             </div>
           </div>
           <h3 className="text-lg font-medium text-center text-gray-900 mb-2">
-            {title}
+            {title || t('common.success')}
           </h3>
           <p className="text-center text-gray-500">
             {message}
@@ -50,7 +53,7 @@ export default function SuccessModal({ isOpen, onClose, message, title = "Succes
             onClick={onClose}
             className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-[#6C5DD3] text-base font-medium text-white hover:bg-[#5c4eb8] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6C5DD3] sm:ml-3 sm:w-auto sm:text-sm"
           >
-            OK
+            {t('common.ok')}
           </button>
         </div>
       </div>

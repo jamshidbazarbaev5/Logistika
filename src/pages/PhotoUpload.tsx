@@ -1,16 +1,45 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { apiService } from "../api/api";
 import SuccessModal from "../components/SuccessModal";
 
+interface Application {
+  id: number;
+  firm_id: number;
+  decloration_number: string | null;
+}
+
 export default function PhotoUpload() {
   const { t } = useTranslation();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [applicationId, setApplicationId] = useState<string>('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string>("");
   const [isUploading, setIsUploading] = useState(false);
-  const [, setSuccessMessage] = useState<string>("");
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [, setIsLoading] = useState(true);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const response = await apiService.getApplications();
+        console.log('API Response:', response.data);
+        
+        // Filter out applications without declaration numbers if needed
+        const applicationsData = response.data.filter((app: Application) => app.decloration_number);
+        setApplications(applicationsData);
+      } catch (error) {
+        console.error('Error fetching applications:', error);
+        setError(t('photoUpload.errorFetchingApplications', 'Error fetching applications'));
+        setApplications([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchApplications();
+  }, [t]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -32,16 +61,34 @@ export default function PhotoUpload() {
       setError(t('photoUpload.errorNoFile', 'Please select a file to upload'));
       return;
     }
+    if (!applicationId) {
+      setError(t('photoUpload.errorNoApplication', 'Please select an application'));
+      return;
+    }
 
     setIsUploading(true);
-    setSuccessMessage("");
     try {
-      await apiService.uploadPhotoReport(selectedFile);
+      const formData = new FormData();
+      formData.append('photo', selectedFile);
+      formData.append('application_id', applicationId);
+
+      await apiService.uploadPhotoReport(formData);
       setSelectedFile(null);
       setPreviewUrl(null);
+      setApplicationId('');
       setIsSuccessModalOpen(true);
-    } catch (error) {
-      setError(t('photoUpload.errorUpload', 'Error uploading file'));
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      if (error.response?.data?.detail) {
+        setError(error.response.data.detail);
+      } else if (typeof error.response?.data === 'object') {
+        const errorMessage = Object.entries(error.response.data)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join(', ');
+        setError(errorMessage);
+      } else {
+        setError(t('photoUpload.errorUpload', 'Error uploading file'));
+      }
     } finally {
       setIsUploading(false);
     }
@@ -50,17 +97,40 @@ export default function PhotoUpload() {
   return (
     <div className="p-4 sm:p-6">
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-lg sm:text-xl font-semibold text-gray-900">
+        <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
           {t('photoUpload.title', 'Upload Photo Report')}
         </h1>
-        <p className="mt-1 sm:mt-2 text-sm text-gray-600">
+        <p className="mt-1 sm:mt-2 text-sm text-gray-600 dark:text-gray-400">
           {t('photoUpload.subtitle', 'Upload your photo report documentation here')}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-4xl">
-        <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-100 dark:border-gray-700">
           <div className="space-y-4">
+            {/* Application Select */}
+            <div>
+              <label htmlFor="application-id" className="block text-sm font-medium text-gray-600 dark:text-gray-300">
+                {t('photoUpload.applicationId', 'Application')}
+              </label>
+              <select
+                id="application-id"
+                value={applicationId}
+                onChange={(e) => setApplicationId(e.target.value)}
+                required
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
+                  focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              >
+                <option value="">{t('photoUpload.selectApplication', 'Select an application')}</option>
+                {applications.map((app) => (
+                  <option key={app.id} value={app.id}>
+                    {`Application ID: ${app.id} - Firm ID: ${app.firm_id}`}
+                  </option>
+                ))}
+              </select>
+            </div>
+
             {/* File Upload Area */}
             <div className="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg">
               <div className="space-y-1 text-center">
@@ -155,8 +225,7 @@ export default function PhotoUpload() {
       <SuccessModal
         isOpen={isSuccessModalOpen}
         onClose={() => setIsSuccessModalOpen(false)}
-        message={t('photoUpload.successUpload', 'Photo uploaded successfully!')}
-        title={t('photoUpload.successTitle', 'Success!')}
+        message={t('photoUpload.successMessage', 'Photo has been uploaded successfully!')}
       />
     </div>
   );

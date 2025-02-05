@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Remove the universal transition blocker */
+/* *,
+*::before,
+*::after {
+    transition: none !important;
+} */
+
+/* Define specific transitions */
+.transition-opacity {
+    transition: opacity 0.3s ease-in-out !important;
+}
+
+.transition-transform {
+    transition: transform 0.3s ease-in-out !important;
+}
+
+.transition-colors {
+    transition: background-color 0.15s ease-in-out,
+                color 0.15s ease-in-out,
+                border-color 0.15s ease-in-out !important;
+}
+
+.hover\:shadow-md {
+    transition: box-shadow 0.2s ease-in-out !important;
+}

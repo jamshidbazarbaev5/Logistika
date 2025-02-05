@@ -26,5 +26,118 @@
       "phonePlaceholder": "+998 93 321 09 87"
     },
     "submit": "Фирма Жаратыў"
+  },
+  "createApplication": {
+    "title": "Өтиниш Жаратыў",
+    "subtitle": "Жаңа өтиниш жаратыў ушын форманы толтырың",
+    "comingDate": "Келиў Сәнеси",
+    "declarationInfo": "Декларация Мағлыўматлары",
+    "declarationNumber": "Декларация Номери",
+    "declarationFile": "Декларация Файлы",
+    "declarationDate": "Декларация Сәнеси",
+    "unloadingQuantity": "Түсириў Муғдары",
+    "submit": "Өтиниш Жаратыў",
+    "successMessage": "Өтиниш табыслы жаратылды!"
+  },
+  "photoUpload": {
+    "title": "Сүўрет Жүклеў",
+    "subtitle": "Өтиниш ушын сүўретлерди жүклең",
+    "applicationId": "Өтиниш",
+    "selectApplication": "Өтиништи таңлаң",
+    "preview": "Алдын көриў",
+    "errorFileType": "Өтиниш, сүўрет файлын таңлаң",
+    "errorNoFile": "Өтиниш, жүклеў ушын файл таңлаң",
+    "errorNoApplication": "Өтиниш, өтиништи таңлаң",
+    "uploading": "Жүкленип атыр...",
+    "submit": "Сүўрет Жүклеў",
+    "successMessage": "Сүўрет табыслы жүкленди!"
+  },
+  "createKeepingService": {
+    "title": "Сақлаў Хызметин Жаратыў",
+    "subtitle": "Жаңа сақлаў хызметин қосыў",
+    "serviceInfo": {
+      "name": "Хызмет Аты",
+      "baseDay": "Тийкарғы Күнлер",
+      "basePrice": "Тийкарғы Баҳа",
+      "extraPrice": "Қосымша Баҳа"
+    },
+    "submit": "Хызмет Жаратыў",
+    "successMessage": "Сақлаў хызмети табыслы жаратылды!"
+  },
+  "createWorkingService": {
+    "title": "Жумыс Хызметин Жаратыў",
+    "subtitle": "Жаңа жумыс хызметин қосыў",
+    "serviceInfo": {
+      "name": "Хызмет Аты",
+      "price": "Баҳа",
+      "baseDay": "Тийкарғы Күнлер",
+      "basePrice": "Тийкарғы Баҳа",
+      "extraPrice": "Қосымша Баҳа",
+      "units": "Өлшем Бирликлери"
+    },
+    "submit": "Хызмет Жаратыў",
+    "successMessage": "Жумыс хызмети табыслы жаратылды!"
+  },
+  "createItemCategory": {
+    "title": "Категория Жаратыў",
+    "subtitle": "Өнимлер ушын жаңа категория жаратыў",
+    "categoryInfo": "Категория Мағлыўматлары",
+    "name": "Категория Аты",
+    "submit": "Категория Жаратыў",
+    "successMessage": "Категория табыслы жаратылды!"
+  },
+  "createTransportNumber": {
+    "title": "Транспорт Номерин Жаратыў",
+    "subtitle": "Жаңа транспорт номерин қосыў",
+    "number": "Транспорт Номери",
+    "type": "Транспорт Түри",
+    "applicationId": "Өтиниш ID",
+    "submit": "Транспорт Номерин Жаратыў",
+    "successMessage": "Транспорт номери табыслы жаратылды!"
+  },
+  "createStorage": {
+    "title": "Қойма Жаратыў",
+    "subtitle": "Жаңа қойма қосыў",
+    "storageInfo": {
+      "title": "Қойма Мағлыўматлары",
+      "name": "Қойма Аты",
+      "location": "Қойма Жайласыўы"
+    },
+    "submit": "Қойма Жаратыў",
+    "successMessage": "Қойма табыслы жаратылды!"
+  },
+  "createProductQuantity": {
+    "title": "Өним Муғдарын Жаратыў",
+    "subtitle": "Сақлаў ҳәм өтинишлер ушын өним муғдарын тайынлаў",
+    "quantityInfo": "Муғдар Мағлыўматлары",
+    "product": "Өним",
+    "storage": "Қойма",
+    "application": "Өтиниш",
+    "quantity": "Муғдары",
+    "submit": "Өним Муғдарын Жаратыў",
+    "successMessage": "Өним муғдары табыслы жаратылды!"
+  },
+  "mode": {
+    "title": "Режим Жаратыў",
+    "subtitle": "Жаңа режим қосыў",
+    "name": "Режим Аты",
+    "code": "Режим Коды",
+    "creating": "Жаратылып атыр...",
+    "create": "Режим Жаратыў",
+    "successMessage": "Режим табыслы жаратылды!"
+  },
+  "common": {
+    "success": "Табыслы!",
+    "ok": "OK"
+  },
+  "login": {
+    "title": "Есапқа кириў",
+    "subtitle": "Есапқа кириў ушын мағлыўматларыңызды киритиң",
+    "username": "Пайдаланыўшы аты",
+    "usernamePlaceholder": "Пайдаланыўшы атын киритиң",
+    "password": "Парол",
+    "passwordPlaceholder": "Паролди киритиң",
+    "signIn": "Кириў",
+    "error": "Надурыс пайдаланыўшы аты ямаса парол"
   }
 } 

@@ -40,20 +40,20 @@ export default function ModeCreate() {
   return (
     <div className="p-4 sm:p-6">
       <div className="mb-6 sm:mb-8">
-        <h1 className="text-lg sm:text-xl font-semibold text-gray-900">
+        <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
           {t('mode.createTitle', 'Create New Mode')}
         </h1>
-        <p className="mt-1 sm:mt-2 text-sm text-gray-600">
+        <p className="mt-1 sm:mt-2 text-sm text-gray-600 dark:text-gray-400">
           {t('mode.createSubtitle', 'Add a new mode with name and code')}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-lg">
-        <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-100">
+        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-100 dark:border-gray-700">
           <div className="space-y-4">
             {/* Mode Name Input */}
             <div>
-              <label htmlFor="name_mode" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name_mode" className="block text-sm font-medium text-gray-600 dark:text-gray-300">
                 {t('mode.name', 'Mode Name')}
               </label>
               <input
@@ -63,13 +63,16 @@ export default function ModeCreate() {
                 value={formData.name_mode}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder={t('mode.namePlaceholder', 'Enter mode name')}
               />
             </div>
 
             {/* Mode Code Input */}
             <div>
-              <label htmlFor="code_mode" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="code_mode" className="block text-sm font-medium text-gray-600 dark:text-gray-300">
                 {t('mode.code', 'Mode Code')}
               </label>
               <input
@@ -79,13 +82,16 @@ export default function ModeCreate() {
                 value={formData.code_mode}
                 onChange={handleChange}
                 required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
+                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                placeholder={t('mode.codePlaceholder', 'Enter mode code')}
               />
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="text-red-500 text-sm text-center">
+              <div className="text-red-500 dark:text-red-400 text-sm text-center">
                 {error}
               </div>
             )}
@@ -97,7 +103,10 @@ export default function ModeCreate() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full sm:w-auto bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed"
+            className="w-full sm:w-auto bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
+            hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
+            dark:focus:ring-offset-gray-800 disabled:bg-gray-300 dark:disabled:bg-gray-600 
+            disabled:cursor-not-allowed"
           >
             {isSubmitting
               ? t('mode.creating', 'Creating...')

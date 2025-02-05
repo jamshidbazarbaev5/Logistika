@@ -26,5 +26,118 @@
       "phonePlaceholder": "+998 93 321 09 87"
     },
     "submit": "Создать Компанию"
+  },
+  "createApplication": {
+    "title": "Создать Заявку",
+    "subtitle": "Заполните форму для создания новой заявки",
+    "comingDate": "Дата Прибытия",
+    "declarationInfo": "Информация о Декларации",
+    "declarationNumber": "Номер Декларации",
+    "declarationFile": "Файл Декларации",
+    "declarationDate": "Дата Декларации",
+    "unloadingQuantity": "Количество Разгрузки",
+    "submit": "Создать Заявку",
+    "successMessage": "Заявка успешно создана!"
+  },
+  "photoUpload": {
+    "title": "Загрузка Фото",
+    "subtitle": "Загрузите фотографии для заявки",
+    "applicationId": "Заявка",
+    "selectApplication": "Выберите заявку",
+    "preview": "Предпросмотр",
+    "errorFileType": "Пожалуйста, выберите файл изображения",
+    "errorNoFile": "Пожалуйста, выберите файл для загрузки",
+    "errorNoApplication": "Пожалуйста, выберите заявку",
+    "uploading": "Загрузка...",
+    "submit": "Загрузить Фото",
+    "successMessage": "Фото успешно загружено!"
+  },
+  "createKeepingService": {
+    "title": "Создать Услугу Хранения",
+    "subtitle": "Добавить новую услугу хранения",
+    "serviceInfo": {
+      "name": "Название Услуги",
+      "baseDay": "Базовые Дни",
+      "basePrice": "Базовая Цена",
+      "extraPrice": "Дополнительная Цена"
+    },
+    "submit": "Создать Услугу",
+    "successMessage": "Услуга хранения успешно создана!"
+  },
+  "createWorkingService": {
+    "title": "Создать Рабочую Услугу",
+    "subtitle": "Добавить новую рабочую услугу",
+    "serviceInfo": {
+      "name": "Название Услуги",
+      "price": "Цена",
+      "baseDay": "Базовые Дни",
+      "basePrice": "Базовая Цена",
+      "extraPrice": "Дополнительная Цена",
+      "units": "Единицы Измерения"
+    },
+    "submit": "Создать Услугу",
+    "successMessage": "Рабочая услуга успешно создана!"
+  },
+  "createItemCategory": {
+    "title": "Создать Категорию",
+    "subtitle": "Создать новую категорию для товаров",
+    "categoryInfo": "Информация о Категории",
+    "name": "Название Категории",
+    "submit": "Создать Категорию",
+    "successMessage": "Категория успешно создана!"
+  },
+  "createTransportNumber": {
+    "title": "Создать Транспортный Номер",
+    "subtitle": "Добавить новый транспортный номер",
+    "number": "Транспортный Номер",
+    "type": "Тип Транспорта",
+    "applicationId": "ID Заявки",
+    "submit": "Создать Транспортный Номер",
+    "successMessage": "Транспортный номер успешно создан!"
+  },
+  "createStorage": {
+    "title": "Создать Склад",
+    "subtitle": "Добавить новый склад",
+    "storageInfo": {
+      "title": "Информация о Складе",
+      "name": "Название Склада",
+      "location": "Местоположение Склада"
+    },
+    "submit": "Создать Склад",
+    "successMessage": "Склад успешно создан!"
+  },
+  "createProductQuantity": {
+    "title": "Создать Количество Продукта",
+    "subtitle": "Назначить количество продуктов для хранения и заявок",
+    "quantityInfo": "Информация о Количестве",
+    "product": "Продукт",
+    "storage": "Склад",
+    "application": "Заявка",
+    "quantity": "Количество",
+    "submit": "Создать Количество Продукта",
+    "successMessage": "Количество продукта успешно создано!"
+  },
+  "mode": {
+    "title": "Создать Режим",
+    "subtitle": "Добавить новый режим",
+    "name": "Название Режима",
+    "code": "Код Режима",
+    "creating": "Создание...",
+    "create": "Создать Режим",
+    "successMessage": "Режим успешно создан!"
+  },
+  "common": {
+    "success": "Успешно!",
+    "ok": "OK"
+  },
+  "login": {
+    "title": "Войти в аккаунт",
+    "subtitle": "Введите свои учетные данные для входа",
+    "username": "Имя пользователя",
+    "usernamePlaceholder": "Введите имя пользователя",
+    "password": "Пароль",
+    "passwordPlaceholder": "Введите пароль",
+    "signIn": "Войти",
+    "error": "Неверное имя пользователя или пароль"
   }
 } 

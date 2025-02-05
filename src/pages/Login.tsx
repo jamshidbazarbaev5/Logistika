@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import axios from 'axios';
+import { BASE_URL } from '../services/auth';
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/api";
 interface LoginCredentials {
@@ -28,18 +29,17 @@ export default function Login() {
 
     try {
       const response = await axios.post<AuthTokens>(
-        'http://147.45.109.126/api/token/',
+        `${BASE_URL}/token/`,
         credentials
       );
 
-      // Store tokens in localStorage
       localStorage.setItem('accessToken', response.data.access);
       localStorage.setItem('refreshToken', response.data.refresh);
 
-      // Set the token in axios instance headers
+      // Set the token in axiosInstance headers
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
       
-      // Also set it for our api instance
+      // Set it for api instance as well
       api.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
 
       // Redirect to home page or dashboard

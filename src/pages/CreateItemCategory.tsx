@@ -1,0 +1,110 @@
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { api } from "../api/api";
+import SuccessModal from "../components/SuccessModal";
+
+interface CategoryFormData {
+  name: string;
+}
+
+export default function CreateItemCategory() {
+  const { t } = useTranslation();
+  const [formData, setFormData] = useState<CategoryFormData>({
+    name: "",
+  });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await api.post('/items/category/', formData, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 201 || response.status === 200) {
+        setFormData({
+          name: "",
+        });
+        setShowSuccessModal(true);
+      }
+    } catch (error: any) {
+      console.error('Error creating category:', error);
+      let errorMessage = t('createItemCategory.errorMessage', 'Failed to create category. Please try again.');
+      
+      if (error.response?.data) {
+        const serverError = error.response.data;
+        errorMessage = typeof serverError === 'object' 
+          ? Object.entries(serverError).map(([key, value]) => `${key}: ${value}`).join('\n')
+          : serverError.toString();
+      }
+      
+      alert(errorMessage);
+    }
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  return (
+    <div className="p-4 sm:p-6">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-lg sm:text-xl font-semibold text-gray-900">
+          {t('createItemCategory.title', 'Create Item Category')}
+        </h1>
+        <p className="mt-1 sm:mt-2 text-sm text-gray-600">
+          {t('createItemCategory.subtitle', 'Create a new category for items')}
+        </p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-4xl">
+        <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-100">
+          <h2 className="text-sm font-medium text-gray-900 mb-3 sm:mb-4">
+            {t('createItemCategory.categoryInfo', 'Category Information')}
+          </h2>
+          
+          <div>
+            <label 
+              htmlFor="name" 
+              className="block text-sm font-medium text-gray-600"
+            >
+              {t('createItemCategory.name', 'Category Name')}
+            </label>
+            <input
+              type="text"
+              name="name"
+              id="name"
+              value={formData.name}
+              onChange={handleChange}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm 
+                focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+              placeholder={t('createItemCategory.namePlaceholder', 'Enter category name')}
+              required
+            />
+          </div>
+        </div>
+
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="w-full sm:w-auto bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
+              hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2"
+          >
+            {t('createItemCategory.submit', 'Create Category')}
+          </button>
+        </div>
+      </form>
+
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        message={t('createItemCategory.successMessage', 'Category has been created successfully!')}
+      />
+    </div>
+  );
+} 

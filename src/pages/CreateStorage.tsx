@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { apiService } from "../api/api";
 import type { Storage } from "../api/api";
 import SuccessModal from "../components/SuccessModal";
+import ErrorModal from "../components/ErrorModal";
 
 export default function CreateStorage() {
   const { t } = useTranslation();
@@ -11,6 +12,8 @@ export default function CreateStorage() {
     storage_location: "",
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +27,8 @@ export default function CreateStorage() {
       setShowSuccessModal(true);
     } catch (error) {
       console.error('Error creating storage:', error);
+      setErrorMessage(t('createStorage.errorMessage', 'Failed to create storage. Please try again.'));
+      setShowErrorModal(true);
     }
   };
 
@@ -98,6 +103,12 @@ export default function CreateStorage() {
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
         message={t('createStorage.successMessage', 'Storage has been created successfully!')}
+      />
+
+      <ErrorModal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        message={errorMessage}
       />
     </div>
   );

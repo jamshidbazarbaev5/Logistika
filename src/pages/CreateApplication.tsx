@@ -35,8 +35,8 @@ interface PaymentMethod {
 
 export default function CreateApplication() {
   const { t } = useTranslation();
-  const [firms, setFirms] = useState<Firm[]>([]);
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [, setFirms] = useState<Firm[]>([]);
+  const [, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [formData, setFormData] = useState<ApplicationFormData>({
     brutto: null,
     netto: null,
@@ -203,7 +203,7 @@ export default function CreateApplication() {
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
               />
             </div>
 
@@ -219,7 +219,7 @@ export default function CreateApplication() {
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -227,40 +227,32 @@ export default function CreateApplication() {
               <label htmlFor="firm_id" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('createApplication.firmId', 'Firm')}
               </label>
-              <select
+              <input
+                type="number"
                 name="firm_id"
                 id="firm_id"
                 value={formData.firm_id || ''}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-              >
-                <option value="">{t('createApplication.selectFirm', 'Select Firm')}</option>
-                {firms.map(firm => (
-                  <option key={firm.id} value={firm.id}>{firm.name}</option>
-                ))}
-              </select>
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              />
             </div>
 
             <div>
               <label htmlFor="payment_method" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('createApplication.paymentMethod', 'Payment Method')}
               </label>
-              <select
+              <input
+                type="number"
                 name="payment_method"
                 id="payment_method"
                 value={formData.payment_method || ''}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-              >
-                <option value="">{t('createApplication.selectPaymentMethod', 'Select Payment Method')}</option>
-                {paymentMethods.map(method => (
-                  <option key={method.id} value={method.id}>{method.name}</option>
-                ))}
-              </select>
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+              />
             </div>
           </div>
         </div>
@@ -284,7 +276,7 @@ export default function CreateApplication() {
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -300,7 +292,7 @@ export default function CreateApplication() {
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -343,7 +335,7 @@ export default function CreateApplication() {
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               />
             </div>
 
@@ -359,7 +351,7 @@ export default function CreateApplication() {
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
               />
             </div>
           </div>

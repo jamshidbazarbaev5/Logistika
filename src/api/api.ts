@@ -1,8 +1,8 @@
 import axios from 'axios';
-import { Firm, Measurement, Mode, PaymentMethod, Transport } from '../types/types';
+import { Firm, Measurement, PaymentMethod } from '../types/types';
 import { authService } from '../services/auth';
 
-const BASE_URL = 'http://147.45.109.126/api/v1';
+const BASE_URL = 'https://cargo-calc.uz/api/v1';
 
 export const api = axios.create({
   baseURL: BASE_URL,
@@ -15,7 +15,6 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    // Don't override Content-Type if it's multipart/form-data
     if (!config.headers['Content-Type'] && !(config.data instanceof FormData)) {
       config.headers['Content-Type'] = 'application/json';
     }
@@ -38,12 +37,10 @@ api.interceptors.response.use(
       try {
         const newToken = await authService.refreshToken();
         if (newToken) {
-          // Update the authorization header
           originalRequest.headers.Authorization = `Bearer ${newToken}`;
           return api(originalRequest);
         }
       } catch (refreshError) {
-        // If refresh fails, redirect to login
         authService.logout();
         window.location.href = '/login';
         return Promise.reject(refreshError);
@@ -67,19 +64,21 @@ interface KeepingService {
 }
 
 interface WorkingService {
-  name: string;
-  price: string;
+  service_name: string;
   base_day: number;
   base_price: string;
   extra_price: string;
   units: string;
-  
 }
 
 export const apiService = {
   // Transport  
-  createTransport: (data: Transport) => 
-    api.post('/transport/', data),
+  createTransport: (data: { 
+    transport_type: number; 
+    transport_number: string;
+    application_id: number;
+  }) => 
+    api.post('/transport/number/', data),
   
   // Firms
   createFirm: (data: Firm) => 
@@ -87,20 +86,24 @@ export const apiService = {
   
   // Storage
   createStorage: (data: Storage) => 
-    api.post('/storage/storage/', data),
+    api.post('/storage/', data),
   
-  // Modes
-  createMode: (data: Mode) => 
-    api.post('/modes/', data),
-  
-  // Photo Report
-  uploadPhotoReport: (file: File) => {
-    const formData = new FormData();
-    formData.append('photo', file);
-    return api.post('/photo_report/', formData);
+  createMode: async (data: { name_mode: string; code_mode: string }) => {
+    return api.post('/modes/', data);
   },
   
-  // Measurement
+  getApplications: () => {
+    return api.get('/application/');
+  },
+  
+  uploadPhotoReport: async (formData: FormData) => {
+    return api.post('/photo_report/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+  
   createMeasurement: (data: Measurement) => 
     api.post('/measurement/', data),
   
@@ -115,6 +118,19 @@ export const apiService = {
   // Working Service
   createWorkingService: (data: WorkingService) => 
     api.post('/working_service/', data),
+  
+  getTransportTypes: () => 
+    api.get('/transport/type/').then(response => response.data),
+  
+  getTransportNumbers: () => 
+    api.get('/transport/number/').then(response => response.data),
+
+  // Add these new methods
+  getCategories: () => 
+    api.get('/items/category/').then(response => response.data),
+  
+  getMeasurements: () => 
+    api.get('/items/measurement/').then(response => response.data),
 };
 
 export type { Storage, KeepingService, WorkingService };

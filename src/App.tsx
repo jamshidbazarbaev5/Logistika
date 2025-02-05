@@ -16,6 +16,9 @@ import PrivateRoute from "./components/PrivateRoute";
 import PhotoUpload from "./pages/PhotoUpload";
 import ModeCreate from "./pages/ModeCreate";
 import CreateApplication from "./pages/CreateApplication";
+import CreateProduct from "./pages/CreateProduct";
+import CreateProductQuantity from "./pages/CreateProductQuantity";
+import WorkingService from "./pages/WorkingService";
 const queryClient = new QueryClient();
 
 function App() {
@@ -40,6 +43,9 @@ function App() {
                 <Route path="/mode" element={<ModeCreate />} />
                 <Route path="/application" element={<CreateApplication />} />
                 <Route path="/" element={<Navigate to="/transport" replace />} />
+                <Route path="/product" element={<CreateProduct />} />
+                <Route path="/product-quantity" element={<CreateProductQuantity />} />
+                <Route path="working_service" element={<WorkingService />} />
               </Route>
             </Routes>
           </Router>
@@ -47,5 +53,5 @@ function App() {
       </div>
   );
 }
-
+  
 export default App;

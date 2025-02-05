@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { apiService } from "../api/api";
 import type { KeepingService } from "../api/api";
+import SuccessModal from "../components/SuccessModal";
 
 export default function CreateKeepingService() {
   const { t } = useTranslation();
@@ -11,6 +12,8 @@ export default function CreateKeepingService() {
     base_price: "",
     extra_price: "",
   });
+
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,6 +26,7 @@ export default function CreateKeepingService() {
         base_price: "",
         extra_price: "",
       });
+      setShowSuccessModal(true);
     } catch (error) {
       console.error('Error creating keeping service:', error);
     }
@@ -51,79 +55,89 @@ export default function CreateKeepingService() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6 max-w-4xl">
-        <div className="bg-white p-6 rounded-lg border border-gray-100">
-          <h2 className="text-sm font-medium text-gray-900 mb-4">
-            {t('createKeepingService.serviceInfo.title', 'Service Information')}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label 
-                htmlFor="name" 
-                className="block text-sm font-medium text-gray-600"
-              >
-                {t('createKeepingService.serviceInfo.name', 'Service Name')}
-              </label>
-              <input
-                type="text"
-                name="name"
-                id="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
-                placeholder={t('createKeepingService.serviceInfo.namePlaceholder', 'Enter service name')}
-              />
-            </div>
-            <div>
-              <label 
-                htmlFor="base_day" 
-                className="block text-sm font-medium text-gray-600"
-              >
-                {t('createKeepingService.serviceInfo.baseDay', 'Base Day')}
-              </label>
-              <input
-                type="number"
-                name="base_day"
-                id="base_day"
-                min="1"
-                value={formData.base_day}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
-                placeholder={t('createKeepingService.serviceInfo.baseDayPlaceholder', 'Enter base day')}
-              />
-            </div>
-            <div>
-              <label 
-                htmlFor="base_price" 
-                className="block text-sm font-medium text-gray-600"
-              >
-                {t('createKeepingService.serviceInfo.basePrice', 'Base Price')}
-              </label>
-              <input
-                type="text"
-                name="base_price"
-                id="base_price"
-                value={formData.base_price}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
-                placeholder={t('createKeepingService.serviceInfo.basePricePlaceholder', 'Enter base price')}
-              />
-            </div>
-            <div>
-              <label 
-                htmlFor="extra_price" 
-                className="block text-sm font-medium text-gray-600"
-              >
-                {t('createKeepingService.serviceInfo.extraPrice', 'Extra Price')}
-              </label>
-              <input
-                type="text"
-                name="extra_price"
-                id="extra_price"
-                value={formData.extra_price}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
-                placeholder={t('createKeepingService.serviceInfo.extraPricePlaceholder', 'Enter extra price')}
-              />
+        <div className="bg-light dark:bg-dark">
+          <div className="bg-light-surface dark:bg-dark-surface hover:bg-light-surface-hover dark:hover:bg-dark-surface-hover p-6 rounded-lg border border-gray-100">
+            <h2 className="text-sm font-medium text-gray-900 mb-4">
+              {t('createKeepingService.serviceInfo.title', 'Service Information')}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label 
+                  htmlFor="name" 
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  {t('createKeepingService.serviceInfo.name', 'Service Name')}
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  id="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  placeholder={t('createKeepingService.serviceInfo.namePlaceholder', 'Enter service name')}
+                />
+              </div>
+              <div>
+                <label 
+                  htmlFor="base_day" 
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  {t('createKeepingService.serviceInfo.baseDay', 'Base Day')}
+                </label>
+                <input
+                  type="number"
+                  name="base_day"
+                  id="base_day"
+                  min="1"
+                  value={formData.base_day}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  placeholder={t('createKeepingService.serviceInfo.baseDayPlaceholder', 'Enter base day')}
+                />
+              </div>
+              <div>
+                <label 
+                  htmlFor="base_price" 
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  {t('createKeepingService.serviceInfo.basePrice', 'Base Price')}
+                </label>
+                <input
+                  type="text"
+                  name="base_price"
+                  id="base_price"
+                  value={formData.base_price}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  placeholder={t('createKeepingService.serviceInfo.basePricePlaceholder', 'Enter base price')}
+                />
+              </div>
+              <div>
+                <label 
+                  htmlFor="extra_price" 
+                  className="block text-sm font-medium text-gray-600"
+                >
+                  {t('createKeepingService.serviceInfo.extraPrice', 'Extra Price')}
+                </label>
+                <input
+                  type="text"
+                  name="extra_price"
+                  id="extra_price"
+                  value={formData.extra_price}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                  placeholder={t('createKeepingService.serviceInfo.extraPricePlaceholder', 'Enter extra price')}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -137,6 +151,11 @@ export default function CreateKeepingService() {
           </button>
         </div>
       </form>
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        message={t('createKeepingService.success', 'Keeping service created successfully')}
+      />    
     </div>
   );
 }
