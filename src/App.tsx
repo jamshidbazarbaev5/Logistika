@@ -21,6 +21,7 @@ import CreateProductQuantity from "./pages/CreateProductQuantity";
 import WorkingService from "./pages/WorkingService";
 import FirmList from "./pages/FirmList";
 import CreatePaymentMethod from "./pages/CreatePaymentMethod";
+import CreateCategory from "./components/CreateCategory";
 const queryClient = new QueryClient();
 
 function App() {
@@ -50,6 +51,7 @@ function App() {
                 <Route path="working_service" element={<WorkingService />} />
                 <Route path="/firm-list" element={<FirmList />} />
                 <Route path="/payment" element={<CreatePaymentMethod />} /> 
+                <Route path="/category" element={<CreateCategory />} />
               </Route>
             </Routes>
           </Router>

@@ -31,6 +31,7 @@ const mainMenuItems = [
   { name: "CreateApplication", icon: RiFileAddFill, href: "/application" },
   { name: "CreateProduct", icon: RiTBoxFill, href: "/product" },
   { name: "CreateProductQuantity", icon: RiBarChartFill, href: "/product-quantity" },
+  
 ];
 
 const generalItems = [{ name: "Account", icon: RiUserFill, href: "/account" }];

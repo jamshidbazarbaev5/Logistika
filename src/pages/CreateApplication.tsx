@@ -567,9 +567,9 @@ export default function CreateApplication() {
             {t('createApplication.services', 'Services')}
           </h2>
           
-          <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex flex-col gap-4">
             {/* Keeping Services Dropdown */}
-            <div className="flex-1 bg-gray-50 dark:bg-gray-900 rounded-lg" ref={keepingServicesRef}>
+            <div className="w-full bg-gray-50 dark:bg-gray-900 rounded-lg" ref={keepingServicesRef}>
               <button
                 type="button"
                 onClick={(e) => {
@@ -638,7 +638,7 @@ export default function CreateApplication() {
             </div>
 
             {/* Working Services Dropdown */}
-            <div className="flex-1 bg-gray-50 dark:bg-gray-900 rounded-lg" ref={workingServicesRef}>
+            <div className="w-full bg-gray-50 dark:bg-gray-900 rounded-lg" ref={workingServicesRef}>
               <button
                 type="button"
                 onClick={(e) => {

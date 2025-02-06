@@ -82,6 +82,10 @@ interface Firm {
   phoneNumber_trustee: string;
 }
 
+interface Category {
+  name: string;
+}
+
 export const apiService = {
   // Transport  
   createTransport: (data: { 
@@ -155,6 +159,10 @@ export const apiService = {
   // Add this new method
   createTransportType: (data: { transport_type: string }) => 
     api.post('/transport/type/', data),
+
+  // Add this new method
+  createCategory: (data: Category) => 
+    api.post('/items/category/', data),
 };
 
-export type { Storage, KeepingService, WorkingService, Firm };
+export type { Storage, KeepingService, WorkingService, Firm, Category };
