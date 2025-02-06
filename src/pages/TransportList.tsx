@@ -43,10 +43,7 @@ export default function TransportList() {
     fetchData();
   }, [t]);
 
-  const getTransportTypeName = (typeId: number) => {
-    const type = transportTypes.find(t => t.id === typeId);
-    return type ? type.transport_type : 'Unknown';
-  };
+ 
 
   if (loading) {
     return (
