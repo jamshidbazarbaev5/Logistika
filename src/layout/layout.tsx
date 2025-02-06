@@ -20,7 +20,7 @@ import {
 } from 'react-icons/ri';
 
 const mainMenuItems = [
-  { name: "firm", icon: RiBuilding2Fill, href: "/firms" },
+  { name: "firm", icon: RiBuilding2Fill, href: "/firm-list" },
   { name: "Storage", icon: RiStore2Fill, href: "/storage" },
   { name: "Transport", icon: RiTruckFill, href: "/transport" },
   { name: "Payment", icon: RiBankCardFill, href: "/payment" },

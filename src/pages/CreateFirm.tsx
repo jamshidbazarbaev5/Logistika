@@ -77,12 +77,9 @@ export default function CreateFirm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-4xl">
-        {/* Company Information Section */}
         <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-100 dark:border-gray-700 transition-colors">
-          <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4 transition-colors">
-            {t('createFirm.companyInfo.title')}
-          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            {/* INN and Firm Name */}
             <div>
               <label htmlFor="INN" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
                 {t('createFirm.companyInfo.inn')}
@@ -115,6 +112,8 @@ export default function CreateFirm() {
                 placeholder={t('createFirm.companyInfo.firmNamePlaceholder')}
               />
             </div>
+
+            {/* Company Phone */}
             <div>
               <label htmlFor="phoneNumber_firm" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
                 {t('createFirm.companyInfo.phoneNumber')}
@@ -131,15 +130,8 @@ export default function CreateFirm() {
                 placeholder={t('createFirm.companyInfo.phonePlaceholder')}
               />
             </div>
-          </div>
-        </div>
 
-        {/* Director Information Section */}
-        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-100 dark:border-gray-700 transition-colors">
-          <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4 transition-colors">
-            {t('createFirm.directorInfo.title')}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            {/* Director Information */}
             <div>
               <label htmlFor="full_name_director" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
                 {t('createFirm.directorInfo.fullName')}
@@ -172,15 +164,8 @@ export default function CreateFirm() {
                 placeholder={t('createFirm.directorInfo.phonePlaceholder')}
               />
             </div>
-          </div>
-        </div>
 
-        {/* Trustee Information Section */}
-        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-100 dark:border-gray-700 transition-colors">
-          <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4 transition-colors">
-            {t('createFirm.trusteeInfo.title')}
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+            {/* Trustee Information */}
             <div>
               <label htmlFor="firm_trustee" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
                 {t('createFirm.trusteeInfo.fullName')}

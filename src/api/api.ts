@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Firm, Measurement, PaymentMethod } from '../types/types';
+import { Measurement, PaymentMethod } from '../types/types';
 import { authService } from '../services/auth';
 
 const BASE_URL = 'https://cargo-calc.uz/api/v1';
@@ -71,6 +71,17 @@ interface WorkingService {
   units: string;
 }
 
+interface Firm {
+  id: number;
+  INN: string;
+  firm_name: string;
+  phoneNumber_firm: string;
+  full_name_director: string;
+  phoneNumber_director: string;
+  firm_trustee: string;
+  phoneNumber_trustee: string;
+}
+
 export const apiService = {
   // Transport  
   createTransport: (data: { 
@@ -81,7 +92,7 @@ export const apiService = {
     api.post('/transport/number/', data),
   
   // Firms
-  createFirm: (data: Firm) => 
+  createFirm: (data: Omit<Firm, 'id'>) => 
     api.post('/firms/', data),
   
   // Storage
@@ -89,7 +100,7 @@ export const apiService = {
     api.post('/storage/', data),
   
   createMode: async (data: { name_mode: string; code_mode: string }) => {
-    return api.post('/modes/', data);
+    return api.post('/modes/modes/', data);
   },
   
   getApplications: () => {
@@ -131,6 +142,19 @@ export const apiService = {
   
   getMeasurements: () => 
     api.get('/items/measurement/').then(response => response.data),
+
+  getFirms: () => 
+    api.get('/firms/').then(response => response.data),
+
+  getKeepingServices: () => 
+    api.get('/keeping_service/').then(response => response.data),
+  
+  getWorkingServices: () => 
+    api.get('/working_service/').then(response => response.data),
+
+  // Add this new method
+  createTransportType: (data: { transport_type: string }) => 
+    api.post('/transport/type/', data),
 };
 
-export type { Storage, KeepingService, WorkingService };
+export type { Storage, KeepingService, WorkingService, Firm };

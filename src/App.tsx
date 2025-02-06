@@ -19,6 +19,8 @@ import CreateApplication from "./pages/CreateApplication";
 import CreateProduct from "./pages/CreateProduct";
 import CreateProductQuantity from "./pages/CreateProductQuantity";
 import WorkingService from "./pages/WorkingService";
+import FirmList from "./pages/FirmList";
+import CreatePaymentMethod from "./pages/CreatePaymentMethod";
 const queryClient = new QueryClient();
 
 function App() {
@@ -46,6 +48,8 @@ function App() {
                 <Route path="/product" element={<CreateProduct />} />
                 <Route path="/product-quantity" element={<CreateProductQuantity />} />
                 <Route path="working_service" element={<WorkingService />} />
+                <Route path="/firm-list" element={<FirmList />} />
+                <Route path="/payment" element={<CreatePaymentMethod />} /> 
               </Route>
             </Routes>
           </Router>
