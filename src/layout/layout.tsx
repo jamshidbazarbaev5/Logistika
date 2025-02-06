@@ -21,16 +21,16 @@ import {
 
 const mainMenuItems = [
   { name: "firm", icon: RiBuilding2Fill, href: "/firm-list" },
-  { name: "Storage", icon: RiStore2Fill, href: "/storage" },
-  { name: "Transport", icon: RiTruckFill, href: "/transport" },
+  { name: "Storage", icon: RiStore2Fill, href: "/storage-list" },
+  { name: "Transport", icon: RiTruckFill, href: "/transport-list" },
   { name: "Payment", icon: RiBankCardFill, href: "/payment" },
-  { name: "Photo Report", icon: RiCameraFill, href: "/photo-report" },
-  { name: "Keeping Service", icon: RiArchiveFill, href: "/keeping_service" },
-  { name: "Working Service", icon: RiToolsFill, href: "/working_service" },
+  // { name: "Photo Report", icon: RiCameraFill, href: "/photo-report" },
   { name: "CreateMode", icon: RiSettings4Fill, href: "/mode" },
   { name: "CreateApplication", icon: RiFileAddFill, href: "/application" },
   { name: "CreateProduct", icon: RiTBoxFill, href: "/product" },
   { name: "CreateProductQuantity", icon: RiBarChartFill, href: "/product-quantity" },
+  { name: "CreateCategory", icon: RiBarChartFill, href: "/category" },
+  { name: "Measurement", icon: RiBarChartFill, href: "/measurements" },
   
 ];
 

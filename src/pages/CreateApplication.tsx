@@ -284,7 +284,7 @@ export default function CreateApplication() {
         ? prev.keeping_services.filter(id => id !== serviceId)
         : [...prev.keeping_services, serviceId]
     }));
-    console.log('Keeping services after toggle:', formData.keeping_services); // Debug log
+    console.log('Keeping services after toggle:', formData.keeping_services);
   };
 
   const handleWorkingServiceToggle = (serviceId: number) => {
@@ -294,7 +294,7 @@ export default function CreateApplication() {
         ? prev.working_services.filter(id => id !== serviceId)
         : [...prev.working_services, serviceId]
     }));
-    console.log('Working services after toggle:', formData.working_services); // Debug log
+    console.log('Working services after toggle:', formData.working_services);
   };
 
   const handleFirmCreated = (newFirm: { id: number; firm_name: string }) => {
@@ -330,380 +330,344 @@ export default function CreateApplication() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-4xl">
-        {/* Basic Information */}
         <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
-            {t('createApplication.basicInfo', 'Basic Information')}
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <div>
-              <label htmlFor="brutto" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('createApplication.brutto', 'Brutto')}
-              </label>
-              <input
-                type="number"
-                name="brutto"
-                id="brutto"
-                value={formData.brutto || ''}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-              />
-            </div>
+          {/* Basic Information */}
+          <div className="mb-6">
+            <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
+              {t('createApplication.basicInfo', 'Basic Information')}
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div>
+                <label htmlFor="brutto" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('createApplication.brutto', 'Brutto')}
+                </label>
+                <input
+                  type="number"
+                  name="brutto"
+                  id="brutto"
+                  value={formData.brutto || ''}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                  bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
+                />
+              </div>
 
-            <div>
-              <label htmlFor="coming_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('createApplication.comingDate', 'Coming Date')}
-              </label>
-              <input
-                type="date"
-                name="coming_date"
-                id="coming_date"
-                value={formData.coming_date}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              />
-            </div>
+              <div>
+                <label htmlFor="coming_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('createApplication.comingDate', 'Coming Date')}
+                </label>
+                <input
+                  type="date"
+                  name="coming_date"
+                  id="coming_date"
+                  value={formData.coming_date}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                  bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                />
+              </div>
 
-            <div className="relative" ref={dropdownRef}>
-              <label htmlFor="firm_search" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('createApplication.firmId', 'Firm')}
-              </label>
-              <input
-                type="text"
-                id="firm_search"
-                value={firmSearch}
-                onChange={(e) => {
-                  setFirmSearch(e.target.value);
-                  setShowFirmDropdown(true);
-                }}
-                onFocus={() => setShowFirmDropdown(true)}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                placeholder={t('createApplication.searchFirm', 'Search for a firm...')}
-              />
-              
-              {showFirmDropdown && (
-                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-                  {filteredFirms.length > 0 ? (
-                    filteredFirms.map((firm) => (
-                      <div
-                        key={firm.id}
-                        onClick={() => handleFirmSelect(firm)}
-                        className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm"
-                      >
-                        {firm.firm_name}
+              <div className="relative" ref={dropdownRef}>
+                <label htmlFor="firm_search" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('createApplication.firmId', 'Firm')}
+                </label>
+                <input
+                  type="text"
+                  id="firm_search"
+                  value={firmSearch}
+                  onChange={(e) => {
+                    setFirmSearch(e.target.value);
+                    setShowFirmDropdown(true);
+                  }}
+                  onFocus={() => setShowFirmDropdown(true)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                  bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  placeholder={t('createApplication.searchFirm', 'Search for a firm...')}
+                />
+                
+                {showFirmDropdown && (
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
+                    {filteredFirms.length > 0 ? (
+                      filteredFirms.map((firm) => (
+                        <div
+                          key={firm.id}
+                          onClick={() => handleFirmSelect(firm)}
+                          className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm"
+                        >
+                          {firm.firm_name}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                          {t('createApplication.noFirmsFound', 'No firms found')}
+                        </p>
+                        <button
+                          onClick={() => setShowCreateFirmModal(true)}
+                          className="w-full text-center bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
+                          hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3]"
+                        >
+                          {t('createApplication.createNewFirm', 'Create New Firm')}
+                        </button>
                       </div>
-                    ))
-                  ) : (
-                    <div className="p-4">
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                        {t('createApplication.noFirmsFound', 'No firms found')}
-                      </p>
-                      <button
-                        onClick={() => setShowCreateFirmModal(true)}
-                        className="w-full text-center bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
-                        hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3]"
-                      >
-                        {t('createApplication.createNewFirm', 'Create New Firm')}
-                      </button>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
+                    )}
+                  </div>
+                )}
+              </div>
 
-            <div className="relative" ref={paymentMethodDropdownRef}>
-              <label htmlFor="payment_method_search" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('createApplication.paymentMethod', 'Payment Method')}
-              </label>
-              <input
-                type="text"
-                id="payment_method_search"
-                value={paymentMethodSearch}
-                onChange={(e) => {
-                  setPaymentMethodSearch(e.target.value);
-                  setShowPaymentMethodDropdown(true);
-                }}
-                onFocus={() => setShowPaymentMethodDropdown(true)}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                placeholder={t('createApplication.searchPaymentMethod', 'Search for a payment method...')}
-              />
-              
-              {showPaymentMethodDropdown && (
-                <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-                  {filteredPaymentMethods.length > 0 ? (
-                    filteredPaymentMethods.map((method) => (
-                      <div
-                        key={method.id}
-                        onClick={() => handlePaymentMethodSelect(method)}
-                        className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm"
-                      >
-                        {method.payment_method}
+              <div className="relative" ref={paymentMethodDropdownRef}>
+                <label htmlFor="payment_method_search" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('createApplication.paymentMethod', 'Payment Method')}
+                </label>
+                <input
+                  type="text"
+                  id="payment_method_search"
+                  value={paymentMethodSearch}
+                  onChange={(e) => {
+                    setPaymentMethodSearch(e.target.value);
+                    setShowPaymentMethodDropdown(true);
+                  }}
+                  onFocus={() => setShowPaymentMethodDropdown(true)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                  bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                  placeholder={t('createApplication.searchPaymentMethod', 'Search for a payment method...')}
+                />
+                
+                {showPaymentMethodDropdown && (
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
+                    {filteredPaymentMethods.length > 0 ? (
+                      filteredPaymentMethods.map((method) => (
+                        <div
+                          key={method.id}
+                          onClick={() => handlePaymentMethodSelect(method)}
+                          className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm"
+                        >
+                          {method.payment_method}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="p-4 text-sm text-gray-500 dark:text-gray-400">
+                        {t('createApplication.noPaymentMethodsFound', 'No payment methods found')}
                       </div>
-                    ))
-                  ) : (
-                    <div className="p-4 text-sm text-gray-500 dark:text-gray-400">
-                      {t('createApplication.noPaymentMethodsFound', 'No payment methods found')}
-                    </div>
-                  )}
-                </div>
-              )}
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Declaration Information */}
-        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
-            {t('createApplication.declarationInfo', 'Declaration Information')}
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <div>
-              <label htmlFor="decloration_number" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('createApplication.declarationNumber', 'Declaration Number')}
-              </label>
-              <input
-                type="text"
-                name="decloration_number"
-                id="decloration_number"
-                value={formData.decloration_number}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              />
-            </div>
+          {/* Declaration Information */}
+          <div className="mb-6">
+            <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
+              {t('createApplication.declarationInfo', 'Declaration Information')}
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+              <div>
+                <label htmlFor="decloration_number" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('createApplication.declarationNumber', 'Declaration Number')}
+                </label>
+                <input
+                  type="text"
+                  name="decloration_number"
+                  id="decloration_number"
+                  value={formData.decloration_number}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                  bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                />
+              </div>
 
-            <div>
-              <label htmlFor="decloration_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('createApplication.declarationDate', 'Declaration Date')}
-              </label>
-              <input
-                type="date"
-                name="decloration_date"
-                id="decloration_date"
-                value={formData.decloration_date}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              />
-            </div>
+              <div>
+                <label htmlFor="decloration_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('createApplication.declarationDate', 'Declaration Date')}
+                </label>
+                <input
+                  type="date"
+                  name="decloration_date"
+                  id="decloration_date"
+                  value={formData.decloration_date}
+                  onChange={handleChange}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                  bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
+                />
+              </div>
 
-            <div className="md:col-span-2">
-              <label htmlFor="decloration_file" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('createApplication.declarationFile', 'Declaration File')}
-              </label>
-              <input
-                type="file"
-                name="decloration_file"
-                id="decloration_file"
-                onChange={handleChange}
-                accept=".jpg,.jpeg,.png,.pdf"
-                className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
-                file:mr-4 file:py-2 file:px-4
-                file:rounded-md file:border-0
-                file:text-sm file:font-semibold
-                file:bg-[#6C5DD3] file:text-white
-                hover:file:bg-[#5c4eb3]"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* Quantities and Services */}
-        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
-            {t('createApplication.quantitiesAndServices', 'Quantities and Services')}
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            <div>
-              <label htmlFor="unloading_quantity" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('createApplication.unloadingQuantity', 'Unloading Quantity')}
-              </label>
-              <input
-                type="number"
-                name="unloading_quantity"
-                id="unloading_quantity"
-                value={formData.unloading_quantity || ''}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="loading_quantity" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t('createApplication.loadingQuantity', 'Loading Quantity')}
-              </label>
-              <input
-                type="number"
-                name="loading_quantity"
-                id="loading_quantity"
-                value={formData.loading_quantity || ''}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-              />
+              <div className="md:col-span-2">
+                <label htmlFor="decloration_file" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('createApplication.declarationFile', 'Declaration File')}
+                </label>
+                <input
+                  type="file"
+                  name="decloration_file"
+                  id="decloration_file"
+                  onChange={handleChange}
+                  accept=".jpg,.jpeg,.png,.pdf"
+                  className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
+                  file:mr-4 file:py-2 file:px-4
+                  file:rounded-md file:border-0
+                  file:text-sm file:font-semibold
+                  file:bg-[#6C5DD3] file:text-white
+                  hover:file:bg-[#5c4eb3]"
+                />
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Services Selection */}
-        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
-            {t('createApplication.services', 'Services')}
-          </h2>
-          
-          <div className="flex flex-col gap-4">
-            {/* Keeping Services Dropdown */}
-            <div className="w-full bg-gray-50 dark:bg-gray-900 rounded-lg" ref={keepingServicesRef}>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setKeepingServicesOpen(!keepingServicesOpen);
-                  setWorkingServicesOpen(false);
-                }}
-                className="w-full px-4 py-3 flex items-center justify-between text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              >
-                <div className="flex items-center">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {t('createApplication.keepingServices', 'Keeping Services')}
-                  </span>
-                  <span className="ml-2 bg-[#6C5DD3] text-white text-xs px-2 py-1 rounded-full">
-                    {formData.keeping_services.length} selected
-                  </span>
-                </div>
-                <svg
-                  className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
-                    keepingServicesOpen ? 'transform rotate-180' : ''
-                  }`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+          {/* Quantities and Services */}
+         
+
+          {/* Services Selection */}
+          <div>
+            <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
+              {t('createApplication.services', 'Services')}
+            </h2>
+            
+            <div className="flex flex-col gap-4">
+              {/* Keeping Services Dropdown */}
+              <div className="w-full bg-gray-50 dark:bg-gray-900 rounded-lg" ref={keepingServicesRef}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setKeepingServicesOpen(!keepingServicesOpen);
+                    setWorkingServicesOpen(false);
+                  }}
+                  className="w-full px-4 py-3 flex items-center justify-between text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              
-              {keepingServicesOpen && keepingServices.length > 0 && (
-                <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                  <div className="space-y-3">
-                    {keepingServices.map((service) => (
-                      <div 
-                        key={service.id}
-                        className={`relative flex items-center p-3 rounded-lg border transition-all duration-200
-                          ${formData.keeping_services.includes(service.id)
-                            ? 'border-[#6C5DD3] bg-[#6C5DD3]/5'
-                            : 'border-gray-200 dark:border-gray-700 hover:border-[#6C5DD3]/50'}`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={formData.keeping_services.includes(service.id)}
-                          onChange={() => handleKeepingServiceToggle(service.id)}
-                          className="rounded border-gray-300 text-[#6C5DD3] focus:ring-[#6C5DD3]
-                            w-4 h-4 mr-3 cursor-pointer"
-                        />
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start">
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                              {service.name}
-                            </span>
-                            <span className="text-sm font-semibold text-[#6C5DD3] ml-2">
-                              {service.base_price}
-                            </span>
-                          </div>
-                          <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            Base days: {service.base_day} | Extra price: {service.extra_price}
+                  <div className="flex items-center">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t('createApplication.keepingServices', 'Keeping Services')}
+                    </span>
+                    <span className="ml-2 bg-[#6C5DD3] text-white text-xs px-2 py-1 rounded-full">
+                      {formData.keeping_services.length} selected
+                    </span>
+                  </div>
+                  <svg
+                    className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+                      keepingServicesOpen ? 'transform rotate-180' : ''
+                    }`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {keepingServicesOpen && keepingServices.length > 0 && (
+                  <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="space-y-3">
+                      {keepingServices.map((service) => (
+                        <div 
+                          key={service.id}
+                          className={`relative flex items-center p-3 rounded-lg border transition-all duration-200
+                            ${formData.keeping_services.includes(service.id)
+                              ? 'border-[#6C5DD3] bg-[#6C5DD3]/5'
+                              : 'border-gray-200 dark:border-gray-700 hover:border-[#6C5DD3]/50'}`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={formData.keeping_services.includes(service.id)}
+                            onChange={() => handleKeepingServiceToggle(service.id)}
+                            className="rounded border-gray-300 text-[#6C5DD3] focus:ring-[#6C5DD3]
+                              w-4 h-4 mr-3 cursor-pointer"
+                          />
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start">
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                                {service.name}
+                              </span>
+                              <span className="text-sm font-semibold text-[#6C5DD3] ml-2">
+                                {service.base_price}
+                              </span>
+                            </div>
+                            <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                              Base days: {service.base_day} | Extra price: {service.extra_price}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
 
-            {/* Working Services Dropdown */}
-            <div className="w-full bg-gray-50 dark:bg-gray-900 rounded-lg" ref={workingServicesRef}>
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setWorkingServicesOpen(!workingServicesOpen);
-                  setKeepingServicesOpen(false);
-                }}
-                className="w-full px-4 py-3 flex items-center justify-between text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-              >
-                <div className="flex items-center">
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {t('createApplication.workingServices', 'Working Services')}
-                  </span>
-                  <span className="ml-2 bg-[#6C5DD3] text-white text-xs px-2 py-1 rounded-full">
-                    {formData.working_services.length} selected
-                  </span>
-                </div>
-                <svg
-                  className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
-                    workingServicesOpen ? 'transform rotate-180' : ''
-                  }`}
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
+              {/* Working Services Dropdown */}
+              <div className="w-full bg-gray-50 dark:bg-gray-900 rounded-lg" ref={workingServicesRef}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setWorkingServicesOpen(!workingServicesOpen);
+                    setKeepingServicesOpen(false);
+                  }}
+                  className="w-full px-4 py-3 flex items-center justify-between text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              
-              {workingServicesOpen && workingServices.length > 0 && (
-                <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                  <div className="space-y-3">
-                    {workingServices.map((service) => (
-                      <div 
-                        key={service.id}
-                        className={`relative flex items-center p-3 rounded-lg border transition-all duration-200
-                          ${formData.working_services.includes(service.id)
-                            ? 'border-[#6C5DD3] bg-[#6C5DD3]/5'
-                            : 'border-gray-200 dark:border-gray-700 hover:border-[#6C5DD3]/50'}`}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={formData.working_services.includes(service.id)}
-                          onChange={() => handleWorkingServiceToggle(service.id)}
-                          className="rounded border-gray-300 text-[#6C5DD3] focus:ring-[#6C5DD3]
-                            w-4 h-4 mr-3 cursor-pointer"
-                        />
-                        <div className="flex-1">
-                          <div className="flex justify-between items-start">
-                            <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                              {service.service_name}
-                            </span>
-                            <span className="text-sm font-semibold text-[#6C5DD3] ml-2">
-                              {service.base_price}
-                            </span>
-                          </div>
-                          <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            Base days: {service.base_day} | Extra price: {service.extra_price} | Units: {service.units}
+                  <div className="flex items-center">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t('createApplication.workingServices', 'Working Services')}
+                    </span>
+                    <span className="ml-2 bg-[#6C5DD3] text-white text-xs px-2 py-1 rounded-full">
+                      {formData.working_services.length} selected
+                    </span>
+                  </div>
+                  <svg
+                    className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+                      workingServicesOpen ? 'transform rotate-180' : ''
+                    }`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                
+                {workingServicesOpen && workingServices.length > 0 && (
+                  <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="space-y-3">
+                      {workingServices.map((service) => (
+                        <div 
+                          key={service.id}
+                          className={`relative flex items-center p-3 rounded-lg border transition-all duration-200
+                            ${formData.working_services.includes(service.id)
+                              ? 'border-[#6C5DD3] bg-[#6C5DD3]/5'
+                              : 'border-gray-200 dark:border-gray-700 hover:border-[#6C5DD3]/50'}`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={formData.working_services.includes(service.id)}
+                            onChange={() => handleWorkingServiceToggle(service.id)}
+                            className="rounded border-gray-300 text-[#6C5DD3] focus:ring-[#6C5DD3]
+                              w-4 h-4 mr-3 cursor-pointer"
+                          />
+                          <div className="flex-1">
+                            <div className="flex justify-between items-start">
+                              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                                {service.service_name}
+                              </span>
+                              <span className="text-sm font-semibold text-[#6C5DD3] ml-2">
+                                {service.base_price}
+                              </span>
+                            </div>
+                            <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                              Base days: {service.base_day} | Extra price: {service.extra_price} | Units: {service.units}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -2,39 +2,36 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../api/api";
 import SuccessModal from "../components/SuccessModal";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
-interface CategoryFormData {
+interface MeasurementFormData {
   name: string;
 }
 
-export default function CreateItemCategory() {
+export default function CreateMeasurement() {
   const { t } = useTranslation();
-  const [formData, setFormData] = useState<CategoryFormData>({
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState<MeasurementFormData>({
     name: "",
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await api.post('/items/category/', formData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
+      const response = await api.post('/items/measurement/', formData);
+      
       if (response.status === 201 || response.status === 200) {
         setFormData({
           name: "",
         });
         setShowSuccessModal(true);
-        navigate('/categories');
+        // Optionally navigate to measurement list after success
+        navigate('/measurements');
       }
     } catch (error: any) {
-      console.error('Error creating category:', error);
-      let errorMessage = t('createItemCategory.errorMessage', 'Failed to create category. Please try again.');
+      console.error('Error creating measurement:', error);
+      let errorMessage = t('createMeasurement.errorMessage', 'Failed to create measurement. Please try again.');
       
       if (error.response?.data) {
         const serverError = error.response.data;
@@ -55,13 +52,13 @@ export default function CreateItemCategory() {
   };
 
   return (
-    <div className="p-8 sm:p-6">
+    <div className="p-4 sm:p-6">
       <div className="mb-6 sm:mb-8">
         <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white transition-colors">
-          {t('createItemCategory.title', 'Create Item Category')}
+          {t('createMeasurement.title', 'Create Measurement')}
         </h1>
         <p className="mt-1 sm:mt-2 text-sm text-gray-600 dark:text-gray-400 transition-colors">
-          {t('createItemCategory.subtitle', 'Create a new category for items')}
+          {t('createMeasurement.subtitle', 'Add a new measurement unit to the system')}
         </p>
       </div>
 
@@ -72,7 +69,7 @@ export default function CreateItemCategory() {
               htmlFor="name" 
               className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors"
             >
-              {t('createItemCategory.name', 'Category Name')}
+              {t('createMeasurement.form.name', 'Measurement Name')}
             </label>
             <input
               type="text"
@@ -80,11 +77,11 @@ export default function CreateItemCategory() {
               id="name"
               value={formData.name}
               onChange={handleChange}
-              className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-              placeholder={t('createItemCategory.namePlaceholder', 'Enter category name')}
               required
+              className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+              px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+              bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
+              placeholder={t('createMeasurement.form.namePlaceholder', 'Enter measurement name (e.g., kg, m, pcs)')}
             />
           </div>
         </div>
@@ -93,10 +90,10 @@ export default function CreateItemCategory() {
           <button
             type="submit"
             className="w-full sm:w-auto bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
-              hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
-              dark:focus:ring-offset-gray-800 transition-all duration-200"
+            hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
+            dark:focus:ring-offset-gray-800 transition-all duration-200"
           >
-            {t('createItemCategory.submit', 'Create Category')}
+            {t('createMeasurement.submit', 'Create Measurement')}
           </button>
         </div>
       </form>
@@ -104,8 +101,9 @@ export default function CreateItemCategory() {
       <SuccessModal
         isOpen={showSuccessModal}
         onClose={() => setShowSuccessModal(false)}
-        message={t('createItemCategory.successMessage', 'Category has been created successfully!')}
+        title={t('common.success')}
+        message={t('createMeasurement.successMessage', 'Measurement has been created successfully!')}
       />
     </div>
   );
-} 
+}

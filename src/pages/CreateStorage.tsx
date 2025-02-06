@@ -4,7 +4,7 @@ import { apiService } from "../api/api";
 import type { Storage } from "../api/api";
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
-
+import { useNavigate } from "react-router-dom";
 export default function CreateStorage() {
   const { t } = useTranslation();
   const [formData, setFormData] = useState<Storage>({
@@ -14,7 +14,7 @@ export default function CreateStorage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
+  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -25,6 +25,7 @@ export default function CreateStorage() {
         storage_location: "",
       });
       setShowSuccessModal(true);
+      navigate("/storage-list");
     } catch (error) {
       console.error('Error creating storage:', error);
       setErrorMessage(t('createStorage.errorMessage', 'Failed to create storage. Please try again.'));
