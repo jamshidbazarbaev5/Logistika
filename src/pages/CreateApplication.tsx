@@ -89,6 +89,7 @@ export default function CreateApplication() {
   const keepingServicesRef = useRef<HTMLDivElement>(null);
   const workingServicesRef = useRef<HTMLDivElement>(null);
   const [showCreateFirmModal, setShowCreateFirmModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -155,6 +156,8 @@ export default function CreateApplication() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    
     try {
       const formDataToSend = new FormData();
 
@@ -222,6 +225,7 @@ export default function CreateApplication() {
           : serverError.toString();
       }
       
+      setError(errorMessage);
     }
   };
 
@@ -301,6 +305,21 @@ export default function CreateApplication() {
 
   return (
     <div className="p-4 sm:p-6">
+      {error && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700 whitespace-pre-line">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mb-6 sm:mb-8">
         <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
           {t('createApplication.title', 'Create Application')}
