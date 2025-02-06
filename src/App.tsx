@@ -51,7 +51,7 @@ function App() {
                 <Route path="/photo-report" element={<PhotoUpload />} />
                 <Route path="/mode" element={<ModeCreate />} />
                 <Route path="/application" element={<CreateApplication />} />
-                <Route path="/" element={<Navigate to="/transport" replace />} />
+                <Route path="/" element={<Navigate to="/firms" replace />} />
                 <Route path="/product" element={<CreateProduct />} />
                 <Route path="/product-quantity" element={<CreateProductQuantity />} />
                 <Route path="working_service" element={<WorkingService />} />
