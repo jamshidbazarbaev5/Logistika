@@ -22,6 +22,8 @@ interface ApplicationFormData {
   payment_method: number;
   keeping_services: number[];
   working_services: number[];
+  product_quantities: ProductQuantity[];
+  transport_numbers: TransportNumber[];
 }
 
 interface Firm {
@@ -52,12 +54,41 @@ interface WorkingService {
   units: string;
 }
 
+interface ProductQuantity {
+  quantity: number;
+  product_id: number;
+  storage_id: number;
+}
+
+interface TransportNumber {
+  transport_number: string;
+  transport_type: number;
+}
+
+interface Product {
+  id: number;
+  name: string;
+}
+
+interface Storage {
+  id: number;
+  storage_name: string;
+}
+
+interface TransportType {
+  id: number;
+  transport_type: string;
+}
+
 export default function CreateApplication() {
   const { t } = useTranslation();
   const [firms, setFirms] = useState<Firm[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [keepingServices, setKeepingServices] = useState<KeepingService[]>([]);
   const [workingServices, setWorkingServices] = useState<WorkingService[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [storages, setStorages] = useState<Storage[]>([]);
+  const [transportTypes, setTransportTypes] = useState<TransportType[]>([]);
   const [formData, setFormData] = useState<ApplicationFormData>({
     brutto: null,
     netto: null,
@@ -76,6 +107,8 @@ export default function CreateApplication() {
     payment_method: 1,
     keeping_services: [],
     working_services: [],
+    product_quantities: [],
+    transport_numbers: []
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [firmSearch, setFirmSearch] = useState("");
@@ -90,6 +123,24 @@ export default function CreateApplication() {
   const workingServicesRef = useRef<HTMLDivElement>(null);
   const [showCreateFirmModal, setShowCreateFirmModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [productQuantity, setProductQuantity] = useState({
+    quantity: 0,
+    product_id: 0,
+    storage_id: 0
+  });
+  const [transportNumber, setTransportNumber] = useState({
+    transport_number: "",
+    transport_type: 1
+  });
+  const [productSearch, setProductSearch] = useState("");
+  const [storageSearch, setStorageSearch] = useState("");
+  const [transportNumberSearch, setTransportNumberSearch] = useState("");
+  const [showProductDropdown, setShowProductDropdown] = useState(false);
+  const [showStorageDropdown, setShowStorageDropdown] = useState(false);
+  const [showTransportTypeDropdown, setShowTransportTypeDropdown] = useState(false);
+  const productDropdownRef = useRef<HTMLDivElement>(null);
+  const storageDropdownRef = useRef<HTMLDivElement>(null);
+  const transportTypeDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -98,18 +149,27 @@ export default function CreateApplication() {
           firmsResponse, 
           paymentMethodsResponse,
           keepingServicesResponse,
-          workingServicesResponse
+          workingServicesResponse,
+          productsResponse,
+          storagesResponse,
+          transportTypesResponse
         ] = await Promise.all([
           api.get('/firms/'),
           api.get('/payment_method/'),
           api.get('/keeping_service/'),
-          api.get('/working_service/')
+          api.get('/working_service/'),
+          api.get('/items/product/'),
+          api.get('/storage/'),
+          api.get('/transport/type/')
         ]);
         
         setFirms(firmsResponse.data);
         setPaymentMethods(paymentMethodsResponse.data);
         setKeepingServices(keepingServicesResponse.data);
         setWorkingServices(workingServicesResponse.data);
+        setProducts(productsResponse.data || []);
+        setStorages(storagesResponse.data || []);
+        setTransportTypes(transportTypesResponse.data || []);
         
         setFormData(prev => ({
           ...prev,
@@ -124,6 +184,8 @@ export default function CreateApplication() {
     fetchData();
   }, []);
 
+  
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (keepingServicesRef.current && 
@@ -135,16 +197,29 @@ export default function CreateApplication() {
         setWorkingServicesOpen(false);
       }
       
-      // Handle firm dropdown
       if (dropdownRef.current && 
           !dropdownRef.current.contains(event.target as Node)) {
         setShowFirmDropdown(false);
       }
       
-      // Handle payment method dropdown
       if (paymentMethodDropdownRef.current && 
           !paymentMethodDropdownRef.current.contains(event.target as Node)) {
         setShowPaymentMethodDropdown(false);
+      }
+      
+      if (productDropdownRef.current && 
+          !productDropdownRef.current.contains(event.target as Node)) {
+        setShowProductDropdown(false);
+      }
+      
+      if (storageDropdownRef.current && 
+          !storageDropdownRef.current.contains(event.target as Node)) {
+        setShowStorageDropdown(false);
+      }
+      
+      if (transportTypeDropdownRef.current && 
+          !transportTypeDropdownRef.current.contains(event.target as Node)) {
+        setShowTransportTypeDropdown(false);
       }
     }
 
@@ -176,7 +251,9 @@ export default function CreateApplication() {
         }
       });
 
-      // Log the data being sent
+      formDataToSend.append('product_quantities', JSON.stringify(formData.product_quantities));
+      formDataToSend.append('transport_numbers', JSON.stringify(formData.transport_numbers));
+
       console.log('Sending data:', {
         ...Object.fromEntries(formDataToSend),
         keeping_services: formData.keeping_services,
@@ -211,6 +288,8 @@ export default function CreateApplication() {
           payment_method: 1,
           keeping_services: [],
           working_services: [],
+          product_quantities: [],
+          transport_numbers: []
         });
       }
     } catch (error: any) {
@@ -302,6 +381,38 @@ export default function CreateApplication() {
     setFormData(prev => ({ ...prev, firm_id: newFirm.id }));
     setFirmSearch(newFirm.firm_name);
   };
+
+  const handleAddProductQuantity = () => {
+    if (productQuantity.quantity && productQuantity.product_id && productQuantity.storage_id) {
+      setFormData(prev => ({
+        ...prev,
+        product_quantities: [...prev.product_quantities, productQuantity]
+      }));
+      setProductQuantity({ quantity: 0, product_id: 0, storage_id: 0 });
+    }
+  };
+
+  const handleAddTransportNumber = () => {
+    if (transportNumber.transport_number && transportNumber.transport_type) {
+      setFormData(prev => ({
+        ...prev,
+        transport_numbers: [...prev.transport_numbers, transportNumber]
+      }));
+      setTransportNumber({ transport_number: "", transport_type: 1 });
+    }
+  };
+
+  const filteredProducts = products.filter(product =>
+    product?.name?.toLowerCase().includes(productSearch.toLowerCase() || '') || false
+  );
+
+  const filteredStorages = storages.filter(storage =>
+    storage?.storage_name?.toLowerCase().includes(storageSearch.toLowerCase() || '') || false
+  );
+
+  const filteredTransportTypes = transportTypes.filter(type =>
+    type?.transport_type?.toLowerCase().includes(transportNumberSearch.toLowerCase() || '') || false
+  );
 
   return (
     <div className="p-4 sm:p-6">
@@ -521,8 +632,253 @@ export default function CreateApplication() {
             </div>
           </div>
 
-          {/* Quantities and Services */}
-         
+          {/* Product Quantities */}
+          <div className="mb-6">
+            <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
+              {t('createApplication.productQuantities', 'Product Quantities')}
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('createApplication.quantity', 'Quantity')}
+                </label>
+                <input
+                  type="number"
+                  value={productQuantity.quantity}
+                  onChange={(e) => setProductQuantity(prev => ({
+                    ...prev,
+                    quantity: parseInt(e.target.value)
+                  }))}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                />
+              </div>
+
+              <div className="relative" ref={productDropdownRef}>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('createApplication.product', 'Product')}
+                </label>
+                <input
+                  type="text"
+                  value={productSearch}
+                  onChange={(e) => {
+                    setProductSearch(e.target.value);
+                    setShowProductDropdown(true);
+                  }}
+                  onFocus={() => setShowProductDropdown(true)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                  placeholder={t('createApplication.searchProduct', 'Search for a product...')}
+                />
+                
+                {showProductDropdown && (
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg">
+                    {filteredProducts.map((product) => (
+                      <div
+                        key={product.id}
+                        onClick={() => {
+                          setProductQuantity(prev => ({ ...prev, product_id: product.id }));
+                          setProductSearch(product.name);
+                          setShowProductDropdown(false);
+                        }}
+                        className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                      >
+                        {product.name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="relative" ref={storageDropdownRef}>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('createApplication.storage', 'Storage')}
+                </label>
+                <input
+                  type="text"
+                  value={storageSearch}
+                  onChange={(e) => {
+                    setStorageSearch(e.target.value);
+                    setShowStorageDropdown(true);
+                  }}
+                  onFocus={() => setShowStorageDropdown(true)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                  placeholder={t('createApplication.searchStorage', 'Search for a storage...')}
+                />
+                
+                {showStorageDropdown && (
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg">
+                    {filteredStorages.map((storage) => (
+                      <div
+                        key={storage.id}
+                        onClick={() => {
+                          setProductQuantity(prev => ({ ...prev, storage_id: storage.id }));
+                          setStorageSearch(storage.storage_name);
+                          setShowStorageDropdown(false);
+                        }}
+                        className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                      >
+                        {storage.storage_name}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <button
+              type="button"
+              onClick={handleAddProductQuantity}
+              className="mb-4 px-4 py-2 text-sm bg-[#6C5DD3] text-white rounded-lg hover:bg-[#5c4eb3]"
+            >
+              {t('createApplication.addProductQuantity', 'Add Product Quantity')}
+            </button>
+
+            {formData.product_quantities.length > 0 && (
+              <div className="mb-4 overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2">Quantity</th>
+                      <th className="px-4 py-2">Product ID</th>
+                      <th className="px-4 py-2">Storage ID</th>
+                      <th className="px-4 py-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {formData.product_quantities.map((pq, index) => (
+                      <tr key={index}>
+                        <td className="px-4 py-2">{pq.quantity}</td>
+                        <td className="px-4 py-2">{pq.product_id}</td>
+                        <td className="px-4 py-2">{pq.storage_id}</td>
+                        <td className="px-4 py-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFormData(prev => ({
+                                ...prev,
+                                product_quantities: prev.product_quantities.filter((_, i) => i !== index)
+                              }));
+                            }}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            {t('common.delete', 'Delete')}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Transport Numbers */}
+          <div className="mb-6">
+            <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
+              {t('createApplication.transportNumbers', 'Transport Numbers')}
+            </h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('createApplication.transportNumber', 'Transport Number')}
+                </label>
+                <input
+                  type="text"
+                  value={transportNumber.transport_number}
+                  onChange={(e) => setTransportNumber(prev => ({
+                    ...prev,
+                    transport_number: e.target.value
+                  }))}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                />
+              </div>
+
+              <div className="relative" ref={transportTypeDropdownRef}>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t('createApplication.transportType', 'Transport Type')}
+                </label>
+                <input
+                  type="text"
+                  value={transportNumberSearch}
+                  onChange={(e) => {
+                    setTransportNumberSearch(e.target.value);
+                    setShowTransportTypeDropdown(true);
+                  }}
+                  onFocus={() => setShowTransportTypeDropdown(true)}
+                  className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                  placeholder={t('createApplication.searchTransportType', 'Search for a transport type...')}
+                />
+                
+                {showTransportTypeDropdown && (
+                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg">
+                    {filteredTransportTypes.map((type) => (
+                      <div
+                        key={type.id}
+                        onClick={() => {
+                          setTransportNumber(prev => ({ ...prev, transport_type: type.id }));
+                          setTransportNumberSearch(type.transport_type);
+                          setShowTransportTypeDropdown(false);
+                        }}
+                        className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                      >
+                        {type.transport_type}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleAddTransportNumber}
+              className="mb-4 px-4 py-2 text-sm bg-[#6C5DD3] text-white rounded-lg hover:bg-[#5c4eb3]"
+            >
+              {t('createApplication.addTransportNumber', 'Add Transport Number')}
+            </button>
+
+            {formData.transport_numbers.length > 0 && (
+              <div className="mb-4 overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <tr>
+                      <th className="px-4 py-2">Transport Number</th>
+                      <th className="px-4 py-2">Transport Type</th>
+                      <th className="px-4 py-2">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {formData.transport_numbers.map((tn, index) => (
+                      <tr key={index}>
+                        <td className="px-4 py-2">{tn.transport_number}</td>
+                        <td className="px-4 py-2">{tn.transport_type}</td>
+                        <td className="px-4 py-2">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setFormData(prev => ({
+                                ...prev,
+                                transport_numbers: prev.transport_numbers.filter((_, i) => i !== index)
+                              }));
+                            }}
+                            className="text-red-600 hover:text-red-800"
+                          >
+                            {t('common.delete', 'Delete')}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
 
           {/* Services Selection */}
           <div>

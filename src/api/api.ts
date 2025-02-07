@@ -163,6 +163,12 @@ export const apiService = {
   // Add this new method
   createCategory: (data: Category) => 
     api.post('/items/category/', data),
+
+  deleteFirm: (id: number) =>
+    api.delete(`/firms/${id}/`),
+
+  updateFirm: (id: number, data: Omit<Firm, 'id'>) =>
+    api.put(`/firms/${id}/`, data),
 };
 
 export type { Storage, KeepingService, WorkingService, Firm, Category };

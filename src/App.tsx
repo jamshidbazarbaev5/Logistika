@@ -28,6 +28,8 @@ import CreateMeasurement from "./pages/MeasurmentPage";
 import CategoryList from "./pages/CategoryList";
 import StorageList from "./pages/StorageList";
 import CreateStorage from "./pages/CreateStorage";
+import ModeList from "./pages/ModeList";
+import PaymentList from "./pages/PaymentList";
 const queryClient = new QueryClient();
 
 function App() {
@@ -44,19 +46,18 @@ function App() {
                   </PrivateRoute>
                 }
               >
+
                 <Route path="/transport/create" element={<TransportForm />} />
                 <Route path="/firms" element={<CreateFirm />} />
                 <Route path="/storage-list" element={<StorageList />} />
                 <Route path="/keeping_service" element={<KeepingService />} />
                 <Route path="/photo-report" element={<PhotoUpload />} />
-                <Route path="/mode" element={<ModeCreate />} />
                 <Route path="/application" element={<CreateApplication />} />
-                <Route path="/" element={<Navigate to="/firms" replace />} />
+                <Route path="/" element={<Navigate to="/firm-list" replace />} />
                 <Route path="/product" element={<CreateProduct />} />
                 <Route path="/product-quantity" element={<CreateProductQuantity />} />
                 <Route path="working_service" element={<WorkingService />} />
                 <Route path="/firm-list" element={<FirmList />} />
-                <Route path="/payment" element={<CreatePaymentMethod />} /> 
                 <Route path="/category" element={<CategoryList />} />
                 <Route path="/transport-list" element={<TransportList />} />
                 <Route path="/transport/number/create" element={<CreateTransportNumber />} />
@@ -64,6 +65,10 @@ function App() {
                 <Route path="/measurements/create" element={<CreateMeasurement />} />
                 <Route path="/categories/create" element={<CreateItemCategory />} />
                 <Route path="/storages/create" element={<CreateStorage />} />
+                <Route path="/modes" element={<ModeList />} />
+                <Route path="/modes/create" element={<ModeCreate />} />
+                <Route path="/payment-list" element={<PaymentList />} />
+                <Route path="/payment-methods/create" element={<CreatePaymentMethod />} />
               </Route>
             </Routes>
           </Router>

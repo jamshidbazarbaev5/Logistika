@@ -8,80 +8,82 @@ import { Fragment } from 'react';
 import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import ConfirmModal from "../components/ConfirmModal";
 
-interface Category {
+interface Mode {
   id: number;
-  name: string;
+  name_mode: string;
+  code_mode: string;
 }
 
-export default function CategoryList() {
+export default function ModeList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [modes, setModes] = useState<Mode[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [modalMessage, setModalMessage] = useState('');
-  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
+  const [editingMode, setEditingMode] = useState<Mode | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null);
+  const [modeToDelete, setModeToDelete] = useState<Mode | null>(null);
 
-  const fetchCategories = async () => {
+  const fetchModes = async () => {
     try {
-      const response = await api.get('/items/category/');
-      setCategories(response.data);
+      const response = await api.get('/modes/modes/');
+      setModes(response.data);
       setLoading(false);
     } catch (err) {
-      setError(t('categoryList.errorLoading', 'Error loading categories'));
+      setError(t('modeList.errorLoading', 'Error loading modes'));
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCategories();
+    fetchModes();
   }, [t]);
 
   const handleDelete = async (id: number, name: string) => {
-    setCategoryToDelete({ id, name } as Category);
+    setModeToDelete({ id, name_mode: name } as Mode);
     setShowDeleteModal(true);
   };
 
   const confirmDelete = async () => {
-    if (!categoryToDelete) return;
+    if (!modeToDelete) return;
 
     try {
-      await api.delete(`/items/category/${categoryToDelete.id}/`);
-      setModalMessage(t('categoryList.deleteSuccess', 'Category deleted successfully'));
+      await api.delete(`/modes/modes/${modeToDelete.id}/`);
+      setModalMessage(t('modeList.deleteSuccess', 'Mode deleted successfully'));
       setShowSuccessModal(true);
-      fetchCategories();
+      fetchModes();
     } catch (error) {
-      console.error('Error deleting category:', error);
-      alert(t('categoryList.deleteError', 'Failed to delete category'));
+      console.error('Error deleting mode:', error);
+      alert(t('modeList.deleteError', 'Failed to delete mode'));
     }
   };
 
-  const handleEdit = (category: Category) => {
-    setEditingCategory(category);
+  const handleEdit = (mode: Mode) => {
+    setEditingMode(mode);
   };
 
   const handleSaveEdit = async (id: number) => {
-    if (!editingCategory) return;
+    if (!editingMode) return;
 
     try {
-      await api.put(`/items/category/${id}/`, {
-        name: editingCategory.name
+      await api.put(`/modes/modes/${id}/`, {
+        name_mode: editingMode.name_mode,
+        code_mode: editingMode.code_mode
       });
-      setModalMessage(t('categoryList.editSuccess', 'Category updated successfully'));
+      setModalMessage(t('modeList.editSuccess', 'Mode updated successfully'));
       setShowSuccessModal(true);
-      setEditingCategory(null);
-      fetchCategories();
+      setEditingMode(null);
+      fetchModes();
     } catch (error) {
-      console.error('Error updating category:', error);
-      alert(t('categoryList.editError', 'Failed to update category'));
+      console.error('Error updating mode:', error);
+      alert(t('modeList.editError', 'Failed to update mode'));
     }
   };
 
   const handleCancelEdit = () => {
-    setEditingCategory(null);
+    setEditingMode(null);
   };
 
   if (loading) {
@@ -104,15 +106,15 @@ export default function CategoryList() {
     <div className="p-4 sm:p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-          {t('categoryList.title', 'Item Categories')}
+          {t('modeList.title', 'Modes')}
         </h1>
         <button
-          onClick={() => navigate('/categories/create')}
+          onClick={() => navigate('/modes/create')}
           className="bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
           hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
           dark:focus:ring-offset-gray-800 transition-all duration-200"
         >
-          {t('categoryList.createCategory', 'Create Category')}
+          {t('modeList.createMode', 'Create Mode')}
         </button>
       </div>
 
@@ -121,52 +123,69 @@ export default function CategoryList() {
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t('categoryList.table.id', 'ID')}
+                {t('modeList.table.id', 'ID')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t('categoryList.table.name', 'Category Name')}
+                {t('modeList.table.name', 'Mode Name')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t('categoryList.table.actions', 'Actions')}
+                {t('modeList.table.code', 'Code')}
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t('modeList.table.actions', 'Actions')}
               </th>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            {categories.map((category, index) => (
-              <tr key={category.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+            {modes.map((mode) => (
+              <tr key={mode.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {index + 1}
+                  {mode.id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {editingCategory?.id === category.id ? (
+                  {editingMode?.id === mode.id ? (
                     <input
                       type="text"
-                      value={editingCategory.name}
-                      onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
+                      value={editingMode.name_mode}
+                      onChange={(e) => setEditingMode({ ...editingMode, name_mode: e.target.value })}
                       className="rounded-md border border-gray-300 dark:border-gray-600 
                       px-3 py-1 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
                       bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     />
                   ) : (
-                    category.name
+                    mode.name_mode
                   )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {editingCategory?.id === category.id ? (
+                  {editingMode?.id === mode.id ? (
+                    <input
+                      type="text"
+                      value={editingMode.code_mode}
+                      onChange={(e) => setEditingMode({ ...editingMode, code_mode: e.target.value })}
+                      className="rounded-md border border-gray-300 dark:border-gray-600 
+                      px-3 py-1 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                      bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    />
+                  ) : (
+                    mode.code_mode
+                  )}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                  {editingMode?.id === mode.id ? (
                     <div className="flex space-x-4">
                       <button
-                        onClick={() => handleSaveEdit(category.id)}
+                        onClick={() => handleSaveEdit(mode.id)}
                         className="text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300
                         transition-colors duration-200"
                       >
-                        {t('categoryList.save', 'Save')}
+                        {t('modeList.save', 'Save')}
                       </button>
                       <button
                         onClick={handleCancelEdit}
                         className="text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-300
                         transition-colors duration-200"
                       >
-                        {t('categoryList.cancel', 'Cancel')}
+                        {t('modeList.cancel', 'Cancel')}
                       </button>
                     </div>
                   ) : (
@@ -186,32 +205,32 @@ export default function CategoryList() {
                         <Menu.Items 
                           className={`absolute z-50 mt-2 w-36 rounded-md bg-white dark:bg-gray-800 
                           shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none
-                          ${categories.indexOf(category) >= categories.length - 3 ? 'bottom-full mb-2' : 'top-full'} 
-                          ${categories.indexOf(category) >= categories.length - 3 ? 'origin-bottom-right' : 'origin-top-right'}
+                          ${modes.indexOf(mode) >= modes.length - 3 ? 'bottom-0 mb-2' : 'top-full'} 
+                          ${modes.indexOf(mode) >= modes.length - 3 ? 'origin-bottom-right' : 'origin-top-right'}
                           right-0`}
                         >
                           <div className="py-1">
                             <Menu.Item>
                               {({ active }) => (
                                 <button
-                                  onClick={() => handleEdit(category)}
+                                  onClick={() => handleEdit(mode)}
                                   className={`${
                                     active ? 'bg-gray-100 dark:bg-gray-700' : ''
                                   } flex w-full items-center px-4 py-2 text-sm text-blue-600 dark:text-blue-400`}
                                 >
-                                  {t('categoryList.edit', 'Edit')}
+                                  {t('modeList.edit', 'Edit')}
                                 </button>
                               )}
                             </Menu.Item>
                             <Menu.Item>
                               {({ active }) => (
                                 <button
-                                  onClick={() => handleDelete(category.id, category.name)}
+                                  onClick={() => handleDelete(mode.id, mode.name_mode)}
                                   className={`${
                                     active ? 'bg-gray-100 dark:bg-gray-700' : ''
                                   } flex w-full items-center px-4 py-2 text-sm text-red-600 dark:text-red-400`}
                                 >
-                                  {t('categoryList.delete', 'Delete')}
+                                  {t('modeList.delete', 'Delete')}
                                 </button>
                               )}
                             </Menu.Item>
@@ -238,10 +257,10 @@ export default function CategoryList() {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={confirmDelete}
-        title={t('categoryList.deleteTitle', 'Delete Category')}
-        message={t('categoryList.deleteConfirmation', 
-          `Are you sure you want to delete category "${categoryToDelete?.name}"? This action cannot be undone.`)}
-        confirmText={t('categoryList.delete', 'Delete')}
+        title={t('modeList.deleteTitle', 'Delete Mode')}
+        message={t('modeList.deleteConfirmation', 
+          `Are you sure you want to delete mode "${modeToDelete?.name_mode}"? This action cannot be undone.`)}
+        confirmText={t('modeList.delete', 'Delete')}
         cancelText={t('common.cancel', 'Cancel')}
       />
     </div>

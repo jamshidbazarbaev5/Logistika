@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { api } from "../api/api";
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
+import { useNavigate } from "react-router-dom";
 
 interface PaymentMethodFormData {
   payment_method: string;
@@ -16,7 +17,7 @@ export default function CreatePaymentMethod() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
+  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -27,6 +28,7 @@ export default function CreatePaymentMethod() {
           payment_method: "",
         });
         setShowSuccessModal(true);
+        navigate("/payment-list");
       }
     } catch (error: any) {
       console.error('Error creating payment method:', error);

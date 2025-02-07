@@ -2,9 +2,10 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { apiService } from "../api/api";
 import SuccessModal from "../components/SuccessModal";
-
+import { useNavigate } from "react-router-dom";
 export default function ModeCreate() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     name_mode: "",
     code_mode: "",
@@ -30,6 +31,7 @@ export default function ModeCreate() {
       await apiService.createMode(formData);
       setFormData({ name_mode: "", code_mode: "" });
       setShowSuccessModal(true);
+      navigate("/modes");
     } catch (error) {
       setError(t('mode.createError', 'Error creating mode'));
     } finally {

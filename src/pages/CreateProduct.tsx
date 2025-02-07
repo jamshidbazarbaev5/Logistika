@@ -117,7 +117,7 @@ export default function CreateProduct() {
       subtitle={t('createProduct.subtitle')}
     >
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm">
+        <div className=" dark:bg-gray-800 p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             <div className="col-span-1 sm:col-span-2 lg:col-span-1">
               <label 
@@ -192,30 +192,7 @@ export default function CreateProduct() {
               />
             </div>
 
-            <div className="col-span-1">
-              <label 
-                htmlFor="price" 
-                className="block text-sm font-medium text-gray-600 dark:text-white mb-1"
-              >
-                {t('createProduct.price', 'Price')}
-              </label>
-              <input
-                type="number"
-                name="price"
-                id="price"
-                value={formData.price || ''}
-                onChange={handleChange}
-                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
-                  px-3 py-2 text-sm md:text-base
-                  focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                  placeholder:text-sm md:placeholder:text-base"
-                placeholder={t('createProduct.pricePlaceholder', 'Enter price')}
-                min="0"
-                step="0.01"
-                required
-              />
-            </div>
+           
 
             <div className="col-span-1">
               <label 
@@ -244,28 +221,7 @@ export default function CreateProduct() {
               </select>
             </div>
 
-            <div className="col-span-1">
-              <label 
-                htmlFor="quantity" 
-                className="block text-sm font-medium text-gray-600 dark:text-white mb-1"
-              >
-                {t('createProduct.quantity', 'Quantity')}
-              </label>
-              <input
-                type="number"
-                name="quantity"
-                id="quantity"
-                value={formData.quantity || ''}
-                onChange={handleChange}
-                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
-                  px-3 py-2 text-sm md:text-base
-                  focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
-                placeholder={t('createProduct.quantityPlaceholder', 'Enter quantity')}
-                min="0"
-                required
-              />
-            </div>
+          
           </div>
         </div>
         <div className="flex justify-end mt-6">

@@ -30,7 +30,7 @@ export default function CreateItemCategory() {
           name: "",
         });
         setShowSuccessModal(true);
-        navigate('/categories');
+        navigate('/category');
       }
     } catch (error: any) {
       console.error('Error creating category:', error);

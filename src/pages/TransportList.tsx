@@ -77,14 +77,14 @@ export default function TransportList() {
             >
               {t('transportList.createTransport', 'Create Transport Type')}
             </button>
-            <button
-              onClick={() => navigate('/transport/number/create')}
-              className="bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
-              hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
-              dark:focus:ring-offset-gray-800 transition-all duration-200"
-            >
-              {t('transportList.createNumber', 'Add Transport Number')}
-            </button>
+            {/*<button*/}
+            {/*  onClick={() => navigate('/transport/number/create')}*/}
+            {/*  className="bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg */}
+            {/*  hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2*/}
+            {/*  dark:focus:ring-offset-gray-800 transition-all duration-200"*/}
+            {/*>*/}
+            {/*  {t('transportList.createNumber', 'Add Transport Number')}*/}
+            {/*</button>*/}
           </div>
         </div>
 
@@ -101,16 +101,14 @@ export default function TransportList() {
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   {t('transportList.table.number', 'Transport Number')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  {t('transportList.table.applicationId', 'Application ID')}
-                </th>
+              
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-              {transportTypes.map((type) => (
+              {transportTypes.map((type, index) => (
                 <tr key={`type-${type.id}`} className="hover:bg-gray-50 dark:hover:bg-gray-800">
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {type.id}
+                    {index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {type.transport_type}
@@ -119,12 +117,6 @@ export default function TransportList() {
                     {transportNumbers
                       .filter(num => num.transport_type === type.id)
                       .map(num => num.transport_number)
-                      .join(', ')}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {transportNumbers
-                      .filter(num => num.transport_type === type.id)
-                      .map(num => num.application_id)
                       .join(', ')}
                   </td>
                 </tr>
