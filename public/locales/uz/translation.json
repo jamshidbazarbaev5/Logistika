@@ -140,5 +140,194 @@
     "passwordPlaceholder": "Parolni kiriting",
     "signIn": "Kirish",
     "error": "Noto'g'ri foydalanuvchi nomi yoki parol"
+  },
+  "applicationList": {
+    "title": "Arizalar",
+    "createApplication": "Ariza Yaratish",
+    "errorLoading": "Arizalarni yuklashda xatolik yuz berdi",
+    "deleteTitle": "Arizani O'chirish",
+    "deleteConfirmation": "\"{{declarationNumber}}\" arizasini o'chirmoqchimisiz? Bu amalni qaytarib bo'lmaydi.",
+    "delete": "O'chirish",
+    "deleteSuccess": "Ariza muvaffaqiyatli o'chirildi",
+    "unknownFirm": "Noma'lum Firma",
+    "table": {
+      "number": "№",
+      "declarationNumber": "Deklaratsiya Raqami",
+      "firmName": "Firma Nomi",
+      "brutto": "Brutto",
+      "dates": "Sanalar",
+      "quantities": "Miqdorlar",
+      "actions": "Amallar",
+      "modes": "Rejimlar"
+    }
+  },
+  "categoryList": {
+    "title": "Mahsulot Kategoriyalari",
+    "createCategory": "Kategoriya Yaratish",
+    "errorLoading": "Kategoriyalarni yuklashda xatolik yuz berdi",
+    "deleteTitle": "Kategoriyani O'chirish",
+    "deleteConfirmation": "\"{{name}}\" kategoriyasini o'chirmoqchimisiz? Bu amalni qaytarib bo'lmaydi.",
+    "delete": "O'chirish",
+    "deleteSuccess": "Kategoriya muvaffaqiyatli o'chirildi",
+    "editSuccess": "Kategoriya muvaffaqiyatli yangilandi",
+    "editError": "Kategoriyani yangilashda xatolik yuz berdi",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "edit": "Tahrirlash",
+    "table": {
+      "id": "ID",
+      "name": "Kategoriya Nomi",
+      "actions": "Amallar"
+    }
+  },
+  "createPaymentMethod": {
+    "title": "To'lov Usulini Yaratish",
+    "subtitle": "Tizimga yangi to'lov usulini qo'shing",
+    "paymentMethodName": "To'lov Usuli Nomi",
+    "successMessage": "To'lov usuli muvaffaqiyatli yaratildi!"
+  },
+  "paymentMethodList": {
+    "title": "To'lov Usullari",
+    "createPaymentMethod": "To'lov Usulini Yaratish",
+    "idColumn": "ID",
+    "nameColumn": "To'lov Usuli Nomi",
+    "actionsColumn": "Amallar",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "deleteTitle": "To'lov Usulini O'chirish",
+    "deleteConfirmation": "Haqiqatan ham \"{{name}}\" to'lov usulini o'chirishni xohlaysizmi? Bu amalni qaytarib bo'lmaydi.",
+    "deleteSuccess": "To'lov usuli muvaffaqiyatli o'chirildi",
+    "editSuccess": "To'lov usuli muvaffaqiyatli yangilandi",
+    "editError": "To'lov usulini yangilashda xatolik yuz berdi"
+  },
+  "modeList": {
+    "title": "Rejimlar",
+    "createMode": "Rejim Yaratish",
+    "table": {
+      "id": "ID",
+      "name": "Rejim Nomi",
+      "code": "Rejim Kodi",
+      "actions": "Amallar"
+    },
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "deleteTitle": "Rejimni O'chirish",
+    "deleteConfirmation": "Haqiqatan ham \"{{name}}\" rejimini o'chirishni xohlaysizmi? Bu amalni qaytarib bo'lmaydi.",
+    "deleteSuccess": "Rejim muvaffaqiyatli o'chirildi",
+    "editSuccess": "Rejim muvaffaqiyatli yangilandi",
+    "editError": "Rejimni yangilashda xatolik yuz berdi"
+  },
+  "createMeasurement": {
+    "title": "O'lchov Birligini Yaratish",
+    "subtitle": "Tizimga yangi o'lchov birligini qo'shing",
+    "form": {
+      "name": "O'lchov Birligi Nomi"
+    },
+    "submit": "O'lchov Birligini Yaratish",
+    "successMessage": "O'lchov birligi muvaffaqiyatli yaratildi!"
+  },
+  "measurementList": {
+    "title": "O'lchov Birliklari",
+    "createMeasurement": "O'lchov Birligini Yaratish",
+    "table": {
+      "id": "ID",
+      "name": "O'lchov Birligi Nomi",
+      "actions": "Amallar"
+    },
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "deleteTitle": "O'lchov Birligini O'chirish",
+    "deleteConfirmation": "Haqiqatan ham \"{{name}}\" o'lchov birligini o'chirishni xohlaysizmi? Bu amalni qaytarib bo'lmaydi.",
+    "deleteSuccess": "O'lchov birligi muvaffaqiyatli o'chirildi",
+    "editSuccess": "O'lchov birligi muvaffaqiyatli yangilandi",
+    "editError": "O'lchov birligini yangilashda xatolik yuz berdi"
+  },
+  "firmList": {
+    "title": "Firmalar",
+    "createFirm": "Firma Yaratish",
+    "errorLoading": "Firmalarni yuklashda xatolik yuz berdi",
+    "deleteTitle": "Firmani O'chirish",
+    "deleteConfirmation": "\"{{name}}\" firmasini o'chirmoqchimisiz? Bu amalni qaytarib bo'lmaydi.",
+    "delete": "O'chirish",
+    "deleteSuccess": "Firma muvaffaqiyatli o'chirildi",
+    "editTitle": "Firmani Tahrirlash",
+    "editSuccess": "Firma muvaffaqiyatli yangilandi",
+    "editError": "Firmani yangilashda xatolik yuz berdi",
+    "table": {
+      "number": "№",
+      "inn": "STIR",
+      "firmName": "Firma Nomi",
+      "phoneNumber": "Telefon Raqami",
+      "director": "Direktor",
+      "trustee": "Ishonchli Vakil",
+      "actions": "Amallar"
+    },
+    "form": {
+      "inn": "STIR",
+      "firmName": "Firma Nomi",
+      "phoneNumberFirm": "Firma Telefon Raqami",
+      "fullNameDirector": "Direktor To'liq Ismi",
+      "phoneNumberDirector": "Direktor Telefon Raqami",
+      "firmTrustee": "Ishonchli Vakil",
+      "phoneNumberTrustee": "Ishonchli Vakil Telefon Raqami"
+    },
+    "edit": "Tahrirlash",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish"
+  },
+  "transportList": {
+    "title": "Transportlar",
+    "createTransport": "Transport Turini Yaratish",
+    "createNumber": "Transport Raqamini Qo'shish",
+    "errorLoading": "Transportlarni yuklashda xatolik yuz berdi",
+    "table": {
+      "id": "ID",
+      "type": "Transport Turi",
+      "number": "Transport Raqami"
+    }
+  },
+  "storageList": {
+    "title": "Omborlar",
+    "createStorage": "Ombor Yaratish",
+    "errorLoading": "Omborlarni yuklashda xatolik yuz berdi",
+    "deleteTitle": "Omborni O'chirish",
+    "deleteConfirmation": "\"{{name}}\" omborini o'chirishni xohlaysizmi? Bu amalni qaytarib bo'lmaydi.",
+    "deleteSuccess": "Ombor muvaffaqiyatli o'chirildi",
+    "deleteError": "Omborni o'chirishda xatolik yuz berdi",
+    "editSuccess": "Ombor muvaffaqiyatli yangilandi",
+    "editError": "Omborni yangilashda xatolik yuz berdi",
+    "save": "Saqlash",
+    "cancel": "Bekor qilish",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "table": {
+      "id": "ID",
+      "name": "Ombor Nomi",
+      "location": "Joylashuvi",
+      "actions": "Amallar"
+    }
+  },
+  "menu": {
+    "mainMenu": "ASOSIY MENYU",
+    "general": "UMUMIY",
+    "others": "BOSHQALAR",
+    "firm": "Firmalar",
+    "storage": "Omborlar",
+    "transport": "Transport",
+    "payment": "To'lov",
+    "createMode": "Rejimlar",
+    "createApplication": "Arizalar",
+    "createProduct": "Mahsulotlar",
+    "createCategory": "Kategoriyalar",
+    "measurement": "O'lchov Birliklari",
+    "account": "Hisob",
+    "settings": "Sozlamalar",
+    "logout": "Chiqish"
   }
 } 

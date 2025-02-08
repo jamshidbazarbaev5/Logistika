@@ -69,7 +69,7 @@ export default function CreateFirm() {
     <div className="p-4 sm:p-6">
       <div className="mb-6 sm:mb-8">
         <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white transition-colors">
-          {t('createFirm.title')}
+          {t('createFirm.title')}   
         </h1>
         <p className="mt-1 sm:mt-2 text-sm text-gray-600 dark:text-gray-400 transition-colors">
           {t('createFirm.subtitle')}

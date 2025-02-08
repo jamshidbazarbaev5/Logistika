@@ -1,143 +1,337 @@
 {
   "createFirm": {
-    "title": "Жаңа Фирма Жаратыў",
-    "subtitle": "Жаңа фирманы дизимнен өткизиў ушын барлық мағлыўматларды толтырың",
+    "title": "Jańa Firma Jaratıw",
+    "subtitle": "Jańa firmanı dizimnen ótkiziw ushın barlıq mag'lıwmatlardı toltırıń",
     "companyInfo": {
-      "title": "Компания Мағлыўматлары",
-      "inn": "СТИР",
-      "innPlaceholder": "СТИР номерин киритиң",
-      "firmName": "Фирма Аты",
-      "firmNamePlaceholder": "Фирма атын киритиң",
-      "phoneNumber": "Компания Телефон Номери",
+      "title": "Kompaniya Mag'lıwmatları",
+      "inn": "STIR",
+      "innPlaceholder": "STIR nomerin kiritiń",
+      "firmName": "Firma Atı",
+      "firmNamePlaceholder": "Firma atın kiritiń",
+      "phoneNumber": "Kompaniya Telefon Nomeri",
       "phonePlaceholder": "+998 90 123 45 67"
     },
     "directorInfo": {
-      "title": "Директор Мағлыўматлары",
-      "fullName": "Директор Толық Аты",
-      "fullNamePlaceholder": "Директор толық атын киритиң",
-      "phoneNumber": "Директор Телефон Номери",
+      "title": "Direktor Mag'lıwmatları",
+      "fullName": "Direktor Tolıq Atı",
+      "fullNamePlaceholder": "Direktor tolıq atın kiritiń",
+      "phoneNumber": "Direktor Telefon Nomeri",
       "phonePlaceholder": "+998 90 987 65 43"
     },
     "trusteeInfo": {
-      "title": "Исеним Ўәкили Мағлыўматлары",
-      "fullName": "Исеним Ўәкили Толық Аты",
-      "fullNamePlaceholder": "Исеним ўәкили толық атын киритиң",
-      "phoneNumber": "Исеним Ўәкили Телефон Номери",
+      "title": "Isenim Wákili Mag'lıwmatları",
+      "fullName": "Isenim Wákili Tolıq Atı",
+      "fullNamePlaceholder": "Isenim wákili tolıq atın kiritiń",
+      "phoneNumber": "Isenim Wákili Telefon Nomeri",
       "phonePlaceholder": "+998 93 321 09 87"
     },
-    "submit": "Фирма Жаратыў"
+    "submit": "Firma Jaratıw"
   },
   "createApplication": {
-    "title": "Өтиниш Жаратыў",
-    "subtitle": "Жаңа өтиниш жаратыў ушын форманы толтырың",
-    "comingDate": "Келиў Сәнеси",
-    "declarationInfo": "Декларация Мағлыўматлары",
-    "declarationNumber": "Декларация Номери",
-    "declarationFile": "Декларация Файлы",
-    "declarationDate": "Декларация Сәнеси",
-    "unloadingQuantity": "Түсириў Муғдары",
-    "submit": "Өтиниш Жаратыў",
-    "successMessage": "Өтиниш табыслы жаратылды!"
+    "title": "Ótinish Jaratıw",
+    "subtitle": "Jańa ótinish jaratıw ushın formanı toltırıń",
+    "comingDate": "Keliw Sánesi",
+    "declarationInfo": "Deklaraciya Mag'lıwmatları",
+    "declarationNumber": "Deklaraciya Nomeri",
+    "declarationFile": "Deklaraciya Faylı",
+    "declarationDate": "Deklaraciya Sánesi",
+    "unloadingQuantity": "Túsiriw Mug'darı",
+    "submit": "Ótinish Jaratıw",
+    "successMessage": "Ótinish tabıslı jaratıldı!"
   },
   "photoUpload": {
-    "title": "Сүўрет Жүклеў",
-    "subtitle": "Өтиниш ушын сүўретлерди жүклең",
-    "applicationId": "Өтиниш",
-    "selectApplication": "Өтиништи таңлаң",
-    "preview": "Алдын көриў",
-    "errorFileType": "Өтиниш, сүўрет файлын таңлаң",
-    "errorNoFile": "Өтиниш, жүклеў ушын файл таңлаң",
-    "errorNoApplication": "Өтиниш, өтиништи таңлаң",
-    "uploading": "Жүкленип атыр...",
-    "submit": "Сүўрет Жүклеў",
-    "successMessage": "Сүўрет табыслы жүкленди!"
+    "title": "Súwret Júklew",
+    "subtitle": "Ótinish ushın súwretlerdi júkleń",
+    "applicationId": "Ótinish",
+    "selectApplication": "Ótinishti tańlań",
+    "preview": "Aldın kóriw",
+    "errorFileType": "Ótinish, súwret faylın tańlań",
+    "errorNoFile": "Ótinish, júklew ushın fayl tańlań",
+    "errorNoApplication": "Ótinish, ótinishti tańlań",
+    "uploading": "Júklenip atır...",
+    "submit": "Súwret Júklew",
+    "successMessage": "Súwret tabıslı júklendi!"
   },
   "createKeepingService": {
-    "title": "Сақлаў Хызметин Жаратыў",
-    "subtitle": "Жаңа сақлаў хызметин қосыў",
+    "title": "Saqlaw Xızmetin Jaratıw",
+    "subtitle": "Jańa saqlaw xızmetin qosıw",
     "serviceInfo": {
-      "name": "Хызмет Аты",
-      "baseDay": "Тийкарғы Күнлер",
-      "basePrice": "Тийкарғы Баҳа",
-      "extraPrice": "Қосымша Баҳа"
+      "name": "Xızmet Atı",
+      "baseDay": "Tiykarg'ı Kúnler",
+      "basePrice": "Tiykarg'ı Baha",
+      "extraPrice": "Qosımsha Baha"
     },
-    "submit": "Хызмет Жаратыў",
-    "successMessage": "Сақлаў хызмети табыслы жаратылды!"
+    "submit": "Xızmet Jaratıw",
+    "successMessage": "Saqlaw xızmeti tabıslı jaratıldı!"
   },
   "createWorkingService": {
-    "title": "Жумыс Хызметин Жаратыў",
-    "subtitle": "Жаңа жумыс хызметин қосыў",
+    "title": "Jumıs Xızmetin Jaratıw",
+    "subtitle": "Jańa jumıs xızmetin qosıw",
     "serviceInfo": {
-      "name": "Хызмет Аты",
-      "price": "Баҳа",
-      "baseDay": "Тийкарғы Күнлер",
-      "basePrice": "Тийкарғы Баҳа",
-      "extraPrice": "Қосымша Баҳа",
-      "units": "Өлшем Бирликлери"
+      "name": "Xızmet Atı",
+      "price": "Baha",
+      "baseDay": "Tiykarg'ı Kúnler",
+      "basePrice": "Tiykarg'ı Baha",
+      "extraPrice": "Qosımsha Baha",
+      "units": "Ólshem Birlikleri"
     },
-    "submit": "Хызмет Жаратыў",
-    "successMessage": "Жумыс хызмети табыслы жаратылды!"
+    "submit": "Xızmet Jaratıw",
+    "successMessage": "Jumıs xızmeti tabıslı jaratıldı!"
   },
   "createItemCategory": {
-    "title": "Категория Жаратыў",
-    "subtitle": "Өнимлер ушын жаңа категория жаратыў",
-    "categoryInfo": "Категория Мағлыўматлары",
-    "name": "Категория Аты",
-    "submit": "Категория Жаратыў",
-    "successMessage": "Категория табыслы жаратылды!"
+    "title": "Kategoriya Jaratıw",
+    "subtitle": "Ónimler ushın jańa kategoriya jaratıw",
+    "categoryInfo": "Kategoriya Mag'lıwmatları",
+    "name": "Kategoriya Atı",
+    "submit": "Kategoriya Jaratıw",
+    "successMessage": "Kategoriya tabıslı jaratıldı!"
   },
   "createTransportNumber": {
-    "title": "Транспорт Номерин Жаратыў",
-    "subtitle": "Жаңа транспорт номерин қосыў",
-    "number": "Транспорт Номери",
-    "type": "Транспорт Түри",
-    "applicationId": "Өтиниш ID",
-    "submit": "Транспорт Номерин Жаратыў",
-    "successMessage": "Транспорт номери табыслы жаратылды!"
+    "title": "Transport Nomerin Jaratıw",
+    "subtitle": "Jańa transport nomerin qosıw",
+    "number": "Transport Nomeri",
+    "type": "Transport Túri",
+    "applicationId": "Ótinish ID",
+    "submit": "Transport Nomerin Jaratıw",
+    "successMessage": "Transport nomeri tabıslı jaratıldı!"
   },
   "createStorage": {
-    "title": "Қойма Жаратыў",
-    "subtitle": "Жаңа қойма қосыў",
+    "title": "Qoyma Jaratıw",
+    "subtitle": "Jańa qoyma qosıw",
     "storageInfo": {
-      "title": "Қойма Мағлыўматлары",
-      "name": "Қойма Аты",
-      "location": "Қойма Жайласыўы"
+      "title": "Qoyma Mag'lıwmatları",
+      "name": "Qoyma Atı",
+      "location": "Qoyma Jaylasıwı"
     },
-    "submit": "Қойма Жаратыў",
-    "successMessage": "Қойма табыслы жаратылды!"
+    "submit": "Qoyma Jaratıw",
+    "successMessage": "Qoyma tabıslı jaratıldı!"
   },
   "createProductQuantity": {
-    "title": "Өним Муғдарын Жаратыў",
-    "subtitle": "Сақлаў ҳәм өтинишлер ушын өним муғдарын тайынлаў",
-    "quantityInfo": "Муғдар Мағлыўматлары",
-    "product": "Өним",
-    "storage": "Қойма",
-    "application": "Өтиниш",
-    "quantity": "Муғдары",
-    "submit": "Өним Муғдарын Жаратыў",
-    "successMessage": "Өним муғдары табыслы жаратылды!"
+    "title": "Ónim Mug'darın Jaratıw",
+    "subtitle": "Saqlaw hám ótinishler ushın ónim mug'darın tayınlaw",
+    "quantityInfo": "Mug'dar Mag'lıwmatları",
+    "product": "Ónim",
+    "storage": "Qoyma",
+    "application": "Ótinish",
+    "quantity": "Mug'darı",
+    "submit": "Ónim Mug'darın Jaratıw",
+    "successMessage": "Ónim mug'darı tabıslı jaratıldı!"
   },
   "mode": {
-    "title": "Режим Жаратыў",
-    "subtitle": "Жаңа режим қосыў",
-    "name": "Режим Аты",
-    "code": "Режим Коды",
-    "creating": "Жаратылып атыр...",
-    "create": "Режим Жаратыў",
-    "successMessage": "Режим табыслы жаратылды!"
+    "title": "Rejim Jaratıw",
+    "subtitle": "Jańa rejim qosıw",
+    "name": "Rejim Atı",
+    "code": "Rejim Kodı",
+    "creating": "Jaratılıp atır...",
+    "create": "Rejim Jaratıw",
+    "successMessage": "Rejim tabıslı jaratıldı!"
   },
   "common": {
-    "success": "Табыслы!",
-    "ok": "OK"
+    "success": "Tabıslı!",
+    "ok": "OK",
+    "error": "Qátelik!"
   },
   "login": {
-    "title": "Есапқа кириў",
-    "subtitle": "Есапқа кириў ушын мағлыўматларыңызды киритиң",
-    "username": "Пайдаланыўшы аты",
-    "usernamePlaceholder": "Пайдаланыўшы атын киритиң",
-    "password": "Парол",
-    "passwordPlaceholder": "Паролди киритиң",
-    "signIn": "Кириў",
-    "error": "Надурыс пайдаланыўшы аты ямаса парол"
+    "title": "Esapqa kiriw",
+    "subtitle": "Esapqa kiriw ushın mag'lıwmatlarıńızdı kiritiń",
+    "username": "Paydalanıwshı atı",
+    "usernamePlaceholder": "Paydalanıwshı atın kiritiń",
+    "password": "Parol",
+    "passwordPlaceholder": "Paroldi kiritiń",
+    "signIn": "Kiriw",
+    "error": "Nadurıs paydalanıwshı atı yamasa parol"
+  },
+  "confirmModal": {
+    "title": "Háreketti tastıyıqlań",
+    "message": "Dawam etiwdi qáleysiz be?",
+    "confirmText": "Tastıyıqlaw",
+    "cancelText": "Biykarlaw"
+  },
+  "applicationList": {
+    "title": "Ótinishler",
+    "createApplication": "Ótinish Jaratıw",
+    "errorLoading": "Ótinishlerdi júklewde qátelik júz berdi",
+    "deleteTitle": "Ótinishti Óshiriw",
+    "deleteConfirmation": "\"{{declarationNumber}}\" ótinishin óshirmekshimisiz? Bul háreketti qaytarıw múmkin emes.",
+    "delete": "Óshiriw",
+    "deleteSuccess": "Ótinish tabıslı óshirildi",
+    "unknownFirm": "Belgisiz Firma",
+    "table": {
+      "number": "№",
+      "declarationNumber": "Deklaraciya Nomeri",
+      "firmName": "Firma Atı",
+      "brutto": "Brutto",
+      "dates": "Sáneler",
+      "quantities": "Mug'darlar",
+      "actions": "Háreketler",
+      "modes": "Rejimler"
+    }
+  },
+  "categoryList": {
+    "title": "Ónim Kategoriyaları",
+    "createCategory": "Kategoriya Jaratıw",
+    "errorLoading": "Kategoriyalardı júklewde qátelik júz berdi",
+    "deleteTitle": "Kategoriyanı Óshiriw",
+    "deleteConfirmation": "\"{{name}}\" kategoriyasın óshirmekshimisiz? Bul háreketti qaytarıw múmkin emes.",
+    "delete": "Óshiriw",
+    "deleteSuccess": "Kategoriya tabıslı óshirildi",
+    "editSuccess": "Kategoriya tabıslı jańalandı",
+    "editError": "Kategoriyanı jańalawda qátelik júz berdi",
+    "save": "Saqlaw",
+    "cancel": "Biykarlaw",
+    "edit": "Ózgertiw",
+    "table": {
+      "id": "ID",
+      "name": "Kategoriya Atı",
+      "actions": "Háreketler"
+    }
+  },
+  "createPaymentMethod": {
+    "title": "Tólew Usılın Jaratıw",
+    "subtitle": "Sistemag'a jańa tólew usılın qosıw",
+    "paymentMethodName": "Tólew Usılınıń Atı",
+    "successMessage": "Tólew usılı tabıslı jaratıldı!"
+  },
+  "paymentMethodList": {
+    "title": "Tólew Usılları",
+    "createPaymentMethod": "Tólew Usılın Jaratıw",
+    "idColumn": "ID",
+    "nameColumn": "Tólew Usılınıń Atı",
+    "actionsColumn": "Háreketler",
+    "edit": "Ózgertiw",
+    "delete": "Óshiriw",
+    "save": "Saqlaw",
+    "cancel": "Biykar etiw",
+    "deleteTitle": "Tólew Usılın Óshiriw",
+    "deleteConfirmation": "Haqıyqattan da \"{{name}}\" tólew usılın óshiriwdi qáleysizbe? Bul háreketti qaytarıw múmkin emes.",
+    "deleteSuccess": "Tólew usılı tabıslı óshirildi",
+    "editSuccess": "Tólew usılı tabıslı jańalandı",
+    "editError": "Tólew usılın jańalawda qátelik júz berdi"
+  },
+  "modeList": {
+    "title": "Rejimler",
+    "createMode": "Rejim Jaratıw",
+    "table": {
+      "id": "ID",
+      "name": "Rejim Atı",
+      "code": "Rejim Kodı",
+      "actions": "Háreketler"
+    },
+    "edit": "Ózgertiw",
+    "delete": "Óshiriw",
+    "save": "Saqlaw",
+    "cancel": "Biykar etiw",
+    "deleteTitle": "Rejimdi Óshiriw",
+    "deleteConfirmation": "Haqıyqattan da \"{{name}}\" rejimin óshiriwdi qáleysizbe? Bul háreketti qaytarıw múmkin emes.",
+    "deleteSuccess": "Rejim tabıslı óshirildi",
+    "editSuccess": "Rejim tabıslı jańalandı",
+    "editError": "Rejimdi jańalawda qátelik júz berdi"
+  },
+  "createMeasurement": {
+    "title": "Ólshew Birligin Jaratıw",
+    "subtitle": "Sistemag'a jańa ólshew birligin qosıw",
+    "form": {
+      "name": "Ólshew Birliginiń Atı"
+    },
+    "submit": "Ólshew Birligin Jaratıw",
+    "successMessage": "Ólshew birligi tabıslı jaratıldı!"
+  },
+  "measurementList": {
+    "title": "Ólshew Birlikleri",
+    "createMeasurement": "Ólshew Birligin Jaratıw",
+    "table": {
+      "id": "ID",
+      "name": "Ólshew Birliginiń Atı",
+      "actions": "Háreketler"
+    },
+    "edit": "Ózgertiw",
+    "delete": "Óshiriw",
+    "save": "Saqlaw",
+    "cancel": "Biykar etiw",
+    "deleteTitle": "Ólshew Birligin Óshiriw",
+    "deleteConfirmation": "Haqıyqattan da \"{{name}}\" ólshew birligin óshiriwdi qáleysizbe? Bul háreketti qaytarıw múmkin emes.",
+    "deleteSuccess": "Ólshew birligi tabıslı jaratıldı!"
+  },
+  "firmList": {
+    "title": "Firmalar",
+    "createFirm": "Firma Jaratıw",
+    "errorLoading": "Firmalardı júklewde qátelik júz berdi",
+    "deleteTitle": "Firmanı Óshiriw",
+    "deleteConfirmation": "\"{{name}}\" firmasın óshirmekshimisiz? Bul háreketti qaytarıw múmkin emes.",
+    "delete": "Óshiriw",
+    "deleteSuccess": "Firma tabıslı óshirildi",
+    "editTitle": "Firmanı Ózgertiw",
+    "editSuccess": "Firma tabıslı jańalandı",
+    "editError": "Firmanı jańalawda qátelik júz berdi",
+    "table": {
+      "number": "№",
+      "inn": "STIR",
+      "firmName": "Firma Atı",
+      "phoneNumber": "Telefon Nomeri",
+      "director": "Direktor",
+      "trustee": "Isenim Wákili",
+      "actions": "Háreketler"
+    },
+    "form": {
+      "inn": "STIR",
+      "firmName": "Firma Atı",
+      "phoneNumberFirm": "Firma Telefon Nomeri",
+      "fullNameDirector": "Direktor Tolıq Atı",
+      "phoneNumberDirector": "Direktor Telefon Nomeri",
+      "firmTrustee": "Isenim Wákili",
+      "phoneNumberTrustee": "Isenim Wákili Telefon Nomeri"
+    },
+    "edit": "Ózgertiw",
+    "save": "Saqlaw",
+    "cancel": "Biykarlaw"
+  },
+  "transportList": {
+    "title": "Transportlar",
+    "createTransport": "Transport Túrin Jaratıw",
+    "createNumber": "Transport Nomerin Qosıw",
+    "errorLoading": "Transportlardı júklewde qátelik júz berdi",
+    "table": {
+      "id": "ID",
+      "type": "Transport Túri",
+      "number": "Transport Nomeri"
+    }
+  },
+  "storageList": {
+    "title": "Qoymalar",
+    "createStorage": "Qoyma Jaratıw",
+    "errorLoading": "Qoymalardı júklewde qátelik júz berdi",
+    "deleteTitle": "Qoymanı Óshiriw",
+    "deleteConfirmation": "\"{{name}}\" qoymasın óshiriwdi qáleysiz be? Bul háreketti qaytarıw múmkin emes.",
+    "deleteSuccess": "Qoyma tabıslı óshirildi",
+    "deleteError": "Qoymanı óshiriwde qátelik júz berdi",
+    "editSuccess": "Qoyma tabıslı jańalandı",
+    "editError": "Qoymanı jańalawda qátelik júz berdi",
+    "save": "Saqlaw",
+    "cancel": "Biykarlaw",
+    "edit": "Ózgertiw",
+    "delete": "Óshiriw",
+    "table": {
+      "id": "ID",
+      "name": "Qoyma Atı",
+      "location": "Jaylasıwı",
+      "actions": "Háreketler"
+    }
+  },
+  "menu": {
+    "mainMenu": "BAS MENYU",
+    "general": "ULÍWMA",
+    "others": "BASQALAR",
+    "firm": "Firmalar",
+    "storage": "Qoymalar",
+    "transport": "Transport",
+    "payment": "Tólew",
+    "createMode": "Rejimler",
+    "createApplication": "Arızalar",
+    "createProduct": "Ónimler",
+    "createCategory": "Kategoriyalar",
+    "measurement": "Ólshew Birlikleri",
+    "account": "Akkaunt",
+    "settings": "Sazlawlar",
+    "logout": "Shıǵıw"
   }
-} 
+}

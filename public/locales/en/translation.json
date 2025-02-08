@@ -26,5 +26,11 @@
       "phonePlaceholder": "+998 93 321 09 87"
     },
     "submit": "Create Firm"
+  },
+  "confirmModal": {
+    "title": "Confirm Action",
+    "message": "Are you sure you want to proceed?",
+    "confirmText": "Confirm",
+    "cancelText": "Cancel"
   }
 }

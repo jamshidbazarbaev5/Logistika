@@ -492,18 +492,18 @@ export default function CreateApplication() {
   const workingServicesRef = useRef<HTMLDivElement>(null);
   const [showCreateFirmModal, setShowCreateFirmModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [] = useState({
-    quantity: 0,
-    product_id: 0,
-    storage_id: 0
-  });
-  const [] = useState({
-    transport_number: "",
-    transport_type: 1
-  });
-  const [] = useState("");
-  const [] = useState("");
-  const [] = useState("");
+  // const [] = useState({
+  //   quantity: 0,
+  //   product_id: 0,
+  //   storage_id: 0
+  // });
+  // const [] = useState({
+  //   transport_number: "",
+  //   transport_type: 1
+  // });
+  // const [] = useState("");
+  // const [] = useState("");
+  // const [] = useState("");
   const [, setShowProductDropdown] = useState(false);
   const [, setShowStorageDropdown] = useState(false);
   const [, setShowTransportTypeDropdown] = useState(false);

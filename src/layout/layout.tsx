@@ -17,31 +17,31 @@ import {
 } from 'react-icons/ri';
 
 const mainMenuItems = [
-  { name: "firm", icon: RiBuilding2Fill, href: "/firm-list" },
-  { name: "Storage", icon: RiStore2Fill, href: "/storage-list" },
-  { name: "Transport", icon: RiTruckFill, href: "/transport-list" },
-  { name: "Payment", icon: RiBankCardFill, href: "/payment-list" },
+  { name: "menu.firm", icon: RiBuilding2Fill, href: "/firm-list" },
+  { name: "menu.storage", icon: RiStore2Fill, href: "/storage-list" },
+  { name: "menu.transport", icon: RiTruckFill, href: "/transport-list" },
+  { name: "menu.payment", icon: RiBankCardFill, href: "/payment-list" },
   // { name: "Photo Report", icon: RiCameraFill, href: "/photo-report" },
-  { name: "CreateMode", icon: RiSettings4Fill, href: "/modes" },
-  { name: "CreateApplication", icon: RiFileAddFill, href: "/application-list" },
-  { name: "CreateProduct", icon: RiTBoxFill, href: "/product" },
+  { name: "menu.createMode", icon: RiSettings4Fill, href: "/modes" },
+  { name: "menu.createApplication", icon: RiFileAddFill, href: "/application-list" },
+  { name: "menu.createProduct", icon: RiTBoxFill, href: "/product" },
   // { name: "CreateProductQuantity", icon: RiBarChartFill, href: "/product-quantity" },
-  { name: "CreateCategory", icon: RiBarChartFill, href: "/category" },
-  { name: "Measurement", icon: RiBarChartFill, href: "/measurements" },
+  { name: "menu.createCategory", icon: RiBarChartFill, href: "/category" },
+  { name: "menu.measurement", icon: RiBarChartFill, href: "/measurements" },
   
 ];
 
-const generalItems = [{ name: "Account", icon: RiUserFill, href: "/account" }];
+const generalItems = [{ name: "menu.account", icon: RiUserFill, href: "/account" }];
 
 const otherItems = [
-  { name: "Settings", icon: RiSettings4Fill, href: "/settings" },
-  { name: "Log out", icon: RiLogoutBoxRFill, href: "#" },
+  { name: "menu.settings", icon: RiSettings4Fill, href: "/settings" },
+  { name: "menu.logout", icon: RiLogoutBoxRFill, href: "#" },
 ];
 
 export default function Layout() {
   const [isOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
@@ -149,7 +149,7 @@ const toggleDarkMode = () => {
           <div className="space-y-6">
             <div className="min-w-[223px]">
               <p className="px-2 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                MAIN MENU
+                {t('menu.mainMenu')}
               </p>
               <div className="mt-4 space-y-1">
                 {mainMenuItems.map((item) => (
@@ -167,7 +167,7 @@ const toggleDarkMode = () => {
                       }`}
                   >
                     <item.icon className="h-5 w-5 flex-shrink-0" />
-                    <span className="ml-3">{item.name}</span>
+                    <span className="ml-3">{t(item.name)}</span>
                   </Link>
                 ))}
               </div>
@@ -176,7 +176,7 @@ const toggleDarkMode = () => {
             {/* General */}
             <div className="min-w-[256px]">
               <p className="px-2 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                GENERAL
+                {t('menu.general')}
               </p>
               <div className="mt-4 space-y-1">
                 {generalItems.map((item) => (
@@ -190,7 +190,7 @@ const toggleDarkMode = () => {
                       rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 whitespace-nowrap"
                   >
                     <item.icon className="h-5 w-5 flex-shrink-0" />
-                    <span className="ml-3">{item.name}</span>
+                    <span className="ml-3">{t(item.name)}</span>
                   </Link>
                 ))}
               </div>
@@ -199,7 +199,7 @@ const toggleDarkMode = () => {
             {/* Others */}
             <div className="min-w-[256px]">
               <p className="px-2 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                OTHERS
+                {t('menu.others')}
               </p>
               <div className="mt-4 space-y-1">
                 {otherItems.map((item) => (
@@ -208,7 +208,7 @@ const toggleDarkMode = () => {
                     to={item.href}
                     onClick={(e) => {
                       setIsMobileMenuOpen(false);
-                      if (item.name === "Log out") {
+                      if (item.name === "menu.logout") {
                         e.preventDefault();
                         handleLogout();
                       }
@@ -217,7 +217,7 @@ const toggleDarkMode = () => {
                       rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 whitespace-nowrap"
                   >
                     <item.icon className="h-5 w-5 flex-shrink-0" />
-                    <span className="ml-3">{item.name}</span>
+                    <span className="ml-3">{t(item.name)}</span>
                   </Link>
                 ))}
               </div>

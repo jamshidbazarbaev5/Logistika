@@ -7,6 +7,12 @@ import { api } from "../api/api";
 import ConfirmModal from "../components/ConfirmModal";
 import SuccessModal from "../components/SuccessModal";
 
+interface ApplicationMode {
+  id: number;
+  mode_id: number;
+  application_id: number;
+}
+
 interface Application {
   id: number;
   decloration_file: string;
@@ -27,6 +33,7 @@ interface Application {
   payment_method: number;
   keeping_services: number[];
   working_services: number[];
+  modes?: ApplicationMode[];
 }
 
 export default function ApplicationList() {
@@ -40,23 +47,42 @@ export default function ApplicationList() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [firms, setFirms] = useState<Record<number, string>>({});
+  const [modes, setModes] = useState<Record<number, ApplicationMode[]>>({});
 
   const fetchApplications = async () => {
     try {
-      const [applicationsResponse, firmsResponse] = await Promise.all([
+      const [applicationsResponse, firmsResponse, modesResponse] = await Promise.all([
         api.get('/application/'),
-        api.get('/firms/')
+        api.get('/firms/'),
+        api.get('/modes/application_modes/')
       ]);
+
+      console.log('Raw modes data:', modesResponse.data);
 
       const firmMap = firmsResponse.data.reduce((acc: Record<number, string>, firm: any) => {
         acc[firm.id] = firm.firm_name;
         return acc;
       }, {});
 
+      const modesMap = modesResponse.data.reduce((acc: Record<number, ApplicationMode[]>, mode: ApplicationMode) => {
+        if (!acc[mode.application_id]) {
+          acc[mode.application_id] = [];
+        }
+        // Only add unique mode_ids for each application
+        if (!acc[mode.application_id].some(m => m.mode_id === mode.mode_id)) {
+          acc[mode.application_id].push(mode);
+        }
+        return acc;
+      }, {});
+
+      // console.log('Processed modes map:', modesMap);
+
       setFirms(firmMap);
+      setModes(modesMap);
       setApplications(applicationsResponse.data);
       setLoading(false);
     } catch (err) {
+      console.error('Error fetching data:', err);
       setError(t("applicationList.errorLoading", "Error loading applications"));
       setLoading(false);
     }
@@ -136,72 +162,90 @@ export default function ApplicationList() {
                 {t("applicationList.table.quantities", "Quantities")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t("applicationList.table.modes", "Modes")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("applicationList.table.actions", "Actions")}
               </th>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            {applications.map((application, index) => (
-              <tr key={application.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {index + 1}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {application.decloration_number}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {firms[application.firm_id] || t("applicationList.unknownFirm", "Unknown Firm")}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {application.brutto || '-'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  <div>Coming: {application.coming_date}</div>
-                  <div className="text-gray-500 dark:text-gray-400">
-                    Declaration: {application.decloration_date}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  <div>Unloading: {application.unloading_quantity}</div>
-                  <div className="text-gray-500 dark:text-gray-400">
-                    Loading: {application.loading_quantity}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  <Menu as="div" className="relative inline-block text-left">
-                    <Menu.Button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
-                      <EllipsisVerticalIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                    </Menu.Button>
-                    <Transition
-                      as={Fragment}
-                      enter="transition ease-out duration-100"
-                      enterFrom="transform opacity-0 scale-95"
-                      enterTo="transform opacity-100 scale-100"
-                      leave="transition ease-in duration-75"
-                      leaveFrom="transform opacity-100 scale-100"
-                      leaveTo="transform opacity-0 scale-95"
-                    >
-                      <Menu.Items className="absolute right-0 z-50 mt-2 w-36 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <div className="py-1">
-                          <Menu.Item>
-                            {({ active }) => (
-                              <button
-                                onClick={() => handleDelete(application)}
-                                className={`${
-                                  active ? "bg-gray-100 dark:bg-gray-700" : ""
-                                } flex w-full items-center px-4 py-2 text-sm text-red-600 dark:text-red-400`}
-                              >
-                                {t("applicationList.delete", "Delete")}
-                              </button>
-                            )}
-                          </Menu.Item>
-                        </div>
-                      </Menu.Items>
-                    </Transition>
-                  </Menu>
-                </td>
-              </tr>
-            ))}
+            {applications.map((application, index) => {
+              console.log(`Modes for application ${application.id}:`, modes[application.id]);
+              return (
+                <tr key={application.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {index + 1}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {application.decloration_number}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {firms[application.firm_id] || t("applicationList.unknownFirm", "Unknown Firm")}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {application.brutto || '-'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    <div>Coming: {application.coming_date}</div>
+                    <div className="text-gray-500 dark:text-gray-400">
+                      Declaration: {application.decloration_date}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    <div>Unloading: {application.unloading_quantity}</div>
+                    <div className="text-gray-500 dark:text-gray-400">
+                      Loading: {application.loading_quantity}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {modes[application.id]?.map((mode) => (
+                      <span
+                        key={mode.id}
+                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-2 mb-1"
+                      >
+                        Mode {mode.mode_id}
+                      </span>
+                    )) || (
+                      <span className="text-gray-400">-</span>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    <Menu as="div" className="relative inline-block text-left">
+                      <Menu.Button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
+                        <EllipsisVerticalIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                      </Menu.Button>
+                      <Transition
+                        as={Fragment}
+                        enter="transition ease-out duration-100"
+                        enterFrom="transform opacity-0 scale-95"
+                        enterTo="transform opacity-100 scale-100"
+                        leave="transition ease-in duration-75"
+                        leaveFrom="transform opacity-100 scale-100"
+                        leaveTo="transform opacity-0 scale-95"
+                      >
+                        <Menu.Items className="absolute right-0 z-50 mt-2 w-36 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                          <div className="py-1">
+                            <Menu.Item>
+                              {({ active }) => (
+                                <button
+                                  onClick={() => handleDelete(application)}
+                                  className={`${
+                                    active ? "bg-gray-100 dark:bg-gray-700" : ""
+                                  } flex w-full items-center px-4 py-2 text-sm text-red-600 dark:text-red-400`}
+                                >
+                                  {t("applicationList.delete", "Delete")}
+                                </button>
+                              )}
+                            </Menu.Item>
+                          </div>
+                        </Menu.Items>
+                      </Transition>
+                    </Menu>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
