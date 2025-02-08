@@ -57,7 +57,6 @@ export default function ApplicationList() {
         api.get('/modes/application_modes/')
       ]);
 
-      console.log('Raw modes data:', modesResponse.data);
 
       const firmMap = firmsResponse.data.reduce((acc: Record<number, string>, firm: any) => {
         acc[firm.id] = firm.firm_name;
@@ -68,14 +67,13 @@ export default function ApplicationList() {
         if (!acc[mode.application_id]) {
           acc[mode.application_id] = [];
         }
-        // Only add unique mode_ids for each application
         if (!acc[mode.application_id].some(m => m.mode_id === mode.mode_id)) {
           acc[mode.application_id].push(mode);
         }
         return acc;
       }, {});
 
-      // console.log('Processed modes map:', modesMap);
+
 
       setFirms(firmMap);
       setModes(modesMap);

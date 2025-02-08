@@ -159,7 +159,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => {
   const [storageId, setStorageId] = useState<number>(0);
   const [products, setProducts] = useState<Product[]>([]);
   const [storages, setStorages] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -217,23 +217,20 @@ const ProductsTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => {
     <div className="p-6 bg-white rounded-lg shadow-sm">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
             Product
           </label>
           <select
             value={selectedProduct}
             onChange={(e) => setSelectedProduct(e.target.value)}
-            className="block w-full rounded-lg border-gray-300 shadow-sm
-              focus:border-[#6C5DD3] focus:ring-[#6C5DD3]
-              text-gray-700 text-sm
-              transition-colors duration-200"
+            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+              px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
+              focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
+              dark:text-gray-100 transition-colors"
           >
             <option value="">Select Product</option>
             {products.map((product, index) => (
-              <option 
-                key={`${product.name}-${index}`} 
-                value={product.name}
-              >
+              <option key={`${product.name}-${index}`} value={product.name}>
                 {product.name}
               </option>
             ))}
@@ -241,16 +238,16 @@ const ProductsTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
             Storage
           </label>
           <select
             value={storageId}
             onChange={(e) => setStorageId(Number(e.target.value))}
-            className="block w-full rounded-lg border-gray-300 shadow-sm
-              focus:border-[#6C5DD3] focus:ring-[#6C5DD3]
-              text-gray-700 text-sm
-              transition-colors duration-200"
+            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+              px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
+              focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
+              dark:text-gray-100 transition-colors"
           >
             <option value={0}>Select Storage</option>
             {storages.map(storage => (
@@ -262,7 +259,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
             Quantity
           </label>
           <input
@@ -270,22 +267,22 @@ const ProductsTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => {
             value={quantity}
             onChange={(e) => setQuantity(Number(e.target.value))}
             min="1"
-            className="block w-full rounded-lg border-gray-300 shadow-sm
-              focus:border-[#6C5DD3] focus:ring-[#6C5DD3]
-              text-gray-700 text-sm
-              transition-colors duration-200"
+            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+              px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
+              focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
+              dark:text-gray-100 transition-colors"
           />
         </div>
       </div>
 
       <button
         onClick={handleAddProduct}
-        disabled={!quantity || !selectedProduct || !storageId || loading}
-        className="mt-6 w-full sm:w-auto px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
-          hover:bg-[#5b4eb3] disabled:opacity-50 disabled:cursor-not-allowed
+        disabled={!selectedProduct || !storageId || !quantity}
+        className="mt-6 w-full sm:w-auto px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg 
+          font-medium hover:bg-[#5b4eb3] disabled:opacity-50 disabled:cursor-not-allowed
           transition-colors duration-200 ease-in-out shadow-sm"
       >
-        {loading ? 'Adding...' : 'Add Product'}
+        Add Product
       </button>
     </div>
   );
@@ -458,27 +455,6 @@ export default function CreateApplication() {
   const [, setProducts] = useState<Product[]>([]);
   const [, setStorages] = useState<any[]>([]);
   const [, setTransportTypes] = useState<TransportType[]>([]);
-  const [formData, setFormData] = useState<ApplicationFormData>({
-    brutto: null,
-    netto: null,
-    coming_date: "",
-    decloration_file: null,
-    decloration_date: "",
-    decloration_number: "",
-    vip_application: null,
-    total_price: null,
-    discount_price: null,
-    keeping_days: null,
-    workers_hours: null,
-    unloading_quantity: null,
-    loading_quantity: null,
-    firm_id: 1,
-    payment_method: 1,
-    keeping_services: [],
-    working_services: [],
-    product_quantities: [],
-    transport_numbers: []
-  });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [firmSearch, setFirmSearch] = useState("");
   const [showFirmDropdown, setShowFirmDropdown] = useState(false);
@@ -491,28 +467,37 @@ export default function CreateApplication() {
   const keepingServicesRef = useRef<HTMLDivElement>(null);
   const workingServicesRef = useRef<HTMLDivElement>(null);
   const [showCreateFirmModal, setShowCreateFirmModal] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  // const [] = useState({
-  //   quantity: 0,
-  //   product_id: 0,
-  //   storage_id: 0
-  // });
-  // const [] = useState({
-  //   transport_number: "",
-  //   transport_type: 1
-  // });
-  // const [] = useState("");
-  // const [] = useState("");
-  // const [] = useState("");
-  const [, setShowProductDropdown] = useState(false);
-  const [, setShowStorageDropdown] = useState(false);
-  const [, setShowTransportTypeDropdown] = useState(false);
-  const productDropdownRef = useRef<HTMLDivElement>(null);
-  const storageDropdownRef = useRef<HTMLDivElement>(null);
-  const transportTypeDropdownRef = useRef<HTMLDivElement>(null);
   const [selectedTab, setSelectedTab] = useState(0);
   const [applicationId, setApplicationId] = useState<number | null>(null);
   const navigate = useNavigate();
+
+  // Format current date to YYYY-MM-DD
+  const getCurrentDate = () => {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+  };
+
+  const [formData, setFormData] = useState<ApplicationFormData>({
+    brutto: null,
+    netto: null,
+    coming_date: getCurrentDate(), // Set current date as default
+    decloration_file: null,
+    decloration_date: "",
+    decloration_number: "",
+    vip_application: null,
+    total_price: null,
+    discount_price: null,
+    keeping_days: null,
+    workers_hours: null,
+    unloading_quantity: null,
+    loading_quantity: null,
+    firm_id: 0,
+    payment_method: 0,
+    keeping_services: [],
+    working_services: [],
+    product_quantities: [],
+    transport_numbers: [],
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -576,21 +561,6 @@ export default function CreateApplication() {
           !paymentMethodDropdownRef.current.contains(event.target as Node)) {
         setShowPaymentMethodDropdown(false);
       }
-      
-      if (productDropdownRef.current && 
-          !productDropdownRef.current.contains(event.target as Node)) {
-        setShowProductDropdown(false);
-      }
-      
-      if (storageDropdownRef.current && 
-          !storageDropdownRef.current.contains(event.target as Node)) {
-        setShowStorageDropdown(false);
-      }
-      
-      if (transportTypeDropdownRef.current && 
-          !transportTypeDropdownRef.current.contains(event.target as Node)) {
-        setShowTransportTypeDropdown(false);
-      }
     }
 
     document.addEventListener('mousedown', handleClickOutside);
@@ -601,44 +571,23 @@ export default function CreateApplication() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    
     try {
+      // Create FormData instance
       const formDataToSend = new FormData();
-
-      // Handle basic fields first
+      
+      // Append all form fields
       Object.entries(formData).forEach(([key, value]) => {
-        if (value !== null && 
-            key !== 'keeping_services' && 
-            key !== 'working_services' && 
-            key !== 'product_quantities' && 
-            key !== 'transport_numbers' &&
-            key !== 'decloration_file') {
+        if (key === 'decloration_file' && value instanceof File) {
+          formDataToSend.append('decloration_file', value);
+        } else if (Array.isArray(value)) {
+          // Handle arrays (keeping_services, working_services, etc.)
+          value.forEach(item => {
+            formDataToSend.append(`${key}[]`, item.toString());
+          });
+        } else if (value !== null) {
           formDataToSend.append(key, value.toString());
         }
       });
-
-      // Handle file separately if it exists
-      if (formData.decloration_file) {
-        formDataToSend.append('decloration_file', formData.decloration_file);
-      }
-
-      // Handle keeping services
-      if (formData.keeping_services.length > 0) {
-        formData.keeping_services.forEach(serviceId => {
-          formDataToSend.append('keeping_services[]', serviceId.toString());
-        });
-      } else {
-        formDataToSend.append('keeping_services', '[]');
-      }
-
-      if (formData.working_services.length > 0) {
-        formData.working_services.forEach(serviceId => {
-          formDataToSend.append('working_services[]', serviceId.toString());
-        });
-      } else {
-        formDataToSend.append('working_services', '[]');
-      }
 
       const response = await api.post('/application/', formDataToSend, {
         headers: {
@@ -646,17 +595,14 @@ export default function CreateApplication() {
         },
       });
 
-      console.log('Response:', response.data);
-
-      if (response.status === 201 || response.status === 200) {
+      if (response.status === 201) {
         setApplicationId(response.data.id);
-        setShowSuccessModal(true);
-        setSelectedTab(1);
+        setSelectedTab(3); // Change from 2 to 3 to navigate to photos tab
+        setShowSuccessModal(true); // Optional: show success modal
       }
-    } catch (error: any) {
-      console.error('Error submitting:', error);
-      console.error('Error response:', error.response?.data);
-      setError(t('createApplication.errorSubmitting', 'Error submitting application'));
+    } catch (error) {
+      console.error('Error creating application:', error);
+      // Add error handling/notification here
     }
   };
 
@@ -743,26 +689,35 @@ export default function CreateApplication() {
   };
 
   const handleTabSuccess = () => {
-    if (selectedTab === 4) {
+    if (selectedTab === 7) {
       navigate('/application-list');
     } else {
       setSelectedTab(prev => prev + 1);
     }
   };
 
-  const resetAllForms = () => {
-    setApplicationId(null);
-    setSelectedTab(0);
+  
+
+  // Update the common input class styles
+  const inputClassName = "mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors";
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData(prev => ({
+        ...prev,
+        decloration_file: e.target.files![0]
+      }));
+    }
   };
 
   return (
     <div className="p-4 sm:p-6">
       <Tab.Group selectedIndex={selectedTab} onChange={setSelectedTab}>
-        <Tab.List className="flex space-x-1 rounded-xl bg-gray-100 p-1 mb-6">
+        <Tab.List className="flex space-x-1 rounded-xl bg-gray-100 p-1">
           <Tab
             className={({ selected }) =>
               classNames(
-                'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
+                'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                 'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                 selected
                   ? 'bg-white text-[#6C5DD3] shadow'
@@ -770,13 +725,41 @@ export default function CreateApplication() {
               )
             }
           >
-            {t('createApplication.mainForm', 'Main Form')}
+            {t('createApplication.basicInfo', 'Basic Info')}
+          </Tab>
+
+          <Tab
+            className={({ selected }) =>
+              classNames(
+                'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
+                'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
+                selected
+                  ? 'bg-white text-[#6C5DD3] shadow'
+                  : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
+              )
+            }
+          >
+            {t('createApplication.declaration', 'Declaration')}
+          </Tab>
+
+          <Tab
+            className={({ selected }) =>
+              classNames(
+                'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
+                'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
+                selected
+                  ? 'bg-white text-[#6C5DD3] shadow'
+                  : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
+              )
+            }
+          >
+            {t('createApplication.services', 'Services')}
           </Tab>
           <Tab
             disabled={!applicationId}
             className={({ selected }) =>
               classNames(
-                'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
+                'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                 'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
                 selected
@@ -791,7 +774,7 @@ export default function CreateApplication() {
             disabled={!applicationId}
             className={({ selected }) =>
               classNames(
-                'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
+                'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                 'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
                 selected
@@ -806,7 +789,7 @@ export default function CreateApplication() {
             disabled={!applicationId}
             className={({ selected }) =>
               classNames(
-                'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
+                'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                 'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
                 selected
@@ -821,7 +804,7 @@ export default function CreateApplication() {
             disabled={!applicationId}
             className={({ selected }) =>
               classNames(
-                'w-full rounded-lg py-2.5 text-sm font-medium leading-5',
+                'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                 'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
                 selected
@@ -836,443 +819,386 @@ export default function CreateApplication() {
 
         <Tab.Panels>
           <Tab.Panel>
-            {/* Main Form Panel */}
-            <div className="mb-6">
-              <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-                {t('createApplication.title', 'Create Application')}
-              </h1>
-              <p className="mt-1 sm:mt-2 text-sm text-gray-600 dark:text-gray-400">
-                {t('createApplication.subtitle', 'Fill in the application details below')}
-              </p>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-4xl">
-              {error && (
-                <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <div className="flex">
-                    <div className="flex-shrink-0">
-                      <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div className="ml-3">
-                      <p className="text-sm text-red-700 whitespace-pre-line">{error}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-                {/* Basic Information */}
-                <div className="mb-6">
-                  <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
-                    {t('createApplication.basicInfo', 'Basic Information')}
-                  </h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                    <div>
-                      <label htmlFor="brutto" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('createApplication.brutto', 'Brutto')}
-                      </label>
-                      <input
-                        type="number"
-                        name="brutto"
-                        id="brutto"
-                        value={formData.brutto || ''}
-                        onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                        px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                        bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="coming_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('createApplication.comingDate', 'Coming Date')}
-                      </label>
-                      <input
-                        type="date"
-                        name="coming_date"
-                        id="coming_date"
-                        value={formData.coming_date}
-                        onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                        px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                        bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                      />
-                    </div>
-
-                    <div className="relative" ref={dropdownRef}>
-                      <label htmlFor="firm_search" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('createApplication.firmId', 'Firm')}
-                      </label>
-                      <input
-                        type="text"
-                        id="firm_search"
-                        value={firmSearch}
-                        onChange={(e) => {
-                          setFirmSearch(e.target.value);
-                          setShowFirmDropdown(true);
-                        }}
-                        onFocus={() => setShowFirmDropdown(true)}
-                        className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                        px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                        bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                        placeholder={t('createApplication.searchFirm', 'Search for a firm...')}
-                      />
-                      
-                      {showFirmDropdown && (
-                        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-                          {filteredFirms.length > 0 ? (
-                            filteredFirms.map((firm) => (
-                              <div
-                                key={firm.id}
-                                onClick={() => handleFirmSelect(firm)}
-                                className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm"
-                              >
-                                {firm.firm_name}
-                              </div>
-                            ))
-                          ) : (
-                            <div className="p-4">
-                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                                {t('createApplication.noFirmsFound', 'No firms found')}
-                              </p>
-                              <button
-                                onClick={() => setShowCreateFirmModal(true)}
-                                className="w-full text-center bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
-                                hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3]"
-                              >
-                                {t('createApplication.createNewFirm', 'Create New Firm')}
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="relative" ref={paymentMethodDropdownRef}>
-                      <label htmlFor="payment_method_search" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('createApplication.paymentMethod', 'Payment Method')}
-                      </label>
-                      <input
-                        type="text"
-                        id="payment_method_search"
-                        value={paymentMethodSearch}
-                        onChange={(e) => {
-                          setPaymentMethodSearch(e.target.value);
-                          setShowPaymentMethodDropdown(true);
-                        }}
-                        onFocus={() => setShowPaymentMethodDropdown(true)}
-                        className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                        px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                        bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                        placeholder={t('createApplication.searchPaymentMethod', 'Search for a payment method...')}
-                      />
-                      
-                      {showPaymentMethodDropdown && (
-                        <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-                          {filteredPaymentMethods.length > 0 ? (
-                            filteredPaymentMethods.map((method) => (
-                              <div
-                                key={method.id}
-                                onClick={() => handlePaymentMethodSelect(method)}
-                                className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm"
-                              >
-                                {method.payment_method}
-                              </div>
-                            ))
-                          ) : (
-                            <div className="p-4 text-sm text-gray-500 dark:text-gray-400">
-                              {t('createApplication.noPaymentMethodsFound', 'No payment methods found')}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Declaration Information */}
-                <div className="mb-6">
-                  <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-3 sm:mb-4">
-                    {t('createApplication.declarationInfo', 'Declaration Information')}
-                  </h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-                    <div>
-                      <label htmlFor="decloration_number" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('createApplication.declarationNumber', 'Declaration Number')}
-                      </label>
-                      <input
-                        type="text"
-                        name="decloration_number"
-                        id="decloration_number"
-                        value={formData.decloration_number}
-                        onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                        px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                        bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                      />
-                    </div>
-
-                    <div>
-                      <label htmlFor="decloration_date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('createApplication.declarationDate', 'Declaration Date')}
-                      </label>
-                      <input
-                        type="date"
-                        name="decloration_date"
-                        id="decloration_date"
-                        value={formData.decloration_date}
-                        onChange={handleChange}
-                        className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                        px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                        bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
-                      />
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <label htmlFor="decloration_file" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('createApplication.declarationFile', 'Declaration File')}
-                      </label>
-                      <input
-                        type="file"
-                        name="decloration_file"
-                        id="decloration_file"
-                        onChange={handleChange}
-                        accept=".jpg,.jpeg,.png,.pdf"
-                        className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-md file:border-0
-                        file:text-sm file:font-semibold
-                        file:bg-[#6C5DD3] file:text-white
-                        hover:file:bg-[#5c4eb3]"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-
-                {/* Services Selection */}
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <h2 className="text-sm font-medium text-gray-900 dark:text-white mb-4">
-                    {t('createApplication.services', 'Services')}
-                  </h2>
-                  
-                  <div className="flex flex-col gap-4">
-                    {/* Keeping Services Dropdown */}
-                    <div className="w-full bg-gray-50 dark:bg-gray-900 rounded-lg" ref={keepingServicesRef}>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setKeepingServicesOpen(!keepingServicesOpen);
-                          setWorkingServicesOpen(false);
-                        }}
-                        className="w-full px-4 py-3 flex items-center justify-between text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                      >
-                        <div className="flex items-center">
-                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {t('createApplication.keepingServices', 'Keeping Services')}
-                          </span>
-                          <span className="ml-2 bg-[#6C5DD3] text-white text-xs px-2 py-1 rounded-full">
-                            {formData.keeping_services.length} selected
-                          </span>
-                        </div>
-                        <svg
-                          className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
-                            keepingServicesOpen ? 'transform rotate-180' : ''
-                          }`}
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                      
-                      {keepingServicesOpen && keepingServices.length > 0 && (
-                        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                          <div className="space-y-3">
-                            {keepingServices.map((service) => (
-                              <div 
-                                key={service.id}
-                                className={`relative flex items-center p-3 rounded-lg border transition-all duration-200
-                                  ${formData.keeping_services.includes(service.id)
-                                    ? 'border-[#6C5DD3] bg-[#6C5DD3]/5'
-                                    : 'border-gray-200 dark:border-gray-700 hover:border-[#6C5DD3]/50'}`}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={formData.keeping_services.includes(service.id)}
-                                  onChange={() => handleKeepingServiceToggle(service.id)}
-                                  className="rounded border-gray-300 text-[#6C5DD3] focus:ring-[#6C5DD3]
-                                    w-4 h-4 mr-3 cursor-pointer"
-                                />
-                                <div className="flex-1">
-                                  <div className="flex justify-between items-start">
-                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                                      {service.name}
-                                    </span>
-                                    <span className="text-sm font-semibold text-[#6C5DD3] ml-2">
-                                      {service.base_price}
-                                    </span>
-                                  </div>
-                                  <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                    Base days: {service.base_day} | Extra price: {service.extra_price}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      )}
-                    </div>
+                  <label htmlFor="brutto" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                    {t('createApplication.brutto', 'Brutto')}
+                  </label>
+                  <input
+                    type="number"
+                    name="brutto"
+                    id="brutto"
+                    value={formData.brutto || ''}
+                    onChange={handleChange}
+                    className={inputClassName}
+                  />
+                </div>
 
-                    {/* Working Services Dropdown */}
-                    <div className="w-full bg-gray-50 dark:bg-gray-900 rounded-lg" ref={workingServicesRef}>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setWorkingServicesOpen(!workingServicesOpen);
-                          setKeepingServicesOpen(false);
-                        }}
-                        className="w-full px-4 py-3 flex items-center justify-between text-left rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                      >
-                        <div className="flex items-center">
-                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                            {t('createApplication.workingServices', 'Working Services')}
-                          </span>
-                          <span className="ml-2 bg-[#6C5DD3] text-white text-xs px-2 py-1 rounded-full">
-                            {formData.working_services.length} selected
-                          </span>
-                        </div>
-                        <svg
-                          className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
-                            workingServicesOpen ? 'transform rotate-180' : ''
-                          }`}
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                      </button>
-                      
-                      {workingServicesOpen && workingServices.length > 0 && (
-                        <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-                          <div className="space-y-3">
-                            {workingServices.map((service) => (
-                              <div 
-                                key={service.id}
-                                className={`relative flex items-center p-3 rounded-lg border transition-all duration-200
-                                  ${formData.working_services.includes(service.id)
-                                    ? 'border-[#6C5DD3] bg-[#6C5DD3]/5'
-                                    : 'border-gray-200 dark:border-gray-700 hover:border-[#6C5DD3]/50'}`}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={formData.working_services.includes(service.id)}
-                                  onChange={() => handleWorkingServiceToggle(service.id)}
-                                  className="rounded border-gray-300 text-[#6C5DD3] focus:ring-[#6C5DD3]
-                                    w-4 h-4 mr-3 cursor-pointer"
-                                />
-                                <div className="flex-1">
-                                  <div className="flex justify-between items-start">
-                                    <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                                      {service.service_name}
-                                    </span>
-                                    <span className="text-sm font-semibold text-[#6C5DD3] ml-2">
-                                      {service.base_price}
-                                    </span>
-                                  </div>
-                                  <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                    Base days: {service.base_day} | Extra price: {service.extra_price} | Units: {service.units}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
+                <div>
+                  <label htmlFor="netto" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                    {t('createApplication.netto', 'Netto')}
+                  </label>
+                  <input
+                    type="number"
+                    name="netto"
+                    id="netto"
+                    value={formData.netto || ''}
+                    onChange={handleChange}
+                    className={inputClassName}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="coming_date" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                    {t('createApplication.comingDate', 'Coming Date')}
+                  </label>
+                  <input
+                    type="date"
+                    name="coming_date"
+                    id="coming_date"
+                    value={formData.coming_date}
+                    onChange={handleChange}
+                    className={inputClassName}
+                  />
+                </div>
+
+                <div className="relative" ref={dropdownRef}>
+                  <label htmlFor="firm_search" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                    {t('createApplication.firmId', 'Firm')}
+                  </label>
+                  <input
+                    type="text"
+                    id="firm_search"
+                    value={firmSearch}
+                    onChange={(e) => {
+                      setFirmSearch(e.target.value);
+                      setShowFirmDropdown(true);
+                    }}
+                    onFocus={() => setShowFirmDropdown(true)}
+                    className={inputClassName}
+                    placeholder={t('createApplication.searchFirm', 'Search for a firm...')}
+                  />
+                  
+                  {showFirmDropdown && (
+                    <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-auto">
+                      {filteredFirms.length > 0 ? (
+                        filteredFirms.map((firm) => (
+                          <div
+                            key={firm.id}
+                            onClick={() => handleFirmSelect(firm)}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                          >
+                            {firm.firm_name}
                           </div>
+                        ))
+                      ) : (
+                        <div className="p-4">
+                          <p className="text-sm text-gray-500 mb-2">
+                            {t('createApplication.noFirmsFound', 'No firms found')}
+                          </p>
+                          <button
+                            onClick={() => setShowCreateFirmModal(true)}
+                            className="w-full text-center bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
+                            hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3]"
+                          >
+                            {t('createApplication.createNewFirm', 'Create New Firm')}
+                          </button>
                         </div>
                       )}
                     </div>
-                  </div>
+                  )}
+                </div>
+
+                <div className="relative" ref={paymentMethodDropdownRef}>
+                  <label htmlFor="payment_method_search" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                    {t('createApplication.paymentMethod', 'Payment Method')}
+                  </label>
+                  <input
+                    type="text"
+                    id="payment_method_search"
+                    value={paymentMethodSearch}
+                    onChange={(e) => {
+                      setPaymentMethodSearch(e.target.value);
+                      setShowPaymentMethodDropdown(true);
+                    }}
+                    onFocus={() => setShowPaymentMethodDropdown(true)}
+                    className={inputClassName}
+                    placeholder={t('createApplication.searchPaymentMethod', 'Search for a payment method...')}
+                  />
+                  
+                  {showPaymentMethodDropdown && (
+                    <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-auto">
+                      {filteredPaymentMethods.length > 0 ? (
+                        filteredPaymentMethods.map((method) => (
+                          <div
+                            key={method.id}
+                            onClick={() => handlePaymentMethodSelect(method)}
+                            className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                          >
+                            {method.payment_method}
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-4 text-sm text-gray-500">
+                          {t('createApplication.noPaymentMethodsFound', 'No payment methods found')}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </Tab.Panel>
+
+          <Tab.Panel>
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label htmlFor="decloration_number" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                    {t('createApplication.declaration.number', 'Declaration Number')}
+                  </label>
+                  <input
+                    type="text"
+                    name="decloration_number"
+                    id="decloration_number"
+                    value={formData.decloration_number}
+                    onChange={handleChange}
+                    className={inputClassName}
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="decloration_date" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                    {t('createApplication.declaration.date', 'Declaration Date')}
+                  </label>
+                  <input
+                    type="date"
+                    name="decloration_date"
+                    id="decloration_date"
+                    value={formData.decloration_date}
+                    onChange={handleChange}
+                    className={inputClassName}
+                  />
+                </div>
+
+                <div className="md:col-span-2">
+                  <label htmlFor="decloration_file" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                    {t('createApplication.declaration.file', 'Declaration File')}
+                  </label>
+                  <input
+                    type="file"
+                    name="decloration_file"
+                    id="decloration_file"
+                    onChange={handleFileChange}
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                    className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
+                      file:mr-4 file:py-2 file:px-4
+                      file:rounded-md file:border-0
+                      file:text-sm file:font-semibold
+                      file:bg-[#6C5DD3] file:text-white
+                      hover:file:bg-[#5b4eb3]
+                      file:cursor-pointer"
+                  />
                 </div>
               </div>
 
-              {/* Create Application Button - Fixed at bottom */}
-              <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 z-10">
-                <div className="max-w-7xl mx-auto flex justify-end">
+              <div className="mt-6 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setSelectedTab(2)}
+                  className="bg-[#6C5DD3] text-white px-6 py-2 rounded-lg hover:bg-[#5b4eb3]"
+                >
+                  {t('common.next', 'Next')}
+                </button>
+              </div>
+            </div>
+          </Tab.Panel>
+
+          <Tab.Panel>
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="flex flex-col gap-4">
+                <div className="w-full bg-gray-50 rounded-lg" ref={keepingServicesRef}>
                   <button
-                    type="submit"
-                    className="w-full sm:w-auto bg-[#6C5DD3] text-white px-6 py-3 text-sm font-medium rounded-lg 
-                    hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
-                    dark:focus:ring-offset-gray-800 dark:hover:bg-[#5c4eb3] transition-colors duration-200
-                    disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled={!formData.brutto || !formData.coming_date || !formData.decloration_date || !formData.decloration_number}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setKeepingServicesOpen(!keepingServicesOpen);
+                      setWorkingServicesOpen(false);
+                    }}
+                    className="w-full px-4 py-3 flex items-center justify-between text-left rounded-lg hover:bg-gray-100 transition-colors"
                   >
-                    {t('createApplication.createButton', 'Create Application')}
+                    <div className="flex items-center">
+                      <span className="text-sm font-medium text-gray-700">
+                        {t('createApplication.keepingServices', 'Keeping Services')}
+                      </span>
+                      <span className="ml-2 bg-[#6C5DD3] text-white text-xs px-2 py-1 rounded-full">
+                        {formData.keeping_services.length} selected
+                      </span>
+                    </div>
+                    <svg
+                      className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+                        keepingServicesOpen ? 'transform rotate-180' : ''
+                      }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {keepingServicesOpen && keepingServices.length > 0 && (
+                    <div className="p-4 border-t border-gray-200">
+                      <div className="space-y-3">
+                        {keepingServices.map((service) => (
+                          <div 
+                            key={service.id}
+                            className={`relative flex items-center p-3 rounded-lg border transition-all duration-200
+                              ${formData.keeping_services.includes(service.id)
+                                ? 'border-[#6C5DD3] bg-[#6C5DD3]/5'
+                                : 'border-gray-200 hover:border-[#6C5DD3]/50'}`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={formData.keeping_services.includes(service.id)}
+                              onChange={() => handleKeepingServiceToggle(service.id)}
+                              className="rounded border-gray-300 text-[#6C5DD3] focus:ring-[#6C5DD3]
+                                w-4 h-4 mr-3 cursor-pointer"
+                            />
+                            <div className="flex-1">
+                              <div className="flex justify-between items-start">
+                                <span className="text-sm font-medium text-gray-700">
+                                  {service.name}
+                                </span>
+                                <span className="text-sm font-semibold text-[#6C5DD3] ml-2">
+                                  {service.base_price}
+                                </span>
+                              </div>
+                              <div className="mt-1 text-xs text-gray-500">
+                                Base days: {service.base_day} | Extra price: {service.extra_price}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="w-full bg-gray-50 rounded-lg" ref={workingServicesRef}>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setWorkingServicesOpen(!workingServicesOpen);
+                      setKeepingServicesOpen(false);
+                    }}
+                    className="w-full px-4 py-3 flex items-center justify-between text-left rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center">
+                      <span className="text-sm font-medium text-gray-700">
+                        {t('createApplication.workingServices', 'Working Services')}
+                      </span>
+                      <span className="ml-2 bg-[#6C5DD3] text-white text-xs px-2 py-1 rounded-full">
+                        {formData.working_services.length} selected
+                      </span>
+                    </div>
+                    <svg
+                      className={`w-5 h-5 text-gray-500 transition-transform duration-200 ${
+                        workingServicesOpen ? 'transform rotate-180' : ''
+                      }`}
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  
+                  {workingServicesOpen && workingServices.length > 0 && (
+                    <div className="p-4 border-t border-gray-200">
+                      <div className="space-y-3">
+                        {workingServices.map((service) => (
+                          <div 
+                            key={service.id}
+                            className={`relative flex items-center p-3 rounded-lg border transition-all duration-200
+                              ${formData.working_services.includes(service.id)
+                                ? 'border-[#6C5DD3] bg-[#6C5DD3]/5'
+                                : 'border-gray-200 hover:border-[#6C5DD3]/50'}`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={formData.working_services.includes(service.id)}
+                              onChange={() => handleWorkingServiceToggle(service.id)}
+                              className="rounded border-gray-300 text-[#6C5DD3] focus:ring-[#6C5DD3]
+                                w-4 h-4 mr-3 cursor-pointer"
+                            />
+                            <div className="flex-1">
+                              <div className="flex justify-between items-start">
+                                <span className="text-sm font-medium text-gray-700">
+                                  {service.service_name}
+                                </span>
+                                <span className="text-sm font-semibold text-[#6C5DD3] ml-2">
+                                  {service.base_price}
+                                </span>
+                              </div>
+                              <div className="mt-1 text-xs text-gray-500">
+                                Base days: {service.base_day} | Extra price: {service.extra_price} | Units: {service.units}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-6 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    className="bg-[#6C5DD3] text-white px-6 py-2.5 rounded-lg font-medium
+                      hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out shadow-sm"
+                  >
+                    {t('createApplication.createApplication', 'Create Application')}
                   </button>
                 </div>
               </div>
-
-              {/* Add padding at bottom to prevent content from being hidden behind fixed button */}
-              <div className="h-20"></div>
-            </form>
+            </div>
           </Tab.Panel>
 
           <Tab.Panel>
-            {applicationId ? (
-              <PhotoReportTab applicationId={applicationId} onSuccess={handleTabSuccess} />
-            ) : (
-              <div className="p-4 text-center text-gray-500">
-                Please create an application first
-              </div>
-            )}
+            <PhotoReportTab applicationId={applicationId} onSuccess={handleTabSuccess} />
           </Tab.Panel>
 
           <Tab.Panel>
-            {applicationId ? (
-              <ProductsTab applicationId={applicationId} onSuccess={handleTabSuccess} />
-            ) : (
-              <div className="p-4 text-center text-gray-500">
-                Please create an application first
-              </div>
-            )}
+            <ProductsTab applicationId={applicationId} onSuccess={handleTabSuccess} />
           </Tab.Panel>
 
           <Tab.Panel>
-            {applicationId ? (
-              <TransportTab 
-                applicationId={applicationId} 
-                onSuccess={handleTabSuccess} 
-              />
-            ) : (
-              <div className="p-4 text-center text-gray-500">
-                Please create an application first
-              </div>
-            )}
+            <TransportTab applicationId={applicationId} onSuccess={handleTabSuccess} />
           </Tab.Panel>
 
           <Tab.Panel>
-            {applicationId ? (
-              <ModesTab 
-                applicationId={applicationId} 
-                onSuccess={() => {
-                  resetAllForms();
-                  navigate('/application-list');
-                }} 
-              />
-            ) : (
-              <div className="p-4 text-center text-gray-500">
-                Please create an application first
-              </div>
-            )}
+            <ModesTab applicationId={applicationId} onSuccess={handleTabSuccess} />
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>
+
+      {selectedTab === 0 && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 z-10">
+          <div className="max-w-7xl mx-auto flex justify-end">
+            <button
+              type="button"
+              onClick={() => setSelectedTab(1)}
+              className="bg-[#6C5DD3] text-white px-6 py-2 rounded-lg hover:bg-[#5b4eb3]"
+            >
+              {t('common.next', 'Next')}
+            </button>
+          </div>
+        </div>
+      )}
 
       <SuccessModal
         isOpen={showSuccessModal}

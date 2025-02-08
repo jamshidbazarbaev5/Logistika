@@ -17,7 +17,7 @@ export default function CreateCategory() {
 
     try {
       await apiService.createCategory({ name });
-      navigate('/categories'); // Adjust this path as needed
+      navigate('/categories');
     } catch (error: any) {
       console.error('Error creating category:', error);
       setError(error.response?.data?.message || 'Failed to create category. Please try again.');
