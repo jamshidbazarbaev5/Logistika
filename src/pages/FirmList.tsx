@@ -289,7 +289,6 @@ export default function FirmList() {
         message={modalMessage}
       />
 
-      {/* Edit Modal */}
       <Dialog
         open={showEditModal}
         onClose={() => setShowEditModal(false)}

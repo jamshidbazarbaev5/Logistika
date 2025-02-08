@@ -8,7 +8,7 @@
 *::after {
     transition: none !important;
 } */
-
+    
 /* Define specific transitions */
 .transition-opacity {
     transition: opacity 0.3s ease-in-out !important;

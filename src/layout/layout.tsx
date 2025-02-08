@@ -23,9 +23,9 @@ const mainMenuItems = [
   { name: "Payment", icon: RiBankCardFill, href: "/payment-list" },
   // { name: "Photo Report", icon: RiCameraFill, href: "/photo-report" },
   { name: "CreateMode", icon: RiSettings4Fill, href: "/modes" },
-  { name: "CreateApplication", icon: RiFileAddFill, href: "/application" },
+  { name: "CreateApplication", icon: RiFileAddFill, href: "/application-list" },
   { name: "CreateProduct", icon: RiTBoxFill, href: "/product" },
-  { name: "CreateProductQuantity", icon: RiBarChartFill, href: "/product-quantity" },
+  // { name: "CreateProductQuantity", icon: RiBarChartFill, href: "/product-quantity" },
   { name: "CreateCategory", icon: RiBarChartFill, href: "/category" },
   { name: "Measurement", icon: RiBarChartFill, href: "/measurements" },
   

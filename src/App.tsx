@@ -30,6 +30,7 @@ import StorageList from "./pages/StorageList";
 import CreateStorage from "./pages/CreateStorage";
 import ModeList from "./pages/ModeList";
 import PaymentList from "./pages/PaymentList";
+import ApplicationList from "./pages/ApplicationList";
 const queryClient = new QueryClient();
 
 function App() {
@@ -52,7 +53,7 @@ function App() {
                 <Route path="/storage-list" element={<StorageList />} />
                 <Route path="/keeping_service" element={<KeepingService />} />
                 <Route path="/photo-report" element={<PhotoUpload />} />
-                <Route path="/application" element={<CreateApplication />} />
+                <Route path="/create-application" element={<CreateApplication />} />
                 <Route path="/" element={<Navigate to="/firm-list" replace />} />
                 <Route path="/product" element={<CreateProduct />} />
                 <Route path="/product-quantity" element={<CreateProductQuantity />} />
@@ -69,6 +70,7 @@ function App() {
                 <Route path="/modes/create" element={<ModeCreate />} />
                 <Route path="/payment-list" element={<PaymentList />} />
                 <Route path="/payment-methods/create" element={<CreatePaymentMethod />} />
+                <Route path="/application-list" element={<ApplicationList />} />
               </Route>
             </Routes>
           </Router>
