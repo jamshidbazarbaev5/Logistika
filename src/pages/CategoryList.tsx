@@ -28,7 +28,7 @@ export default function CategoryList() {
   const fetchCategories = async () => {
     try {
       const response = await api.get('/items/category/');
-      setCategories(response.data);
+      setCategories(response.data.results);
       setLoading(false);
     } catch (err) {
       setError(t('categoryList.errorLoading', 'Error loading categories'));
@@ -104,7 +104,7 @@ export default function CategoryList() {
     <div className="p-4 sm:p-6">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-          {t('categoryList.title', 'Item Categories')}
+          {t('categoryList.title', 'Categories')}
         </h1>
         <button
           onClick={() => navigate('/categories/create')}
@@ -121,10 +121,10 @@ export default function CategoryList() {
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t('categoryList.table.id', 'ID')}
+                {t('categoryList.table.number', '#')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t('categoryList.table.name', 'Category Name')}
+                {t('categoryList.table.name', 'Name')}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t('categoryList.table.actions', 'Actions')}

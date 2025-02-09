@@ -29,7 +29,7 @@ export default function ModeList() {
   const fetchModes = async () => {
     try {
       const response = await api.get('/modes/modes/');
-      setModes(response.data);
+      setModes(response.data.results);
       setLoading(false);
     } catch (err) {
       setError(t('modeList.errorLoading', 'Error loading modes'));

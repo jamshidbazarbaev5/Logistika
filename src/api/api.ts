@@ -147,8 +147,10 @@ export const apiService = {
   getMeasurements: () => 
     api.get('/items/measurement/').then(response => response.data),
 
-  getFirms: () => 
-    api.get('/firms/').then(response => response.data),
+  getFirms: async (queryString: string = "") => {
+    const response = await api.get(`/firms/${queryString ? `?${queryString}` : ""}`);
+    return response.data;
+  },
 
   getKeepingServices: () => 
     api.get('/keeping_service/').then(response => response.data),

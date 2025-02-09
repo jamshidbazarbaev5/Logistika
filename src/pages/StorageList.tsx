@@ -29,7 +29,7 @@ export default function StorageList() {
   const fetchStorages = async () => {
     try {
       const response = await api.get('/storage/');
-      setStorages(response.data);
+      setStorages(response.data.results);
       setLoading(false);
     } catch (err) {
       setError(t('storageList.errorLoading', 'Error loading storages'));

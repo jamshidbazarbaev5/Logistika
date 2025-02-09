@@ -7,6 +7,7 @@ import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import ConfirmModal from "../components/ConfirmModal";
 import SuccessModal from "../components/SuccessModal";
 import { Dialog } from "@headlessui/react";
+import { SearchBar, type SearchField } from '../components/SearchBar';
 
 interface Firm {
   id: number;
@@ -40,11 +41,36 @@ export default function FirmList() {
     firm_trustee: "",
     phoneNumber_trustee: "",
   });
+  const [searchParams, setSearchParams] = useState({
+    firm_name: "",
+    INN: ""
+  });
+
+  const searchFields: SearchField[] = [
+    {
+      name: 'firm_name',
+      label: 'Search by Firm Name',
+      placeholder: 'Enter firm name...'
+    },
+    {
+      name: 'INN',
+      label: 'Search by INN',
+      placeholder: 'Enter INN...'
+    }
+  ];
+
+  const handleSearch = (values: Record<string, string>) => {
+    setSearchParams(values as { firm_name: string; INN: string });
+  };
 
   const fetchFirms = async () => {
     try {
-      const response = await apiService.getFirms();
-      setFirms(response);
+      const queryParams = new URLSearchParams();
+      if (searchParams.firm_name) queryParams.append("firm_name", searchParams.firm_name);
+      if (searchParams.INN) queryParams.append("inn", searchParams.INN);
+      
+      const response = await apiService.getFirms(queryParams.toString());
+      setFirms(response.results);
       setLoading(false);
     } catch (err) {
       setError(t("firmList.errorLoading", "Error loading firms"));
@@ -54,7 +80,7 @@ export default function FirmList() {
 
   useEffect(() => {
     fetchFirms();
-  }, [t]);
+  }, [searchParams, t]);
 
   console.log(firms);
   if (loading) {
@@ -146,6 +172,14 @@ export default function FirmList() {
           {t("firmList.createFirm", "Create Firm")}
         </button>
       </div>
+
+      <SearchBar 
+        fields={searchFields}
+        initialValues={searchParams}
+        onSearch={handleSearch}
+        className="mb-6"
+        t={t}
+      />
 
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">

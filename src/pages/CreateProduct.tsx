@@ -45,11 +45,11 @@ export default function CreateProduct() {
           apiService.getMeasurements()
         ]);
         
-        const sortedCategories = [...categoriesData].sort((a, b) => 
+        const sortedCategories = [...categoriesData.results].sort((a:any, b:any) => 
           a.name.localeCompare(b.name, undefined, { sensitivity: 'base' })
         );
         setCategories(sortedCategories);
-        setMeasurements(measurementsData);
+        setMeasurements(measurementsData.results);
       } catch (error) {
         console.error('Error fetching data:', error);
       }

@@ -81,14 +81,12 @@ interface TransportType {
 }
 
 interface TabPanelProps {
-  applicationId: number | null;
-  onSuccess?: () => void;
+    onSuccess?: () => void;
 }
 
-const PhotoReportTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => {
+const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
-  // const { t } = useTranslation();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -97,11 +95,10 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) =
   };
 
   const handleUpload = async () => {
-    if (!applicationId || !selectedFiles.length) return;
+    if (!selectedFiles.length) return;
     setLoading(true);
 
     const formData = new FormData();
-    formData.append('application_id', applicationId.toString());
     selectedFiles.forEach(file => {
       formData.append('photo', file);
     });
@@ -153,7 +150,7 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) =
   );
 };
 
-const ProductsTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => {
+const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const [quantity, setQuantity] = useState<number>(1);
   const [selectedProduct, setSelectedProduct] = useState<string>('');
   const [storageId, setStorageId] = useState<number>(0);
@@ -169,9 +166,9 @@ const ProductsTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => {
           api.get('/storage/')
         ]);
         
-        console.log('Products:', productsRes.data);
-        setProducts(productsRes.data);
-        setStorages(storagesRes.data);
+        console.log('Products:', productsRes.data.results);
+        setProducts(productsRes.data.results);
+        setStorages(storagesRes.data.results);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -186,7 +183,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => {
   };
 
   const handleAddProduct = async () => {
-    if (!applicationId || !quantity || !selectedProduct || !storageId) return;
+    if (!quantity || !selectedProduct || !storageId) return;
     setLoading(true);
 
     try {
@@ -195,7 +192,6 @@ const ProductsTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => {
         quantity,
         product_id: productId,
         storage_id: storageId,
-        application_id: applicationId
       });
       
       // Reset form
@@ -288,7 +284,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => {
   );
 };
 
-const TransportTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => {
+const TransportTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const [transportNumber, setTransportNumber] = useState('');
   const [transportTypeId, setTransportTypeId] = useState<number>(0);
   const [transportTypes, setTransportTypes] = useState<TransportType[]>([]);
@@ -307,21 +303,19 @@ const TransportTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => 
   }, []);
 
   const handleAddTransport = async () => {
-    if (!applicationId || !transportNumber || !transportTypeId) return;
+    if (!transportNumber || !transportTypeId) return;
     setLoading(true);
 
     try {
       await api.post('/transport/number/', {
         transport_type: transportTypeId,
-        transport_number: transportNumber,
-        application_id: applicationId
+        transport_number: transportNumber
       });
       
       // Reset form
       setTransportNumber('');
       setTransportTypeId(0);
       
-      // Navigate to next tab
       if (onSuccess) {
         onSuccess();
       }
@@ -371,11 +365,11 @@ const TransportTab: React.FC<TabPanelProps> = ({ applicationId, onSuccess }) => 
   );
 };
 
-const ModesTab: React.FC<TabPanelProps> = ({ applicationId }) => {
+const ModesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const [modeId, setModeId] = useState<number>(0);
   const [modes, setModes] = useState<Array<{ id: number; name_mode: string }>>([]);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     const fetchModes = async () => {
@@ -390,19 +384,17 @@ const ModesTab: React.FC<TabPanelProps> = ({ applicationId }) => {
   }, []);
 
   const handleAddMode = async () => {
-    if (!applicationId || !modeId) return;
+    if (!modeId) return;
     setLoading(true);
 
     try {
       await api.post('/modes/application_modes/', {
-        mode_id: modeId,
-        application_id: applicationId
+        mode_id: modeId
       });
       
-      // Reset all forms (you'll need to lift this state up or use context/redux)
-      // For now, we'll just navigate to the applications list
-      navigate('/application-list');
-      
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       console.error('Error adding mode:', error);
     } finally {
@@ -468,7 +460,7 @@ export default function CreateApplication() {
   const workingServicesRef = useRef<HTMLDivElement>(null);
   const [showCreateFirmModal, setShowCreateFirmModal] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [applicationId, setApplicationId] = useState<number | null>(null);
+  const [, setApplicationId] = useState<number | null>(null);
   const navigate = useNavigate();
 
   // Format current date to YYYY-MM-DD
@@ -520,18 +512,18 @@ export default function CreateApplication() {
           api.get('/transport/type/')
         ]);
         
-        setFirms(firmsResponse.data);
-        setPaymentMethods(paymentMethodsResponse.data);
-        setKeepingServices(keepingServicesResponse.data);
-        setWorkingServices(workingServicesResponse.data);
+        setFirms(firmsResponse.data.results);
+        setPaymentMethods(paymentMethodsResponse.data.results || []);
+        setKeepingServices(keepingServicesResponse.data.results);
+        setWorkingServices(workingServicesResponse.data.results);
         setProducts(productsResponse.data || []);
         setStorages(storagesResponse.data || []);
         setTransportTypes(transportTypesResponse.data || []);
         
         setFormData(prev => ({
           ...prev,
-          firm_id: firmsResponse.data[0]?.id || null,
-          payment_method: paymentMethodsResponse.data[0]?.id || null
+          firm_id: firmsResponse.data.results?.[0]?.id || null,
+          payment_method: paymentMethodsResponse.data.results?.[0]?.id || null
         }));
       } catch (error) {
         console.error('Error fetching data:', error);
@@ -569,41 +561,43 @@ export default function CreateApplication() {
     };
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     try {
-      // Create FormData instance
       const formDataToSend = new FormData();
       
-      // Append all form fields
+      // Handle dates separately
+      formDataToSend.append('coming_date', formData.coming_date);
+      formDataToSend.append('decloration_date', formData.decloration_date || '');
+      
+      // Append other form data fields
       Object.entries(formData).forEach(([key, value]) => {
-        if (key === 'decloration_file' && value instanceof File) {
-          formDataToSend.append('decloration_file', value);
-        } else if (Array.isArray(value)) {
-          // Handle arrays (keeping_services, working_services, etc.)
-          value.forEach(item => {
-            formDataToSend.append(`${key}[]`, item.toString());
-          });
-        } else if (value !== null) {
-          formDataToSend.append(key, value.toString());
+        if (value !== null && 
+            key !== 'decloration_file' && 
+            key !== 'coming_date' && 
+            key !== 'decloration_date') {
+          formDataToSend.append(key, JSON.stringify(value));
         }
       });
 
-      const response = await api.post('/application/', formDataToSend, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      if (response.status === 201) {
-        setApplicationId(response.data.id);
-        setSelectedTab(3); // Change from 2 to 3 to navigate to photos tab
-        setShowSuccessModal(true); // Optional: show success modal
+      // Append file if exists
+      if (formData.decloration_file) {
+        formDataToSend.append('decloration_file', formData.decloration_file);
       }
+
+      const response = await api.post('/application/', formDataToSend);
+      
+      setApplicationId(response.data.id);
+      setShowSuccessModal(true);
+      
     } catch (error) {
       console.error('Error creating application:', error);
-      // Add error handling/notification here
     }
+  };
+
+  // Modify the success modal close handler
+  const handleSuccessModalClose = () => {
+    setShowSuccessModal(false);
+    setSelectedTab(3); // Move to Photos tab after closing the modal
   };
 
   const handleChange = (
@@ -710,9 +704,14 @@ export default function CreateApplication() {
     }
   };
 
+  const handleTabChange = (index: number) => {
+    // Remove the condition that prevents going back to tabs 0-2
+    setSelectedTab(index);
+  };
+
   return (
     <div className="p-4 sm:p-6">
-      <Tab.Group selectedIndex={selectedTab} onChange={setSelectedTab}>
+      <Tab.Group selectedIndex={selectedTab} onChange={handleTabChange}>
         <Tab.List className="flex space-x-1 rounded-xl bg-gray-100 p-1">
           <Tab
             className={({ selected }) =>
@@ -756,12 +755,10 @@ export default function CreateApplication() {
             {t('createApplication.services', 'Services')}
           </Tab>
           <Tab
-            disabled={!applicationId}
             className={({ selected }) =>
               classNames(
                 'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                 'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
-                'disabled:opacity-50 disabled:cursor-not-allowed',
                 selected
                   ? 'bg-white text-[#6C5DD3] shadow'
                   : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
@@ -771,12 +768,10 @@ export default function CreateApplication() {
             {t('createApplication.photos', 'Photos')}
           </Tab>
           <Tab
-            disabled={!applicationId}
             className={({ selected }) =>
               classNames(
                 'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                 'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
-                'disabled:opacity-50 disabled:cursor-not-allowed',
                 selected
                   ? 'bg-white text-[#6C5DD3] shadow'
                   : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
@@ -786,12 +781,10 @@ export default function CreateApplication() {
             {t('createApplication.products', 'Products')}
           </Tab>
           <Tab
-            disabled={!applicationId}
             className={({ selected }) =>
               classNames(
                 'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                 'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
-                'disabled:opacity-50 disabled:cursor-not-allowed',
                 selected
                   ? 'bg-white text-[#6C5DD3] shadow'
                   : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
@@ -801,12 +794,10 @@ export default function CreateApplication() {
             {t('createApplication.transport', 'Transport')}
           </Tab>
           <Tab
-            disabled={!applicationId}
             className={({ selected }) =>
               classNames(
                 'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                 'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
-                'disabled:opacity-50 disabled:cursor-not-allowed',
                 selected
                   ? 'bg-white text-[#6C5DD3] shadow'
                   : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
@@ -1169,19 +1160,19 @@ export default function CreateApplication() {
           </Tab.Panel>
 
           <Tab.Panel>
-            <PhotoReportTab applicationId={applicationId} onSuccess={handleTabSuccess} />
+            <PhotoReportTab onSuccess={handleTabSuccess} />
           </Tab.Panel>
 
           <Tab.Panel>
-            <ProductsTab applicationId={applicationId} onSuccess={handleTabSuccess} />
+            <ProductsTab onSuccess={handleTabSuccess} />
           </Tab.Panel>
 
           <Tab.Panel>
-            <TransportTab applicationId={applicationId} onSuccess={handleTabSuccess} />
+            <TransportTab onSuccess={handleTabSuccess} />
           </Tab.Panel>
 
           <Tab.Panel>
-            <ModesTab applicationId={applicationId} onSuccess={handleTabSuccess} />
+            <ModesTab onSuccess={handleTabSuccess} />
           </Tab.Panel>
         </Tab.Panels>
       </Tab.Group>
@@ -1202,7 +1193,7 @@ export default function CreateApplication() {
 
       <SuccessModal
         isOpen={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
+        onClose={handleSuccessModalClose}
         message={t('createApplication.successMessage', 'Application created successfully!')}
       />
 

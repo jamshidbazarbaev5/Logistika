@@ -28,7 +28,7 @@ export default function PaymentMethodList() {
   const fetchPaymentMethods = async () => {
     try {
       const response = await api.get('/payment_method/');
-      setPaymentMethods(response.data);
+      setPaymentMethods(response.data.results);
       setLoading(false);
     } catch (err) {
       setError(t("paymentMethodList.errorLoading", "Error loading payment methods"));
