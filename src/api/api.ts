@@ -6,6 +6,9 @@ const BASE_URL = 'https://cargo-calc.uz/api/v1';
 
 export const api = axios.create({
   baseURL: BASE_URL,
+  headers:{
+    'Accept':"application/json"
+  }
 });
 
 api.interceptors.request.use(
@@ -84,6 +87,13 @@ interface Firm {
 
 interface Category {
   name: string;
+}
+
+interface Product {
+  id: number;
+  name: string;
+  measurement_id: number;
+  category_id: number;
 }
 
 export const apiService = {
@@ -171,6 +181,21 @@ export const apiService = {
 
   updateFirm: (id: number, data: Omit<Firm, 'id'>) =>
     api.put(`/firms/${id}/`, data),
+
+  // Product methods
+  getProducts: (queryString: string = "") => 
+    api.get(`/items/product/${queryString ? `?${queryString}` : ""}`).then(response => response.data),
+  
+  createProduct: (data: Omit<Product, 'id'>) => 
+    api.post('/items/product/', data),
+  
+  updateProduct: (id: number, data: Omit<Product, 'id'>) => {
+    if (!id) throw new Error('Product ID is required');
+    return api.put(`/items/product/${id}/`, data);
+  },
+  
+  deleteProduct: (id: number) => 
+    api.delete(`/items/product/${id}/`),
 };
 
-export type { Storage, KeepingService, WorkingService, Firm, Category };
+export type { Storage, KeepingService, WorkingService, Firm, Category, Product };

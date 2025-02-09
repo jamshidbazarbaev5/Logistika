@@ -30,7 +30,7 @@ const otherItems = [
     icon: RiSettings4Fill, 
     href: "#",
     subItems: [
-      { name: "menu.createProduct", icon: RiTBoxFill, href: "/product" },
+      { name: "menu.createProduct", icon: RiTBoxFill, href: "/products-list" },
       { name: "menu.createCategory", icon: RiBarChartFill, href: "/category" },
       { name: "menu.measurement", icon: RiBarChartFill, href: "/measurements" },
       { name: "menu.firm", icon: RiBuilding2Fill, href: "/firm-list" },
@@ -150,7 +150,7 @@ export default function Layout() {
               <Truck className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-semibold text-gray-900 dark:text-white">
-              Drivergo
+              Cargo-Calc
             </span>
           </div>
         </div>

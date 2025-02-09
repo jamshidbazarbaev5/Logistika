@@ -9,18 +9,22 @@ export interface SearchField {
   className?: string;
 }
 
-interface SearchBarProps<T extends Record<string, string>> {
+interface SearchBarProps<T extends Record<keyof T, string>> {
   fields: SearchField[];
   initialValues: T;
   onSearch: (values: T) => void;
+  onChange?: (values: T) => void;
+  immediate?: boolean;
   className?: string;
-  t?: (key: string, fallback: string) => string;
+  t: (key: string, defaultValue: string) => string;
 }
 
-export function SearchBar<T extends Record<string, string>>({ 
+export function SearchBar<T extends Record<keyof T, string>>({ 
   fields, 
   initialValues, 
   onSearch, 
+  onChange,
+  immediate = false,
   className = "",
   t = (_, fallback) => fallback 
 }: SearchBarProps<T>) {
@@ -64,7 +68,7 @@ export function SearchBar<T extends Record<string, string>>({
               id={field.name}
               type={field.type || 'text'}
               name={field.name}
-              value={localValues[field.name] || ''}
+              value={localValues[field.name as keyof T] || ''}
               onChange={handleInputChange}
               placeholder={t(`search.${field.placeholder}`, field.placeholder)}
               className={`
@@ -79,7 +83,7 @@ export function SearchBar<T extends Record<string, string>>({
                 ${field.type === 'date' ? 'cursor-pointer' : ''}
               `}
             />
-            {localValues[field.name] && (
+            {localValues[field.name as keyof T] && (
               <button
                 type="button"
                 onClick={() => {

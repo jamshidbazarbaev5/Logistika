@@ -28,11 +28,11 @@ export default function TransportList() {
       try {
         const [typesResponse, numbersResponse] = await Promise.all([
           api.get('/transport/type/'),
-          api.get('/transport/number/')
+          // api.get('/transport/number/')
         ]);
         
-        setTransportTypes(typesResponse.data);
-        setTransportNumbers(numbersResponse.data);
+        setTransportTypes(typesResponse.data.results);
+        // setTransportNumbers(numbersResponse.data.results);
         setLoading(false);
       } catch (err) {
         setError(t('transportList.errorLoading', 'Error loading transports'));

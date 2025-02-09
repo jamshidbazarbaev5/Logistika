@@ -31,6 +31,7 @@ import CreateStorage from "./pages/CreateStorage";
 import ModeList from "./pages/ModeList";
 import PaymentList from "./pages/PaymentList";
 import ApplicationList from "./pages/ApplicationList";
+import ProductsList from "./pages/ProductsList";
 const queryClient = new QueryClient();
 
 function App() {
@@ -71,6 +72,7 @@ function App() {
                 <Route path="/payment-list" element={<PaymentList />} />
                 <Route path="/payment-methods/create" element={<CreatePaymentMethod />} />
                 <Route path="/application-list" element={<ApplicationList />} />
+                <Route path="/products-list" element={<ProductsList />} />
               </Route>
             </Routes>
           </Router>
