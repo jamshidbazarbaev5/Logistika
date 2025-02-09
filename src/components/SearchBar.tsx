@@ -23,8 +23,6 @@ export function SearchBar<T extends Record<keyof T, string>>({
   fields, 
   initialValues, 
   onSearch, 
-  onChange,
-  immediate = false,
   className = "",
   t = (_, fallback) => fallback 
 }: SearchBarProps<T>) {

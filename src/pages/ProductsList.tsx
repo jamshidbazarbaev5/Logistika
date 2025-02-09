@@ -1,7 +1,7 @@
 import { useState, useEffect, Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { api } from "../api/api";
+
 import { Menu, Transition } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import ConfirmModal from "../components/ConfirmModal";
@@ -17,20 +17,20 @@ interface Product {
   category_id: number;
 }
 
-interface ProductResponse {
-  links: {
-    first: string | null;
-    last: string | null;
-    next: string | null;
-    previous: string | null;
-  };
-  total_pages: number;
-  current_page: number;
-  page_range: number[];
-  page_size: number;
-  results: Product[];
-  count: number;
-}
+// interface ProductResponse {
+//   links: {
+//     first: string | null;
+//     last: string | null;
+//     next: string | null;
+//     previous: string | null;
+//   };
+//   total_pages: number;
+//   current_page: number;
+//   page_range: number[];
+//   page_size: number;
+//   results: Product[];
+//   count: number;
+// }
 
 export default function ProductList() {
   const { t } = useTranslation();

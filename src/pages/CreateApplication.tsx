@@ -72,16 +72,16 @@ interface WorkingService {
   units: string;
 }
 
-interface ProductQuantity {
-  quantity: number;
-  product_id: number;
-  storage_id: number;
-}
+// interface ProductQuantity {
+//   quantity: number;
+//   product_id: number;
+//   storage_id: number;
+// }
 
-interface TransportNumber {
-  transport_number: string;
-  transport_type: number;
-}
+// interface TransportNumber {
+//   transport_number: string;
+//   transport_type: number;
+// }
 
 interface Product {
   name: string;
@@ -101,30 +101,30 @@ interface TabPanelProps {
     setModeId?: (id: number) => void;
 }
 
-interface KeepingServiceQuantity {
-  day: number;
-  keeping_services_id: number;
-}
+// interface KeepingServiceQuantity {
+//   day: number;
+//   keeping_services_id: number;
+// }
 
-interface WorkingServiceQuantity {
-  quantity: number;
-  service_id: number;
-}
+// interface WorkingServiceQuantity {
+//   quantity: number;
+//   service_id: number;
+// }
 
-interface TransportUpload {
-  transport_number: string;
-  transport_type: number;
-}
+// interface TransportUpload {
+//   transport_number: string;
+//   transport_type: number;
+// }
 
-interface ModeUpload {
-  mode_id: number;
-}
+// interface ModeUpload {
+//   mode_id: number;
+// }
 
-interface ProductUpload {
-  quantity: number;
-  product_id: number;
-  storage_id: number;
-}
+// interface ProductUpload {
+//   quantity: number;
+//   product_id: number;
+//   storage_id: number;
+// }
 
 // First, create a context to share formData and setFormData
 interface FormContextType {
@@ -144,7 +144,7 @@ const useFormContext = () => {
 };
 
 const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [, setSelectedFiles] = useState<File[]>([]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -184,14 +184,13 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   );
 };
 
-const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
+const ProductsTab: React.FC<TabPanelProps> = ({  }) => {
   const { formData, setFormData } = useFormContext();
   const [quantity, setQuantity] = useState<number>(0);
   const [selectedProduct, setSelectedProduct] = useState<number>(0);
   const [selectedStorage, setSelectedStorage] = useState<number>(0);
   const [products, setProducts] = useState<Product[]>([]);
   const [storages, setStorages] = useState<any[]>([]);
-  const [, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -211,11 +210,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     fetchData();
   }, []);
 
-  const getProductId = (productName: string): number => {
-    // Find the index of the product in the array and add 1 (1-based index)
-    const index = products.findIndex(p => p.name === productName);
-    return index + 1;
-  };
+ 
 
   const handleAddProduct = () => {
     if (!quantity || !selectedProduct || !selectedStorage) return;
@@ -351,7 +346,6 @@ const TransportTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const [transportNumber, setTransportNumber] = useState('');
   const [transportTypeId, setTransportTypeId] = useState<number>(0);
   const [transportTypes, setTransportTypes] = useState<TransportType[]>([]);
-  const [, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchTransportTypes = async () => {
@@ -753,7 +747,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   );
 };
 
-const ModesTab: React.FC<TabPanelProps> = ({ onSuccess, onSubmit, modeId = 0, setModeId }) => {
+const ModesTab: React.FC<TabPanelProps> = ({  onSubmit }) => {
   const { formData, setFormData } = useFormContext();
   const [selectedMode, setSelectedMode] = useState<number>(0);
   const [modes, setModes] = useState<Array<{ id: number; name_mode: string }>>([]);
@@ -852,8 +846,8 @@ export default function CreateApplication() {
   const { t } = useTranslation();
   const [firms, setFirms] = useState<Firm[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
-  const [keepingServices, setKeepingServices] = useState<KeepingService[]>([]);
-  const [workingServices, setWorkingServices] = useState<WorkingService[]>([]);
+  const [, setKeepingServices] = useState<KeepingService[]>([]);
+  const [, setWorkingServices] = useState<WorkingService[]>([]);
   const [, setProducts] = useState<Product[]>([]);
   const [, setStorages] = useState<any[]>([]);
   const [, setTransportTypes] = useState<TransportType[]>([]);
@@ -864,8 +858,8 @@ export default function CreateApplication() {
   const [paymentMethodSearch, setPaymentMethodSearch] = useState("");
   const [showPaymentMethodDropdown, setShowPaymentMethodDropdown] = useState(false);
   const paymentMethodDropdownRef = useRef<HTMLDivElement>(null);
-  const [keepingServicesOpen, setKeepingServicesOpen] = useState(false);
-  const [workingServicesOpen, setWorkingServicesOpen] = useState(false);
+  const [, setKeepingServicesOpen] = useState(false);
+  const [, setWorkingServicesOpen] = useState(false);
   const keepingServicesRef = useRef<HTMLDivElement>(null);
   const workingServicesRef = useRef<HTMLDivElement>(null);
   const [showCreateFirmModal, setShowCreateFirmModal] = useState(false);
@@ -873,7 +867,7 @@ export default function CreateApplication() {
   const [, setApplicationId] = useState<number | null>(null);
   const navigate = useNavigate();
   const [modeId, setModeId] = useState<number>(0);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [selectedFiles] = useState<File[]>([]);
 
   // Format current date to YYYY-MM-DD
   const getCurrentDate = () => {

@@ -19,14 +19,14 @@ export default function TransportList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [transportTypes, setTransportTypes] = useState<TransportType[]>([]);
-  const [transportNumbers, setTransportNumbers] = useState<TransportNumber[]>([]);
+  const [transportNumbers] = useState<TransportNumber[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [typesResponse, numbersResponse] = await Promise.all([
+        const [typesResponse] = await Promise.all([
           api.get('/transport/type/'),
           // api.get('/transport/number/')
         ]);
