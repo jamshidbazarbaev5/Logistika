@@ -7,7 +7,6 @@ import { Tab } from '@headlessui/react';
 import { classNames } from '../../utils/classNames'
 import { useNavigate } from "react-router-dom";
 import { createContext, useContext } from 'react';
-import { Dialog } from '@headlessui/react';
 
 interface ApplicationFormData {
   firm_id: number;
@@ -1002,7 +1001,7 @@ export default function CreateApplication() {
   const [, setApplicationId] = useState<number | null>(null);
   const navigate = useNavigate();
   const [modeId, setModeId] = useState<number>(0);
-  const [selectedFiles] = useState<File[]>([]);
+  // const [selectedFiles] = useState<File[]>([]);
 
   // Format current date to YYYY-MM-DD
   const getCurrentDate = () => {

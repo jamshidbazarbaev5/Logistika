@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const UpdateUser = () => {
@@ -37,7 +37,7 @@ const UpdateUser = () => {
   const handleSubmit = async (e:any) => {
     e.preventDefault();
     try {
-      const response = await axios.put(`https://cargo-calc.uz/api/v1/users/`, user);
+    //   const response = await axios.put(`https://cargo-calc.uz/api/v1/users/`, user);
       setMessage('User updated successfully!');
     } catch (error) {
       setMessage('Error updating user');

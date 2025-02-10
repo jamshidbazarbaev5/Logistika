@@ -3,7 +3,6 @@
   import { Pencil, Trash2, Plus, User, Mail, Key, UserCircle } from 'lucide-react';
   import ConfirmModal from '../components/ConfirmModal';
   import SuccessModal from '../components/SuccessModal';
-  import { useTranslation } from 'react-i18next';
 
   interface User {
     id: number;
@@ -22,7 +21,6 @@
   }
 
   export default function Users() {
-    const { t } = useTranslation();
     const [users, setUsers] = useState<User[]>([]);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
