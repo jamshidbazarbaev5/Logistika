@@ -32,6 +32,8 @@ import ModeList from "./pages/ModeList";
 import PaymentList from "./pages/PaymentList";
 import ApplicationList from "./pages/ApplicationList";
 import ProductsList from "./pages/ProductsList";
+import UpdateUser from "./pages/UpdataUser";
+import UserList from "./pages/UserList";
 const queryClient = new QueryClient();
 
 function App() {
@@ -56,7 +58,7 @@ function App() {
                 <Route path="/photo-report" element={<PhotoUpload />} />
                 <Route path="/create-application" element={<CreateApplication />} />
                 <Route path="/" element={<Navigate to="/firm-list" replace />} />
-                <Route path="/product" element={<CreateProduct />} />
+                <Route path="/products/create" element={<CreateProduct />} />
                 <Route path="/product-quantity" element={<CreateProductQuantity />} />
                 <Route path="working_service" element={<WorkingService />} />
                 <Route path="/firm-list" element={<FirmList />} />
@@ -73,6 +75,8 @@ function App() {
                 <Route path="/payment-methods/create" element={<CreatePaymentMethod />} />
                 <Route path="/application-list" element={<ApplicationList />} />
                 <Route path="/products-list" element={<ProductsList />} />
+                <Route path="/update-user" element={<UpdateUser />} />
+                <Route path="/user-list" element={<UserList />} />
               </Route>
             </Routes>
           </Router>

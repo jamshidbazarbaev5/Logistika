@@ -257,7 +257,7 @@ export default function FirmList() {
                         shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none
                         ${
                           firms.indexOf(firm) >= firms.length - 3
-                            ? "bottom-full mb-2"
+                            ? "bottom-[-15px] mb-2"
                             : "top-full"
                         } 
                         ${
@@ -265,7 +265,7 @@ export default function FirmList() {
                             ? "origin-bottom-right"
                             : "origin-top-right"
                         }
-                        right-0`}
+                        right-20`}
                       >
                         <div className="py-1">
                           <Menu.Item>

@@ -17,6 +17,16 @@ interface Product {
   category_id: number;
 }
 
+interface Measurement {
+  id: number;
+  name: string;
+}
+
+interface Category {
+  id: number;
+  name: string;
+}
+
 // interface ProductResponse {
 //   links: {
 //     first: string | null;
@@ -53,6 +63,8 @@ export default function ProductList() {
   const [searchParams, setSearchParams] = useState({
     name: "",
   });
+  const [measurements, setMeasurements] = useState<Measurement[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const searchFields: SearchField[] = [
     {
@@ -70,6 +82,7 @@ export default function ProductList() {
     try {
       const queryParams = new URLSearchParams();
       if (searchParams.name) queryParams.append("product_name", searchParams.name);
+      queryParams.append("ordering", "id");
       
       const response = await apiService.getProducts(queryParams.toString());
       setProducts(response.results);
@@ -80,8 +93,22 @@ export default function ProductList() {
     }
   };
 
+  const fetchMeasurementsAndCategories = async () => {
+    try {
+      const [measurementsResponse, categoriesResponse] = await Promise.all([
+        apiService.getMeasurements(),
+        apiService.getCategories()
+      ]);
+      setMeasurements(measurementsResponse.results);
+      setCategories(categoriesResponse.results);
+    } catch (error) {
+      console.error('Error fetching measurements and categories:', error);
+    }
+  };
+
   useEffect(() => {
     fetchProducts();
+    fetchMeasurementsAndCategories();
   }, [searchParams, t]);
 
   if (loading) {
@@ -213,10 +240,10 @@ export default function ProductList() {
                   {product.name}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {product.measurement_id}
+                  {measurements.find(m => m.id === product.measurement_id)?.name || product.measurement_id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {product.category_id}
+                  {categories.find(c => c.id === product.category_id)?.name || product.category_id}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                   <Menu as="div" className="relative inline-block text-left">
@@ -329,8 +356,11 @@ export default function ProductList() {
                   onChange={handleInputChange}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3] dark:bg-gray-700 dark:border-gray-600"
                 >
-                  <option value="1">Measurement 1</option>
-                  <option value="2">Measurement 2</option>
+                  {measurements.map(measurement => (
+                    <option key={measurement.id} value={measurement.id}>
+                      {measurement.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -344,8 +374,11 @@ export default function ProductList() {
                   onChange={handleInputChange}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3] dark:bg-gray-700 dark:border-gray-600"
                 >
-                  <option value="1">Category 1</option>
-                  <option value="2">Category 2</option>
+                  {categories.map(category => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 

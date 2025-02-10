@@ -22,7 +22,7 @@ const mainMenuItems = [
   { name: "menu.createApplication", icon: RiFileAddFill, href: "/application-list" },
 ];
 
-const generalItems = [{ name: "menu.account", icon: RiUserFill, href: "/account" }];
+const generalItems = [{ name: "menu.account", icon: RiUserFill, href: "/user-list" }];
 
 const otherItems = [
   { 

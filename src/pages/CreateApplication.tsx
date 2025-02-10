@@ -7,6 +7,7 @@ import { Tab } from '@headlessui/react';
 import { classNames } from '../../utils/classNames'
 import { useNavigate } from "react-router-dom";
 import { createContext, useContext } from 'react';
+import { Dialog } from '@headlessui/react';
 
 interface ApplicationFormData {
   firm_id: number;
@@ -42,6 +43,7 @@ interface ApplicationFormData {
     product_id: number;
     storage_id: number;
   }>;
+  upload_photos?: File[];
 }
 
 interface Firm {
@@ -84,6 +86,7 @@ interface WorkingService {
 // }
 
 interface Product {
+  id: number;
   name: string;
   measurement_id: number;
   category_id: number;
@@ -99,6 +102,7 @@ interface TabPanelProps {
     onSubmit?: () => void;
     modeId?: number;
     setModeId?: (id: number) => void;
+    setSelectedTab?: (index: number) => void;
 }
 
 // interface KeepingServiceQuantity {
@@ -143,48 +147,163 @@ const useFormContext = () => {
   return context;
 };
 
-const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
-  const [, setSelectedFiles] = useState<File[]>([]);
+const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) => {
+  const { formData, setFormData } = useFormContext();
+  const [previews, setPreviews] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!formData.firm_id) {
+      setError('Please select a firm in the Basic Info tab first');
+      return;
+    }
+
     if (e.target.files) {
-      setSelectedFiles(Array.from(e.target.files));
+      const newFiles = Array.from(e.target.files);
+      setFormData(prev => ({
+        ...prev,
+        upload_photos: [...(prev.upload_photos || []), ...newFiles]
+      }));
+      
+      // Generate previews for new files
+      newFiles.forEach(file => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          setPreviews(prev => [...prev, reader.result as string]);
+        };
+        reader.readAsDataURL(file);
+      });
+      
+      setError(null);
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      upload_photos: (prev.upload_photos || []).filter((_, i) => i !== index)
+    }));
+    setPreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleNext = () => {
+    if (!formData.firm_id) {
+      setError('Please select a firm in the Basic Info tab first');
+      return;
+    }
+    if (onSuccess) {
+      onSuccess();
+    }
+  };
+
+  const handleGoToBasicInfo = () => {
+    if (setSelectedTab) {
+      setSelectedTab(0);
     }
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-sm">
-      <div className="mb-6">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Upload Photos
-        </label>
-        <input
-          type="file"
-          multiple
-          accept="image/*"
-          onChange={handleFileChange}
-          className="block w-full text-sm text-gray-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-md file:border-0
-            file:text-sm file:font-semibold
-            file:bg-[#6C5DD3] file:text-white
-            hover:file:bg-[#5b4eb3]
-            file:cursor-pointer"
-        />
-      </div>
+    <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
+      {!formData.firm_id ? (
+        <div className="text-center p-6">
+          <div className="text-red-600 mb-4">
+            Please select a firm in the Basic Info tab first
+          </div>
+          <button
+            onClick={handleGoToBasicInfo}
+            className="px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
+              hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out shadow-sm"
+          >
+            Go to Basic Info
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Upload Photos
+            </label>
+            
+            {/* File Input */}
+            <div className="flex items-center justify-center w-full">
+              <label className="flex flex-col w-full h-32 border-2 border-dashed border-gray-300 rounded-lg 
+                cursor-pointer hover:bg-gray-50 transition-colors">
+                <div className="flex flex-col items-center justify-center pt-7">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
+                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  <p className="pt-1 text-sm tracking-wider text-gray-400">
+                    Select photos
+                  </p>
+                </div>
+                <input 
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="opacity-0"
+                />
+              </label>
+            </div>
 
-      <button
-        onClick={onSuccess}
-        className="w-full sm:w-auto px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
-          hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out shadow-sm"
-      >
-        Next
-      </button>
+            {/* Error Message */}
+            {error && (
+              <div className="mt-2 text-sm text-red-600">
+                {error}
+              </div>
+            )}
+
+            {/* Preview Grid */}
+            {previews.length > 0 && (
+              <div className="mt-6">
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  Selected Photos ({previews.length})
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {previews.map((preview, index) => (
+                    <div key={index} className="relative group">
+                      <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200">
+                        <img
+                          src={preview}
+                          alt={`Preview ${index + 1}`}
+                          className="object-cover w-full h-full"
+                        />
+                      </div>
+                      <button
+                        onClick={() => removePhoto(index)}
+                        className="absolute top-2 right-2 p-1 bg-red-500 rounded-full text-white 
+                          opacity-0 group-hover:opacity-100 transition-opacity duration-200
+                          hover:bg-red-600"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-between items-center mt-6 pt-6 border-t">
+            <button
+              onClick={handleNext}
+              className="px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
+                hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out shadow-sm"
+            >
+              Next
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
 
-const ProductsTab: React.FC<TabPanelProps> = ({  }) => {
+const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const { formData, setFormData } = useFormContext();
   const [quantity, setQuantity] = useState<number>(0);
   const [selectedProduct, setSelectedProduct] = useState<number>(0);
@@ -210,8 +329,6 @@ const ProductsTab: React.FC<TabPanelProps> = ({  }) => {
     fetchData();
   }, []);
 
- 
-
   const handleAddProduct = () => {
     if (!quantity || !selectedProduct || !selectedStorage) return;
 
@@ -221,15 +338,10 @@ const ProductsTab: React.FC<TabPanelProps> = ({  }) => {
       storage_id: selectedStorage
     };
 
-    console.log('Adding product to form state:', newProduct);
-    setFormData(prev => {
-      const newState = {
-        ...prev,
-        upload_products: [...prev.upload_products, newProduct]
-      };
-      console.log('New form state after adding product:', newState);
-      return newState;
-    });
+    setFormData(prev => ({
+      ...prev,
+      upload_products: [...prev.upload_products, newProduct]
+    }));
 
     // Reset form fields
     setQuantity(0);
@@ -246,7 +358,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({  }) => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-sm">
+    <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
@@ -261,8 +373,8 @@ const ProductsTab: React.FC<TabPanelProps> = ({  }) => {
               dark:text-gray-100 transition-colors"
           >
             <option value={0}>Select Product</option>
-            {products.map((product, index) => (
-              <option key={`${product.name}-${index}`} value={index}>
+            {products.map((product) => (
+              <option key={product.id} value={product.id}>
                 {product.name}
               </option>
             ))}
@@ -310,32 +422,49 @@ const ProductsTab: React.FC<TabPanelProps> = ({  }) => {
       <button
         onClick={handleAddProduct}
         disabled={!selectedProduct || !selectedStorage || !quantity}
-        className="mt-6 w-full sm:w-auto px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg 
+        className="mt-6 px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg 
           font-medium hover:bg-[#5b4eb3] disabled:opacity-50 disabled:cursor-not-allowed
           transition-colors duration-200 ease-in-out shadow-sm"
       >
-        Next
+        Add Product
       </button>
 
       {/* Display selected products */}
-      <div className="mt-4">
-        <h3 className="text-sm font-medium text-gray-700 mb-2">Selected Products:</h3>
+      <div className="mt-6">
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Products:</h3>
         <div className="space-y-2">
           {formData.upload_products.map((product, index) => (
-            <div key={index} className="flex justify-between items-center bg-gray-50 p-2 rounded">
-              <span>
-                Product: {product.product_id}, Quantity: {product.quantity}, 
-                Storage: {product.storage_id}
-              </span>
+            <div key={index} className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+              <div className="flex-1">
+                <span className="font-medium dark:text-gray-100">
+                  {products.find(p => p.id === product.product_id)?.name}
+                </span>
+                <span className="mx-2 text-gray-400 dark:text-gray-500">|</span>
+                <span className="text-gray-600 dark:text-gray-300">
+                  Storage: {storages.find(s => s.id === product.storage_id)?.storage_name}
+                </span>
+                <span className="mx-2 text-gray-400 dark:text-gray-500">|</span>
+                <span className="text-gray-600 dark:text-gray-300">Quantity: {product.quantity}</span>
+              </div>
               <button
                 onClick={() => handleRemoveProduct(index)}
-                className="text-red-500 hover:text-red-700"
+                className="text-red-500 hover:text-red-700 p-2 dark:text-red-400 dark:hover:text-red-300"
               >
                 Remove
               </button>
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="mt-6 flex justify-end border-t pt-6">
+        <button
+          onClick={onSuccess}
+          className="px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
+            hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out shadow-sm"
+        >
+          Next
+        </button>
       </div>
     </div>
   );
@@ -384,14 +513,16 @@ const TransportTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 bg-white dark:bg-gray-900">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Transport Type</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Transport Type</label>
           <select
             value={transportTypeId}
             onChange={(e) => setTransportTypeId(Number(e.target.value))}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
+              focus:border-[#6C5DD3] focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 
+              text-gray-900 dark:text-gray-100 transition-colors"
           >
             <option value={0}>Select Transport Type</option>
             {transportTypes?.map(type => (
@@ -401,12 +532,14 @@ const TransportTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700">Transport Number</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Transport Number</label>
           <input
             type="text"
             value={transportNumber}
             onChange={(e) => setTransportNumber(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
+              focus:border-[#6C5DD3] focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 
+              text-gray-900 dark:text-gray-100 transition-colors"
           />
         </div>
       </div>
@@ -529,7 +662,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm">
+    <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
       <div className="space-y-8">
         {/* Keeping Services Dropdown */}
         <div ref={keepingServicesRef} className="relative">
@@ -629,8 +762,6 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
                         <span>Base: {service.base_price}</span>
                         <span>•</span>
                         <span>Extra: {service.extra_price}</span>
-                        <span>•</span>
-                        <span>Units: {service.units}</span>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
@@ -747,7 +878,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   );
 };
 
-const ModesTab: React.FC<TabPanelProps> = ({  onSubmit }) => {
+const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
   const { formData, setFormData } = useFormContext();
   const [selectedMode, setSelectedMode] = useState<number>(0);
   const [modes, setModes] = useState<Array<{ id: number; name_mode: string }>>([]);
@@ -795,14 +926,15 @@ const ModesTab: React.FC<TabPanelProps> = ({  onSubmit }) => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-sm">
+    <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
       <div className="max-w-md">
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">Mode</label>
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mode</label>
           <select
             value={selectedMode}
             onChange={(e) => handleModeSelect(Number(e.target.value))}
-            className="block w-full rounded-lg border-gray-300 shadow-sm"
+            className="block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm
+              bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
           >
             <option value={0}>Select Mode</option>
             {modes.map(mode => (
@@ -812,30 +944,33 @@ const ModesTab: React.FC<TabPanelProps> = ({  onSubmit }) => {
             ))}
           </select>
         </div>
-        <button
-          onClick={onSubmit}
-          className="mt-4 w-full px-6 py-2.5 bg-green-600 text-white rounded-lg font-medium
-            hover:bg-green-700 transition-colors duration-200 ease-in-out shadow-sm"
-        >
-          Create Application
-        </button>
 
         {/* Display selected modes */}
         <div className="mt-4">
-          <h3 className="text-sm font-medium text-gray-700 mb-2">Selected Modes:</h3>
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Modes:</h3>
           <div className="space-y-2">
             {formData.upload_modes.map((mode, index) => (
-              <div key={index} className="flex justify-between items-center bg-gray-50 p-2 rounded">
-                <span>{modes.find(m => m.id === mode.mode_id)?.name_mode}</span>
+              <div key={index} className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                <span className="text-gray-900 dark:text-gray-100">{modes.find(m => m.id === mode.mode_id)?.name_mode}</span>
                 <button
                   onClick={() => handleRemoveMode(mode.mode_id)}
-                  className="text-red-500 hover:text-red-700"
+                  className="text-red-500 hover:text-red-700 p-2 dark:text-red-400 dark:hover:text-red-300"
                 >
                   Remove
                 </button>
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="mt-6 flex justify-end border-t pt-6">
+          <button
+            onClick={onSubmit}
+            className="w-full px-6 py-2.5 bg-green-600 text-white rounded-lg font-medium
+              hover:bg-green-700 transition-colors duration-200 ease-in-out shadow-sm"
+          >
+            Create Application
+          </button>
         </div>
       </div>
     </div>
@@ -876,7 +1011,7 @@ export default function CreateApplication() {
   };
 
   const [formData, setFormData] = useState<ApplicationFormData>({
-    firm_id: 0,
+    firm_id: null as unknown as number,
     brutto: null,
     netto: null,
     vip_application: false,
@@ -892,7 +1027,6 @@ export default function CreateApplication() {
     upload_transport: [],
     upload_modes: [],
     upload_products: [],
-    // photo_report: []
   });
 
   useEffect(() => {
@@ -967,70 +1101,55 @@ export default function CreateApplication() {
 
   const handleSubmit = async () => {
     try {
-      // Check if we have any files to upload
-      const hasFiles = formData.decloration_file || selectedFiles.length > 0;
+      console.log('Starting submission with firm_id:', formData.firm_id);
+      
+      const formDataToSend = new FormData();
 
-      if (hasFiles) {
-        // Handle file upload separately if needed
-        const formDataToSend = new FormData();
-        if (formData.decloration_file) {
-          formDataToSend.append('decloration_file', formData.decloration_file);
-        }
-        if (selectedFiles.length > 0) {
-          selectedFiles.forEach(file => {
-            formDataToSend.append('upload_photos', file);
-          });
-        }
-        // Handle file upload logic here
+      formDataToSend.append('firm_id', String(formData.firm_id));
+
+      formDataToSend.append('brutto', String(formData.brutto || ''));
+      formDataToSend.append('netto', String(formData.netto || ''));
+      formDataToSend.append('coming_date', formData.coming_date || '');
+      formDataToSend.append('decloration_date', formData.decloration_date || '');
+      formDataToSend.append('decloration_number', formData.decloration_number || '');
+      formDataToSend.append('vip_application', String(formData.vip_application || false));
+      formDataToSend.append('total_price', String(formData.total_price || ''));
+      formDataToSend.append('discount_price', String(formData.discount_price || ''));
+
+      formDataToSend.append('keeping_services', JSON.stringify(formData.keeping_services || []));
+      formDataToSend.append('working_services', JSON.stringify(formData.working_services || []));
+      formDataToSend.append('transport', JSON.stringify(formData.upload_transport || []));
+      formDataToSend.append('modes', JSON.stringify(formData.upload_modes || []));
+      formDataToSend.append('products', JSON.stringify(formData.upload_products || []));
+
+      if (formData.decloration_file) {
+        formDataToSend.append('decloration_file', formData.decloration_file);
       }
 
-      // Prepare the JSON data
-      const requestData = {
-        firm_id: formData.firm_id,
-        brutto: formData.brutto,
-        netto: formData.netto,
-        vip_application: formData.vip_application,
-        total_price: formData.total_price,
-        discount_price: formData.discount_price,
-        coming_date: formData.coming_date,
-        decloration_date: formData.decloration_date,
-        decloration_number: formData.decloration_number,
-        keeping_services: formData.upload_keeping_services_quantity.map(item => ({
-          day: item.day,
-          keeping_services_id: item.keeping_services_id
-        })),
-        working_services: formData.upload_working_services_quantity.map(item => ({
-          quantity: item.quantity,
-          service_id: item.service_id
-        })),
-        upload_keeping_services_quantity: formData.upload_keeping_services_quantity,
-        upload_working_services_quantity: formData.upload_working_services_quantity,
-        upload_transport: formData.upload_transport,
-        upload_modes: formData.upload_modes,
-        upload_products: formData.upload_products,
-      };
+      if (formData.upload_photos?.length) {
+        formData.upload_photos.forEach(file => {
+          formDataToSend.append('upload_photos', file);
+        });
+      }
 
-      console.log('Sending data:', requestData);
+      console.log('FormData entries:');
+      for (let pair of formDataToSend.entries()) {
+        console.log(pair[0], pair[1]);
+      }
 
-      const response = await api.post('/application/', requestData, {
+      const response = await api.post('/application/', formDataToSend, {
         headers: {
-          'Content-Type': 'application/json',
-        },
+        }
       });
 
-      console.log('Response:', response.data);
+      console.log('Success Response:', response.data);
       setApplicationId(response.data.id);
       setShowSuccessModal(true);
       navigate('/application-list');
+
     } catch (error: any) {
       console.error('Error submitting application:', error);
-      if (error.response) {
-        console.error('Server error details:', {
-          status: error.response.status,
-          data: error.response.data,
-          headers: error.response.headers
-        });
-      }
+      console.error('Error response:', error.response?.data);
     }
   };
   
@@ -1073,11 +1192,19 @@ export default function CreateApplication() {
   );
 
   const handleFirmSelect = (firm: Firm) => {
-    console.log('Selected firm:', firm);
+    console.log('Firm selection - Received firm:', firm);
+    console.log('Firm selection - Firm ID:', firm.id);
+    console.log('Firm selection - Firm ID type:', typeof firm.id);
+
+    if (!firm.id) {
+      console.error('Invalid firm selected - firm.id is falsy');
+      return;
+    }
+    
     setFormData(prev => {
       const updated = {
         ...prev,
-        firm_id: firm.id
+        firm_id: Number(firm.id) // Ensure it's a number
       };
       console.log('Updated form data:', updated);
       return updated;
@@ -1110,8 +1237,11 @@ export default function CreateApplication() {
     }
   };
 
-  // Update the common input class styles
-  const inputClassName = "mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors";
+  // Update the common input class styles with dark theme support
+  const inputClassName = `mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+    px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
+    focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
+    dark:text-gray-100 transition-colors`;
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -1131,7 +1261,7 @@ export default function CreateApplication() {
     <FormContext.Provider value={{ formData, setFormData }}>
       <div className="p-4 sm:p-6">
         <Tab.Group selectedIndex={selectedTab} onChange={handleTabChange}>
-          <Tab.List className="flex space-x-1 rounded-xl bg-gray-100 p-1">
+          <Tab.List className="flex space-x-1 rounded-xl bg-gray-100 dark:bg-gray-800 p-1">
             <Tab
               className={({ selected }) =>
                 classNames(
@@ -1230,7 +1360,7 @@ export default function CreateApplication() {
 
           <Tab.Panels>
             <Tab.Panel>
-              <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="brutto" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
@@ -1292,26 +1422,27 @@ export default function CreateApplication() {
                     />
                     
                     {showFirmDropdown && (
-                      <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
                         {filteredFirms.length > 0 ? (
                           filteredFirms.map((firm) => (
                             <div
                               key={firm.id}
                               onClick={() => handleFirmSelect(firm)}
-                              className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                              className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-900 dark:text-gray-100"
                             >
                               {firm.firm_name}
                             </div>
                           ))
                         ) : (
                           <div className="p-4">
-                            <p className="text-sm text-gray-500 mb-2">
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
                               {t('createApplication.noFirmsFound', 'No firms found')}
                             </p>
                             <button
                               onClick={() => setShowCreateFirmModal(true)}
                               className="w-full text-center bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
-                              hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3]"
+                              hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
+                              dark:focus:ring-offset-gray-800"
                             >
                               {t('createApplication.createNewFirm', 'Create New Firm')}
                             </button>
@@ -1339,19 +1470,19 @@ export default function CreateApplication() {
                     />
                     
                     {showPaymentMethodDropdown && (
-                      <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-60 overflow-auto">
+                      <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
                         {filteredPaymentMethods.length > 0 ? (
                           filteredPaymentMethods.map((method) => (
                             <div
                               key={method.id}
                               onClick={() => handlePaymentMethodSelect(method)}
-                              className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                              className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm text-gray-900 dark:text-gray-100"
                             >
                               {method.payment_method}
                             </div>
                           ))
                         ) : (
-                          <div className="p-4 text-sm text-gray-500">
+                          <div className="p-4 text-sm text-gray-500 dark:text-gray-400">
                             {t('createApplication.noPaymentMethodsFound', 'No payment methods found')}
                           </div>
                         )}
@@ -1362,8 +1493,11 @@ export default function CreateApplication() {
               </div>
               <div className="mt-6 flex justify-end">
                 <button
+                  type="button"
                   onClick={() => setSelectedTab(1)}
-                  className="bg-[#6C5DD3] text-white px-6 py-2 rounded-lg hover:bg-[#5b4eb3]"
+                  className="bg-[#6C5DD3] text-white px-6 py-2 rounded-lg hover:bg-[#5b4eb3]
+                    focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
+                    dark:focus:ring-offset-gray-800"
                 >
                   Next
                 </button>
@@ -1371,7 +1505,7 @@ export default function CreateApplication() {
             </Tab.Panel>
 
             <Tab.Panel>
-              <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="decloration_number" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
@@ -1417,7 +1551,9 @@ export default function CreateApplication() {
                         file:text-sm file:font-semibold
                         file:bg-[#6C5DD3] file:text-white
                         hover:file:bg-[#5b4eb3]
-                        file:cursor-pointer"
+                        file:cursor-pointer
+                        dark:file:bg-[#6C5DD3] dark:file:text-white
+                        dark:hover:file:bg-[#5b4eb3]"
                     />
                   </div>
                 </div>
@@ -1426,7 +1562,9 @@ export default function CreateApplication() {
                   <button
                     type="button"
                     onClick={() => setSelectedTab(2)}
-                    className="bg-[#6C5DD3] text-white px-6 py-2 rounded-lg hover:bg-[#5b4eb3]"
+                    className="bg-[#6C5DD3] text-white px-6 py-2 rounded-lg hover:bg-[#5b4eb3]
+                      focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
+                      dark:focus:ring-offset-gray-800"
                   >
                     Next
                   </button>
@@ -1439,7 +1577,10 @@ export default function CreateApplication() {
             </Tab.Panel>
 
             <Tab.Panel>
-              <PhotoReportTab onSuccess={() => setSelectedTab(4)} />
+              <PhotoReportTab 
+                onSuccess={() => setSelectedTab(4)}
+                setSelectedTab={setSelectedTab}
+              />
             </Tab.Panel>
 
             <Tab.Panel>

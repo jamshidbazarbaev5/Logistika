@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { api, apiService } from "../api/api";
 import SuccessModal from "../components/SuccessModal";
 import FormLayout from "../components/FormLayout";
+import {useNavigate} from "react-router-dom";
 
 interface Category {
   id: number;
@@ -36,7 +37,7 @@ export default function CreateProduct() {
     measurement_id: null,
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -50,6 +51,7 @@ export default function CreateProduct() {
         );
         setCategories(sortedCategories);
         setMeasurements(measurementsData.results);
+        navigate('products-list')
       } catch (error) {
         console.error('Error fetching data:', error);
       }
