@@ -1147,7 +1147,6 @@ export default function CreateApplication() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [, setApplicationId] = useState<number | null>(null);
   const navigate = useNavigate();
-  const [modeId, setModeId] = useState<number>(0);
   // const [selectedFiles] = useState<File[]>([]);
 
   // Format current date to YYYY-MM-DD
@@ -1392,13 +1391,7 @@ export default function CreateApplication() {
     setFirmSearch(newFirm.firm_name);
   };
 
-  const handleTabSuccess = () => {
-    if (selectedTab === 7) {
-      navigate('/application-list');
-    } else {
-      setSelectedTab(prev => prev + 1);
-    }
-  };
+  
 
   // Update the common input class styles with dark theme support
   const inputClassName = `mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
