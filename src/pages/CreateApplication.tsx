@@ -1130,7 +1130,7 @@ export default function CreateApplication() {
       }
 
       if (formData.upload_photos && formData.upload_photos.length > 0) {
-        formData.upload_photos.forEach((photo, index) => {
+        formData.upload_photos.forEach((photo) => {
           formDataToSend.append(`upload_photos`, photo);
         });
       }
