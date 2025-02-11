@@ -100,7 +100,7 @@ export default function PaymentMethodList() {
       <div className="sm:flex sm:items-center sm:justify-between mb-6">
         <div>
           <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-            {t("paymentMethodList.title", "Payment Methods")}
+            {t("paymentMethodList.title")}
           </h1>
           <p className="mt-1 sm:mt-2 text-sm text-gray-600 dark:text-gray-400">
             {t("paymentMethodList.subtitle", "Manage payment methods")}
@@ -134,13 +134,13 @@ export default function PaymentMethodList() {
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
               >
-                {t("paymentMethodList.methodColumn", "Payment Method")}
+                {t("paymentMethodList.title")}
               </th>
               <th
                 scope="col"
                 className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider"
               >
-                {t("paymentMethodList.actionsColumn", "Actions")}
+                {t("paymentMethodList.actionsColumn")}
               </th>
             </tr>
           </thead>

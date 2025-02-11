@@ -53,19 +53,46 @@
     "successMessage": "Súwret tabıslı júklendi!"
   },
   "createKeepingService": {
-    "title": "Saqlaw Xızmetin Jaratıw",
-    "subtitle": "Jańa saqlaw xızmetin qosıw",
-    "serviceInfo": {
-      "name": "Xızmet Atı",
-      "baseDay": "Tiykarg'ı Kúnler",
-      "basePrice": "Tiykarg'ı Baha",
-      "extraPrice": "Qosımsha Baha"
-    },
-    "submit": "Xızmet Jaratıw",
-    "successMessage": "Saqlaw xızmeti tabıslı jaratıldı!"
+    "title": "Saqlaw Xızmetleri",
+    "create": "Saqlaw Xızmetin Jaratıw",
+    "edit": "Saqlaw Xızmetin Ózgertiw",
+    "name": "Xızmet Atı",
+    "baseDay": "Tiykarǵı Kún",
+    "basePrice": "Tiykarǵı Narq",
+    "extraPrice": "Qosımsha Narq",
+    "deleteTitle": "Saqlaw Xızmetin Óshiriw",
+    "deleteConfirmation": "Haqıyqattan da \"{{name}}\" saqlaw xızmetin óshiriwdi qáleysizbe? Bul háreketti qaytarıw múmkin emes.",
+    "deleteSuccess": "Saqlaw xızmeti tabıslı óshirildi",
+    "updateSuccess": "Saqlaw xızmeti tabıslı jańalandı",
+    "createSuccess": "Saqlaw xızmeti tabıslı jaratıldı"
   },
+  "workingService": {
+    "title": "Jumıs Xızmetleri",
+    "subtitle": "Jańa jumıs xızmetin qosıw",
+    "serviceName": "Xızmet Atı",
+    "baseDay": "Tiykarg'ı Kúnler",
+    "basePrice": "Tiykarg'ı Baha",
+    "extraPrice": "Qosımsha Baha",
+    "deleteTitle": "Jumıs Xızmetin Óshiriw",
+    "deleteConfirmation": "Haqıyqattan da \"{{name}}\" jumıs xızmetin óshiriwdi qáleysizbe? Bul háreketti qaytarıw múmkin emes.",
+    "deleteSuccess": "Jumıs xızmeti tabıslı óshirildi",
+    "updateSuccess": "Jumıs xızmeti tabıslı jańalandı",
+    "createSuccess": "Jumıs xızmeti tabıslı jaratıldı",
+    "units": "Ólshem Birlikleri"
+  },
+  "keepingService": {
+    "title": "Saqlaw Xızmetleri",
+    "subtitle": "Jańa saqlaw xızmetin qosıw",
+    "serviceName": "Xızmet Atı",
+    "baseDay": "Tiykarg'ı Kúnler",
+    "basePrice": "Tiykarg'ı Baha",
+    "extraPrice": "Qosımsha Baha"
+
+  },
+  
+    
   "createWorkingService": {
-    "title": "Jumıs Xızmetin Jaratıw",
+    "title": "Jumıs Xızmetleri",
     "subtitle": "Jańa jumıs xızmetin qosıw",
     "serviceInfo": {
       "name": "Xızmet Atı",
@@ -73,7 +100,12 @@
       "baseDay": "Tiykarg'ı Kúnler",
       "basePrice": "Tiykarg'ı Baha",
       "extraPrice": "Qosımsha Baha",
-      "units": "Ólshem Birlikleri"
+      "units": "Ólshem Birlikleri",
+      "units": {
+        "day": "kun",
+        "hour": "sag'at",
+        "piece": "shtuk"
+      }
     },
     "submit": "Xızmet Jaratıw",
     "successMessage": "Jumıs xızmeti tabıslı jaratıldı!"
@@ -83,6 +115,7 @@
     "subtitle": "Ónimler ushın jańa kategoriya jaratıw",
     "categoryInfo": "Kategoriya Mag'lıwmatları",
     "name": "Kategoriya Atı",
+    "namePlaceholder": "Kategoriya nomini kiritiń (masalan, Mahsulot, Transport, Ombor)",
     "submit": "Kategoriya Jaratıw",
     "successMessage": "Kategoriya tabıslı jaratıldı!"
   },
@@ -101,8 +134,11 @@
     "storageInfo": {
       "title": "Qoyma Mag'lıwmatları",
       "name": "Qoyma Atı",
-      "location": "Qoyma Jaylasıwı"
+      "namePlaceholder": "Qoyma nomini kiritiń",
+      "location": "Qoyma Jaylasıwı",
+      "locationPlaceholder": "Qoyma joylasıwın kiritiń"
     },
+
     "submit": "Qoyma Jaratıw",
     "successMessage": "Qoyma tabıslı jaratıldı!"
   },
@@ -129,7 +165,11 @@
   "common": {
     "success": "Tabıslı!",
     "ok": "OK",
-    "error": "Qátelik!"
+    "error": "Qátelik!",
+    "create": "Jaratıw",
+    "update": "Jańalaw",
+    "cancel": "Biykar etiw",
+    "actions": "Háreketler"
   },
   "login": {
     "title": "Esapqa kiriw",
@@ -190,7 +230,8 @@
     "title": "Tólew Usılın Jaratıw",
     "subtitle": "Sistemag'a jańa tólew usılın qosıw",
     "paymentMethodName": "Tólew Usılınıń Atı",
-    "successMessage": "Tólew usılı tabıslı jaratıldı!"
+    "successMessage": "Tólew usılı tabıslı jaratıldı!",
+    "placeholder":"Tólew usılınıń atın kiritiń"
   },
   "paymentMethodList": {
     "title": "Tólew Usılları",
@@ -231,10 +272,12 @@
     "title": "Ólshew Birligin Jaratıw",
     "subtitle": "Sistemag'a jańa ólshew birligin qosıw",
     "form": {
-      "name": "Ólshew Birliginiń Atı"
+      "name": "Ólshew Birliginiń Atı",
+      "namePlaceholder": "Ólshew birliginiń atın kiritiń (m, kg, pcs)"
     },
     "submit": "Ólshew Birligin Jaratıw",
     "successMessage": "Ólshew birligi tabıslı jaratıldı!"
+
   },
   "measurementList": {
     "title": "Ólshew Birlikleri",
@@ -294,7 +337,8 @@
       "id": "ID",
       "type": "Transport Túri",
       "number": "Transport Nomeri"
-    }
+    },
+    "actions": "Háreketler"
   },
   "storageList": {
     "title": "Qoymalar",
@@ -333,5 +377,29 @@
     "account": "Akkaunt",
     "settings": "Sazlawlar",
     "logout": "Shıǵıw"
+  },
+  "productList": {
+    "title": "Ónimler",
+    "createProduct": "Ónim Jaratıw",
+    "errorLoading": "Ónimlerdi júklewde qátelik júz berdi",
+    "deleteTitle": "Ónimni Óshiriw",
+    "deleteConfirmation": "\"{{name}}\" ónimini óshirmekshimisiz? Bul háreketti qaytarıw múmkin emes.",
+    "deleteSuccess": "Ónim tabıslı óshirildi",
+    "name": "Ónim Atı",
+    "units": "Ólshem Birlikleri",
+    "category": "Kategoriya",
+    "actions": "Háreketler",
+    "edit": "Ózgertiw",
+    "delete": "Óshiriw"
+  },
+  "createTransport": {
+    "title": "Transport Turini Yaratish",
+    "subtitle": "Tizimga yangi transport turini qo'shing",
+    "transportType": "Transport Turi",
+    "successMessage": "Transport turi muvaffaqiyatli yaratildi!",
+    "unauthorizedError": "Iltimos, transport turini yaratish uchun avtorizatsiya qiling",
+    "error": "Transport turini yaratishda xatolik yuz berdi",
+    "placeholder": "Transport turini kiriting"
   }
+
 }

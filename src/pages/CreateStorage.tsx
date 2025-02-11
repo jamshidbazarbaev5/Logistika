@@ -67,7 +67,7 @@ export default function CreateStorage() {
                 value={formData.storage_name}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
-                placeholder={t('createStorage.storageInfo.namePlaceholder', 'Enter storage name')}
+                placeholder={t('createStorage.storageInfo.namePlaceholder')}
               />
             </div>
             <div>
@@ -84,7 +84,7 @@ export default function CreateStorage() {
                 value={formData.storage_location}
                 onChange={handleChange}
                 className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
-                placeholder={t('createStorage.storageInfo.locationPlaceholder', 'Enter storage location')}
+                placeholder={t('createStorage.storageInfo.locationPlaceholder')}
               />
             </div>
           </div>

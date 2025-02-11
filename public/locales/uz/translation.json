@@ -73,16 +73,23 @@
       "baseDay": "Asosiy Kunlar",
       "basePrice": "Asosiy Narx",
       "extraPrice": "Qo'shimcha Narx",
-      "units": "O'lchov Birliklari"
+      "units": "O'lchov Birliklari",
+      "units": {
+        "day": "kun",
+        "hour": "soat",
+        "piece": "shtuk"
+      }
     },
     "submit": "Xizmat Yaratish",
     "successMessage": "Ish xizmati muvaffaqiyatli yaratildi!"
   },
+
   "createItemCategory": {
     "title": "Kategoriya Yaratish",
     "subtitle": "Mahsulotlar uchun yangi kategoriya yaratish",
     "categoryInfo": "Kategoriya Ma'lumotlari",
     "name": "Kategoriya Nomi",
+    "namePlaceholder": "Kategoriya nomini kiriting (masalan, Mahsulot, Transport, Ombor)",
     "submit": "Kategoriya Yaratish",
     "successMessage": "Kategoriya muvaffaqiyatli yaratildi!"
   },
@@ -101,7 +108,9 @@
     "storageInfo": {
       "title": "Ombor Ma'lumotlari",
       "name": "Ombor Nomi",
-      "location": "Ombor Joylashuvi"
+      "namePlaceholder": "Ombor nomini kiriting",
+      "location": "Ombor Joylashuvi",
+      "locationPlaceholder": "Ombor joylashuvi kiriting"
     },
     "submit": "Ombor Yaratish",
     "successMessage": "Ombor muvaffaqiyatli yaratildi!"
@@ -129,7 +138,11 @@
   "common": {
     "success": "Muvaffaqiyatli!",
     "ok": "OK",
-    "error": "Xatolik!"
+    "error": "Xatolik!",
+    "create": "Yaratish",
+    "update": "Yangilash",
+    "cancel": "Bekor qilish",
+    "actions": "Amallar"
   },
   "login": {
     "title": "Hisobingizga kiring",
@@ -184,7 +197,8 @@
     "title": "To'lov Usulini Yaratish",
     "subtitle": "Tizimga yangi to'lov usulini qo'shing",
     "paymentMethodName": "To'lov Usuli Nomi",
-    "successMessage": "To'lov usuli muvaffaqiyatli yaratildi!"
+    "successMessage": "To'lov usuli muvaffaqiyatli yaratildi!",
+    "placeholder": "To'lov usuli nomini kiriting"
   },
   "paymentMethodList": {
     "title": "To'lov Usullari",
@@ -225,7 +239,8 @@
     "title": "O'lchov Birligini Yaratish",
     "subtitle": "Tizimga yangi o'lchov birligini qo'shing",
     "form": {
-      "name": "O'lchov Birligi Nomi"
+      "name": "O'lchov Birligi Nomi",
+      "namePlaceholder": "O'lchov birligini kiriting (masalan, kg, m, sht)"
     },
     "submit": "O'lchov Birligini Yaratish",
     "successMessage": "O'lchov birligi muvaffaqiyatli yaratildi!"
@@ -290,7 +305,18 @@
       "id": "ID",
       "type": "Transport Turi",
       "number": "Transport Raqami"
-    }
+    },
+  
+    "actions": "Amallar"
+  },
+  "createTransport": {
+    "title": "Transport Turini Yaratish",
+    "subtitle": "Tizimga yangi transport turini qo'shing",
+    "transportType": "Transport Turi",
+    "successMessage": "Transport turi muvaffaqiyatli yaratildi!",
+    "unauthorizedError": "Iltimos, transport turini yaratish uchun avtorizatsiya qiling",
+    "error": "Transport turini yaratishda xatolik yuz berdi",
+    "placeholder": "Transport turini kiriting"
   },
   "storageList": {
     "title": "Omborlar",
@@ -329,5 +355,50 @@
     "account": "Hisob",
     "settings": "Sozlamalar",
     "logout": "Chiqish"
+  },
+  "workingService": {
+    "title": "Ish Xizmatlari",
+    "create": "Ish Xizmatini Yaratish",
+    "edit": "Ish Xizmatini Tahrirlash",
+    "serviceName": "Xizmat Nomi",
+    "baseDay": "Asosiy Kun",
+    "basePrice": "Asosiy Narx",
+    "extraPrice": "Qo'shimcha Narx",
+    "units": "O'lchov Birligi",
+
+    "deleteTitle": "Ish Xizmatini O'chirish",
+    "deleteConfirmation": "Haqiqatan ham \"{{name}}\" ish xizmatini o'chirishni xohlaysizmi? Bu amalni qaytarib bo'lmaydi.",
+    "deleteSuccess": "Ish xizmati muvaffaqiyatli o'chirildi",
+    "updateSuccess": "Ish xizmati muvaffaqiyatli yangilandi",
+    "createSuccess": "Ish xizmati muvaffaqiyatli yaratildi"
+  },
+  "keepingService": {
+    "title": "Saqlash Xizmatlari",
+    "create": "Saqlash Xizmatini Yaratish",
+    "edit": "Saqlash Xizmatini Tahrirlash",
+    "name": "Xizmat Nomi",
+    "baseDay": "Asosiy Kun",
+    "basePrice": "Asosiy Narx",
+    "extraPrice": "Qo'shimcha Narx",
+    "deleteTitle": "Saqlash Xizmatini O'chirish",
+    "deleteConfirmation": "Haqiqatan ham \"{{name}}\" saqlash xizmatini o'chirishni xohlaysizmi? Bu amalni qaytarib bo'lmaydi.",
+    "deleteSuccess": "Saqlash xizmati muvaffaqiyatli o'chirildi",
+    "updateSuccess": "Saqlash xizmati muvaffaqiyatli yangilandi",
+    "createSuccess": "Saqlash xizmati muvaffaqiyatli yaratildi"
+  },
+  "productList":{
+    "title": "Mahsulotlar",
+    "createProduct": "Mahsulot Yaratish",
+    "errorLoading": "Mahsulotlarni yuklashda xatolik yuz berdi",
+    "deleteTitle": "Mahsulotni O'chirish",
+    "deleteConfirmation": "Haqiqatan ham \"{{name}}\" mahsulotini o'chirishni xohlaysizmi? Bu amalni qaytarib bo'lmaydi.",
+    "deleteSuccess": "Mahsulot muvaffaqiyatli o'chirildi",
+    "name": "Mahsulot Nomi",
+    "units": "O'lchov Birligi",
+    "category": "Kategoriya",
+    "actions": "Amallar",
+    "edit": "Tahrirlash",
+    "delete": "O'chirish",
+    "input":"Mahsulot nomini kiriting"
   }
 } 

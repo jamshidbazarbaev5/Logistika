@@ -9,7 +9,7 @@ import Layout from "../src/layout/layout";
 import TransportForm from "./pages/TransportForm";
 import "./App.css";
 import CreateFirm from "./pages/CreateFirm";
-import KeepingService from "./pages/KeepingService";
+import KeepingService from "./pages/CreateKeepingService";
 import Login from "./pages/Login";
 import PrivateRoute from "./components/PrivateRoute";
 import PhotoUpload from "./pages/PhotoUpload";
@@ -17,7 +17,7 @@ import ModeCreate from "./pages/ModeCreate";
 import CreateApplication from "./pages/CreateApplication";
 import CreateProduct from "./pages/CreateProduct";
 import CreateProductQuantity from "./pages/CreateProductQuantity";
-import WorkingService from "./pages/WorkingService";
+import WorkingService from "./pages/CreateWorkingService";
 import FirmList from "./pages/FirmList";
 import CreatePaymentMethod from "./pages/CreatePaymentMethod";
 import CreateItemCategory from "./pages/CreateItemCategory";
@@ -34,6 +34,10 @@ import ApplicationList from "./pages/ApplicationList";
 import ProductsList from "./pages/ProductsList";
 import UpdateUser from "./pages/UpdataUser";
 import UserList from "./pages/UserList";
+import KeepingServiceList from './pages/KeepingServiceList'
+import CreateKeepingService from './pages/CreateKeepingService'
+import WorkingServiceList from './pages/WorkinServiceList'
+import CreateWorkingService from './pages/CreateWorkingService'
 const queryClient = new QueryClient();
 
 function App() {
@@ -77,6 +81,10 @@ function App() {
                 <Route path="/products-list" element={<ProductsList />} />
                 <Route path="/update-user" element={<UpdateUser />} />
                 <Route path="/user-list" element={<UserList />} />
+                <Route path="/keeping-services" element={<KeepingServiceList />} />
+                <Route path="/keeping-services/create" element={<CreateKeepingService />} />
+                <Route path="/working-services" element={<WorkingServiceList />} />
+                <Route path="/working-services/create" element={<CreateWorkingService />} />
               </Route>
             </Routes>
           </Router>

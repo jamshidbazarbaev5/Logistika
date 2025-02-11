@@ -38,6 +38,8 @@ const otherItems = [
       { name: "menu.transport", icon: RiTruckFill, href: "/transport-list" },
       { name: "menu.payment", icon: RiBankCardFill, href: "/payment-list" },
       { name: "menu.createMode", icon: RiSettings4Fill, href: "/modes" },
+      {name:"working services", icon: RiUserFill, href: "/working-services" },
+      {name:"keeping services", icon: RiUserFill, href: "/keeping-services" },
 
     ]
   },

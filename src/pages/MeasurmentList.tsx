@@ -28,7 +28,8 @@ export default function MeasurementList() {
   const fetchMeasurements = async () => {
     try {
       const response = await api.get('/items/measurement/');
-      setMeasurements(response.data.results);
+      const sortedMeasurements = response.data.results.sort((a: Measurement, b: Measurement) => a.id - b.id);
+      setMeasurements(sortedMeasurements);
       setLoading(false);
     } catch (err) {
       setError(t('measurementList.errorLoading', 'Error loading measurements'));

@@ -196,6 +196,15 @@ export const apiService = {
   
   deleteProduct: (id: number) => 
     api.delete(`/items/product/${id}/`),
+
+  deleteKeepingService: (id: number) =>
+    api.delete(`/keeping_service/${id}/`),
+  deleteWorkingService: (id: number) =>
+    api.delete(`/working_service/${id}/`),
+  updateKeepingService: (id: number, data: KeepingService) =>
+    api.put(`/keeping_service/${id}/`, data),
+  updateWorkingService: (id: number, data: WorkingService) =>
+    api.put(`/working_service/${id}/`, data),
 };
 
 export type { Storage, KeepingService, WorkingService, Firm, Category, Product };

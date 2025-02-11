@@ -129,7 +129,6 @@ interface TabPanelProps {
 //   storage_id: number;
 // }
 
-// First, create a context to share formData and setFormData
 interface FormContextType {
   formData: ApplicationFormData;
   setFormData: React.Dispatch<React.SetStateAction<ApplicationFormData>>;
@@ -137,7 +136,6 @@ interface FormContextType {
 
 const FormContext = createContext<FormContextType | undefined>(undefined);
 
-// Create a hook to use the context
 const useFormContext = () => {
   const context = useContext(FormContext);
   if (!context) {
@@ -164,7 +162,6 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) 
         upload_photos: [...(prev.upload_photos || []), ...newFiles]
       }));
       
-      // Generate previews for new files
       newFiles.forEach(file => {
         const reader = new FileReader();
         reader.onloadend = () => {
@@ -567,7 +564,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     const fetchServices = async () => {
       try {
         const [keepingRes, workingRes] = await Promise.all([
-          api.get('/keeping_service/keeping_service/'),
+          api.get('/keeping_service/'),
           api.get('/working_service/')
         ]);
         setKeepingServices(keepingRes.data.results);
@@ -1010,7 +1007,7 @@ export default function CreateApplication() {
   };
 
   const [formData, setFormData] = useState<ApplicationFormData>({
-    firm_id: null as unknown as number,
+    firm_id: 0,
     brutto: null,
     netto: null,
     vip_application: false,
@@ -1100,47 +1097,52 @@ export default function CreateApplication() {
 
   const handleSubmit = async () => {
     try {
-      console.log('Starting submission with firm_id:', formData.firm_id);
-      
+      if (!formData.firm_id) {
+        console.error('No firm selected');
+        return;
+      }
+
+      // Create FormData object for multipart/form-data
       const formDataToSend = new FormData();
 
-      formDataToSend.append('firm_id', String(formData.firm_id));
+      // Add basic application data
+      const applicationData = {
+        firm_id: Number(formData.firm_id),
+        brutto: Number(formData.brutto),
+        netto: Number(formData.netto),
+        vip_application: Boolean(formData.vip_application),
+        total_price: formData.total_price,
+        discount_price: formData.discount_price,
+        coming_date: formData.coming_date,
+        decloration_number: formData.decloration_number || null,
+        decloration_date: formData.decloration_date || null,
+        upload_keeping_services_quantity: formData.upload_keeping_services_quantity,
+        upload_working_services_quantity: formData.upload_working_services_quantity,
+        upload_transport: formData.upload_transport,
+        upload_modes: formData.upload_modes,
+        upload_products: formData.upload_products,
+      };
 
-      formDataToSend.append('brutto', String(formData.brutto || ''));
-      formDataToSend.append('netto', String(formData.netto || ''));
-      formDataToSend.append('coming_date', formData.coming_date || '');
-      formDataToSend.append('decloration_date', formData.decloration_date || '');
-      formDataToSend.append('decloration_number', formData.decloration_number || '');
-      formDataToSend.append('vip_application', String(formData.vip_application || false));
-      formDataToSend.append('total_price', String(formData.total_price || ''));
-      formDataToSend.append('discount_price', String(formData.discount_price || ''));
-
-      formDataToSend.append('keeping_services', JSON.stringify(formData.keeping_services || []));
-      formDataToSend.append('working_services', JSON.stringify(formData.working_services || []));
-      formDataToSend.append('transport', JSON.stringify(formData.upload_transport || []));
-      formDataToSend.append('modes', JSON.stringify(formData.upload_modes || []));
-      formDataToSend.append('products', JSON.stringify(formData.upload_products || []));
+      formDataToSend.append('data', JSON.stringify(applicationData));
 
       if (formData.decloration_file) {
         formDataToSend.append('decloration_file', formData.decloration_file);
       }
 
-      if (formData.upload_photos?.length) {
-        formData.upload_photos.forEach(file => {
-          formDataToSend.append('upload_photos', file);
+      if (formData.upload_photos && formData.upload_photos.length > 0) {
+        formData.upload_photos.forEach((photo, index) => {
+          formDataToSend.append(`upload_photos`, photo);
         });
       }
 
-      console.log('FormData entries:');
-      for (let pair of formDataToSend.entries()) {
-        console.log(pair[0], pair[1]);
-      }
+      console.log('Sending request with FormData:', applicationData);
 
       const response = await api.post('/application/', formDataToSend, {
         headers: {
-        }
+          'Content-Type': 'multipart/form-data',
+        },
       });
-
+      
       console.log('Success Response:', response.data);
       setApplicationId(response.data.id);
       setShowSuccessModal(true);
@@ -1148,14 +1150,16 @@ export default function CreateApplication() {
 
     } catch (error: any) {
       console.error('Error submitting application:', error);
-      console.error('Error response:', error.response?.data);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+      }
     }
   };
   
 
   const handleSuccessModalClose = () => {
     setShowSuccessModal(false);
-    setSelectedTab(3); // Move to Photos tab after closing the modal
+    setSelectedTab(3);
   };
 
   const handleChange = (
@@ -1191,10 +1195,8 @@ export default function CreateApplication() {
   );
 
   const handleFirmSelect = (firm: Firm) => {
-    console.log('Firm selection - Received firm:', firm);
-    console.log('Firm selection - Firm ID:', firm.id);
-    console.log('Firm selection - Firm ID type:', typeof firm.id);
-
+    console.log('Selected firm:', firm); // Add this for debugging
+    
     if (!firm.id) {
       console.error('Invalid firm selected - firm.id is falsy');
       return;
@@ -1203,11 +1205,12 @@ export default function CreateApplication() {
     setFormData(prev => {
       const updated = {
         ...prev,
-        firm_id: Number(firm.id) // Ensure it's a number
+        firm_id: Number(firm.id) 
       };
       console.log('Updated form data:', updated);
       return updated;
     });
+    
     setFirmSearch(firm.firm_name);
     setShowFirmDropdown(false);
   };

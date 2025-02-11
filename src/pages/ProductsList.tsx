@@ -197,7 +197,7 @@ export default function ProductList() {
           hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
           dark:focus:ring-offset-gray-800 transition-all duration-200"
         >
-          {t("productList.createProduct", "Create Product")}
+          {t("productList.createProduct")}
         </button>
       </div>
 
@@ -214,19 +214,19 @@ export default function ProductList() {
           <thead className="bg-gray-50 dark:bg-gray-800">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("productList.table.number", "#")}
+                {t("productList.number", "#")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("productList.table.name", "Name")}
+                {t("productList.name","productList.name")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("productList.table.measurement", "Measurement")}
+                {t("productList.units", "prdocutList.units")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("productList.table.category", "Category")}
+                {t("productList.category", "productList.category")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("productList.table.actions", "Actions")}
+                {t("productList.actions", "productList.actions")}
               </th>
             </tr>
           </thead>
