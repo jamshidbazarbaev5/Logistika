@@ -305,25 +305,61 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const [selectedProduct, setSelectedProduct] = useState<number>(0);
   const [selectedStorage, setSelectedStorage] = useState<number>(0);
   const [products, setProducts] = useState<Product[]>([]);
+  const [productDetails, setProductDetails] = useState<Map<number, Product>>(new Map());
   const [storages, setStorages] = useState<any[]>([]);
+  const [productSearch, setProductSearch] = useState('');
+  const [storageSearch, setStorageSearch] = useState('');
+  const [showProductDropdown, setShowProductDropdown] = useState(false);
+  const [showStorageDropdown, setShowStorageDropdown] = useState(false);
+  const productDropdownRef = useRef<HTMLDivElement>(null);
+  const storageDropdownRef = useRef<HTMLDivElement>(null);
 
+  // Add function to fetch single product details
+  const fetchProductDetails = async (productId: number) => {
+    try {
+      const response = await api.get(`/items/product/${productId}/`);
+      const product = response.data;
+      setProductDetails(prev => new Map(prev).set(productId, product));
+    } catch (error) {
+      console.error('Error fetching product details:', error);
+    }
+  };
+
+  // Fetch product details for all products in formData on mount
   useEffect(() => {
-    const fetchData = async () => {
+    formData.upload_products.forEach(product => {
+      if (!productDetails.has(product.product_id)) {
+        fetchProductDetails(product.product_id);
+      }
+    });
+  }, []);
+
+  // Add useEffect to fetch storages
+  useEffect(() => {
+    const fetchStorages = async () => {
       try {
-        const [productsRes, storagesRes] = await Promise.all([
-          api.get('/items/product/'),
-          api.get('/storage/')
-        ]);
-        
-        console.log('Products:', productsRes.data.results);
-        setProducts(productsRes.data.results);
-        setStorages(storagesRes.data.results);
+        const response = await api.get('/storage/');
+        setStorages(response.data.results || []);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching storages:', error);
       }
     };
-    fetchData();
+
+    fetchStorages();
   }, []);
+
+  const handleProductSelect = (product: Product) => {
+    setSelectedProduct(product.id);
+    setProductSearch(product.name);
+    setShowProductDropdown(false);
+    setProductDetails(prev => new Map(prev).set(product.id, product));
+  };
+
+  const handleStorageSelect = (storage: any) => {
+    setSelectedStorage(storage.id);
+    setStorageSearch(storage.storage_name);
+    setShowStorageDropdown(false);
+  };
 
   const handleAddProduct = () => {
     if (!quantity || !selectedProduct || !selectedStorage) return;
@@ -343,9 +379,10 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     setQuantity(0);
     setSelectedProduct(0);
     setSelectedStorage(0);
+    setProductSearch('');
+    setStorageSearch('');
   };
 
-  // Add function to remove product
   const handleRemoveProduct = (index: number) => {
     setFormData(prev => ({
       ...prev,
@@ -353,49 +390,128 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     }));
   };
 
+  const getProductDetails = (productId: number, storageId: number) => {
+    const product = productDetails.get(productId);
+    const storage = storages.find(s => s.id === storageId);
+
+    // If product details are not found, fetch them
+    if (!product) {
+      fetchProductDetails(productId);
+    }
+
+    return {
+      productName: product?.name || 'Loading...',
+      storageName: storage?.storage_name || 'Unknown Storage'
+    };
+  };
+
+  // Update the searchProducts function
+  const searchProducts = async (searchTerm: string) => {
+    try {
+      if (!searchTerm.trim()) {
+        setProducts([]);
+        setShowProductDropdown(false);
+        return;
+      }
+      const response = await api.get(`/items/product/?product_name=${searchTerm}`);
+      setProducts(response.data.results || []);
+      setShowProductDropdown(true);
+    } catch (error) {
+      console.error('Error searching products:', error);
+      setProducts([]);
+    }
+  };
+
+  // Add debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      searchProducts(productSearch);
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [productSearch]);
+
   return (
     <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div>
+        <div className="relative" ref={productDropdownRef}>
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
             Product
           </label>
-          <select
-            value={selectedProduct}
-            onChange={(e) => setSelectedProduct(Number(e.target.value))}
+          <input
+            type="text"
+            value={productSearch}
+            onChange={(e) => {
+              setProductSearch(e.target.value);
+              setSelectedProduct(0); // Reset selected product when searching
+            }}
+            onFocus={() => {
+              if (productSearch) {
+                setShowProductDropdown(true);
+              }
+            }}
             className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
               px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
               focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
               dark:text-gray-100 transition-colors"
-          >
-            <option value={0}>Select Product</option>
-            {products.map((product) => (
-              <option key={product.id} value={product.id}>
-                {product.name}
-              </option>
-            ))}
-          </select>
+            placeholder="Search for a product..."
+          />
+          
+          {showProductDropdown && products.length > 0 && (
+            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
+              border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
+              {products.map((product) => (
+                <div
+                  key={product.id}
+                  onClick={() => handleProductSelect(product)}
+                  className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
+                    cursor-pointer text-sm text-gray-900 dark:text-gray-100"
+                >
+                  {product.name}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
-        <div>
+        <div className="relative" ref={storageDropdownRef}>
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
             Storage
           </label>
-          <select
-            value={selectedStorage}
-            onChange={(e) => setSelectedStorage(Number(e.target.value))}
+          <input
+            type="text"
+            value={storageSearch}
+            onChange={(e) => {
+              setStorageSearch(e.target.value);
+              setShowStorageDropdown(true);
+            }}
+            onFocus={() => setShowStorageDropdown(true)}
             className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
               px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
               focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
               dark:text-gray-100 transition-colors"
-          >
-            <option value={0}>Select Storage</option>
-            {storages.map(storage => (
-              <option key={storage.id} value={storage.id}>
-                {storage.storage_name}
-              </option>
-            ))}
-          </select>
+            placeholder="Search for a storage..."
+          />
+          
+          {showStorageDropdown && (
+            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
+              border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
+              {storages
+                .filter(storage => 
+                  storage.storage_name.toLowerCase().includes(storageSearch.toLowerCase())
+                )
+                .map((storage) => (
+                  <div
+                    key={storage.id}
+                    onClick={() => handleStorageSelect(storage)}
+                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
+                      cursor-pointer text-sm text-gray-900 dark:text-gray-100"
+                  >
+                    {storage.storage_name}
+                  </div>
+                ))}
+            </div>
+          )}
         </div>
 
         <div>
@@ -404,7 +520,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           </label>
           <input
             type="number"
-            value={quantity}
+            value={quantity || ''}
             onChange={(e) => setQuantity(Number(e.target.value))}
             min="1"
             className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
@@ -429,27 +545,30 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
       <div className="mt-6">
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Products:</h3>
         <div className="space-y-2">
-          {formData.upload_products.map((product, index) => (
-            <div key={index} className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-              <div className="flex-1">
-                <span className="font-medium dark:text-gray-100">
-                  {products.find(p => p.id === product.product_id)?.name}
-                </span>
-                <span className="mx-2 text-gray-400 dark:text-gray-500">|</span>
-                <span className="text-gray-600 dark:text-gray-300">
-                  Storage: {storages.find(s => s.id === product.storage_id)?.storage_name}
-                </span>
-                <span className="mx-2 text-gray-400 dark:text-gray-500">|</span>
-                <span className="text-gray-600 dark:text-gray-300">Quantity: {product.quantity}</span>
+          {formData.upload_products.map((product, index) => {
+            const details = getProductDetails(product.product_id, product.storage_id);
+            return (
+              <div key={index} className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                <div className="flex-1">
+                  <span className="font-medium dark:text-gray-100">
+                    {details.productName}
+                  </span>
+                  <span className="mx-2 text-gray-400 dark:text-gray-500">|</span>
+                  <span className="text-gray-600 dark:text-gray-300">
+                    Storage: {details.storageName}
+                  </span>
+                  <span className="mx-2 text-gray-400 dark:text-gray-500">|</span>
+                  <span className="text-gray-600 dark:text-gray-300">Quantity: {product.quantity}</span>
+                </div>
+                <button
+                  onClick={() => handleRemoveProduct(index)}
+                  className="text-red-500 hover:text-red-700 p-2 dark:text-red-400 dark:hover:text-red-300"
+                >
+                  Remove
+                </button>
               </div>
-              <button
-                onClick={() => handleRemoveProduct(index)}
-                className="text-red-500 hover:text-red-700 p-2 dark:text-red-400 dark:hover:text-red-300"
-              >
-                Remove
-              </button>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -466,8 +585,8 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   );
 };
 
-const TransportTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
-  const { setFormData } = useFormContext();
+const TransportSection = () => {
+  const { formData, setFormData } = useFormContext();
   const [transportNumber, setTransportNumber] = useState('');
   const [transportTypeId, setTransportTypeId] = useState<number>(0);
   const [transportTypes, setTransportTypes] = useState<TransportType[]>([]);
@@ -496,20 +615,22 @@ const TransportTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
       ...prev,
       upload_transport: [...prev.upload_transport, newTransport]
     }));
-    
-    console.log('Added transport:', newTransport);
 
     // Reset form
     setTransportNumber('');
     setTransportTypeId(0);
-    
-    if (onSuccess) {
-      onSuccess();
-    }
+  };
+
+  const handleRemoveTransport = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      upload_transport: prev.upload_transport.filter((_, i) => i !== index)
+    }));
   };
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-900">
+    <div className="mt-6 border-t pt-6">
+      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Transport Information</h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Transport Type</label>
@@ -543,10 +664,39 @@ const TransportTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
       <button
         onClick={handleAddTransport}
         disabled={!transportNumber || !transportTypeId}
-        className="mt-4 px-4 py-2 bg-[#6C5DD3] text-white rounded disabled:opacity-50"
+        className="mt-4 px-4 py-2 bg-[#6C5DD3] text-white rounded-lg disabled:opacity-50
+          hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out"
       >
-        Next
+        Add Transport
       </button>
+
+      {/* Display selected transports */}
+      {formData.upload_transport.length > 0 && (
+        <div className="mt-4">
+          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Transports:</h4>
+          <div className="space-y-2">
+            {formData.upload_transport.map((transport, index) => (
+              <div key={index} className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                <div className="flex-1">
+                  <span className="font-medium dark:text-gray-100">
+                    {transportTypes.find(t => t.id === transport.transport_type)?.transport_type}
+                  </span>
+                  <span className="mx-2 text-gray-400 dark:text-gray-500">|</span>
+                  <span className="text-gray-600 dark:text-gray-300">
+                    Number: {transport.transport_number}
+                  </span>
+                </div>
+                <button
+                  onClick={() => handleRemoveTransport(index)}
+                  className="text-red-500 hover:text-red-700 p-2"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -1023,6 +1173,7 @@ export default function CreateApplication() {
     upload_transport: [],
     upload_modes: [],
     upload_products: [],
+    upload_photos: []
   });
 
   useEffect(() => {
@@ -1097,25 +1248,42 @@ export default function CreateApplication() {
 
   const handleSubmit = async () => {
     try {
-      if (!formData.firm_id) {
-        console.error('No firm selected');
-        return;
-      }
+      // Check if we have any files to upload
+      // const hasFiles = formData.decloration_file || selectedFiles.length > 0;
 
-      // Create FormData object for multipart/form-data
-      const formDataToSend = new FormData();
+      // if (hasFiles) {
+      //   // Handle file upload separately if needed
+      //   const formDataToSend = new FormData();
+      //   if (formData.decloration_file) {
+      //     formDataToSend.append('decloration_file', formData.decloration_file);
+      //   }
+      //   if (selectedFiles.length > 0) {
+      //     selectedFiles.forEach(file => {
+      //       formDataToSend.append('upload_photos', file);
+      //     });
+      //   }
+      //   // Handle file upload logic here
+      // }
 
-      // Add basic application data
-      const applicationData = {
-        firm_id: Number(formData.firm_id),
-        brutto: Number(formData.brutto),
-        netto: Number(formData.netto),
-        vip_application: Boolean(formData.vip_application),
+      // Prepare the JSON data
+      const requestData = {
+        firm_id: formData.firm_id,
+        brutto: formData.brutto,
+        netto: formData.netto,
+        vip_application: formData.vip_application,
         total_price: formData.total_price,
         discount_price: formData.discount_price,
         coming_date: formData.coming_date,
-        decloration_number: formData.decloration_number || null,
-        decloration_date: formData.decloration_date || null,
+        decloration_date: formData.decloration_date,
+        decloration_number: formData.decloration_number,
+        keeping_services: formData.upload_keeping_services_quantity.map(item => ({
+          day: item.day,
+          keeping_services_id: item.keeping_services_id
+        })),
+        working_services: formData.upload_working_services_quantity.map(item => ({
+          quantity: item.quantity,
+          service_id: item.service_id
+        })),
         upload_keeping_services_quantity: formData.upload_keeping_services_quantity,
         upload_working_services_quantity: formData.upload_working_services_quantity,
         upload_transport: formData.upload_transport,
@@ -1123,40 +1291,31 @@ export default function CreateApplication() {
         upload_products: formData.upload_products,
       };
 
-      formDataToSend.append('data', JSON.stringify(applicationData));
+      console.log('Sending data:', requestData);
 
-      if (formData.decloration_file) {
-        formDataToSend.append('decloration_file', formData.decloration_file);
-      }
-
-      if (formData.upload_photos && formData.upload_photos.length > 0) {
-        formData.upload_photos.forEach((photo) => {
-          formDataToSend.append(`upload_photos`, photo);
-        });
-      }
-
-      console.log('Sending request with FormData:', applicationData);
-
-      const response = await api.post('/application/', formDataToSend, {
+      const response = await api.post('/application/', requestData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
       });
-      
-      console.log('Success Response:', response.data);
+
+      console.log('Response:', response.data);
       setApplicationId(response.data.id);
       setShowSuccessModal(true);
       navigate('/application-list');
-
     } catch (error: any) {
       console.error('Error submitting application:', error);
       if (error.response) {
-        console.error('Error response:', error.response.data);
+        console.error('Server error details:', {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers
+        });
       }
     }
   };
-  
 
+  
   const handleSuccessModalClose = () => {
     setShowSuccessModal(false);
     setSelectedTab(3);
@@ -1195,19 +1354,21 @@ export default function CreateApplication() {
   );
 
   const handleFirmSelect = (firm: Firm) => {
-    console.log('Selected firm:', firm); // Add this for debugging
+    console.log('Selected firm:', firm); // Debug log
     
     if (!firm.id) {
       console.error('Invalid firm selected - firm.id is falsy');
       return;
     }
     
+    const firmId = Number(firm.id); // Ensure it's a number
+    
     setFormData(prev => {
       const updated = {
         ...prev,
-        firm_id: Number(firm.id) 
+        firm_id: firmId
       };
-      console.log('Updated form data:', updated);
+      console.log('Updated form data:', updated); // Debug log
       return updated;
     });
     
@@ -1331,19 +1492,6 @@ export default function CreateApplication() {
               }
             >
               {t('createApplication.products', 'Products')}
-            </Tab>
-            <Tab
-              className={({ selected }) =>
-                classNames(
-                  'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
-                  'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
-                  selected
-                    ? 'bg-white text-[#6C5DD3] shadow'
-                    : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
-                )
-              }
-            >
-              {t('createApplication.transport', 'Transport')}
             </Tab>
             <Tab
               className={({ selected }) =>
@@ -1492,6 +1640,8 @@ export default function CreateApplication() {
                     )}
                   </div>
                 </div>
+                
+                <TransportSection />
               </div>
               <div className="mt-6 flex justify-end">
                 <button
@@ -1590,16 +1740,7 @@ export default function CreateApplication() {
             </Tab.Panel>
 
             <Tab.Panel>
-              <TransportTab onSuccess={() => setSelectedTab(6)} />
-            </Tab.Panel>
-
-            <Tab.Panel>
-              <ModesTab 
-                onSuccess={handleTabSuccess} 
-                onSubmit={handleSubmit}
-                modeId={modeId}
-                setModeId={setModeId}
-              />
+              <ModesTab onSubmit={handleSubmit} />
             </Tab.Panel>
           </Tab.Panels>
         </Tab.Group>
