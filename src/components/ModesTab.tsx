@@ -2,10 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ApplicationFormData } from '../context/FormContext';
 
-interface Mode {
-  id: number;
-  name: string;
-}
+
 
 interface ModesTabProps {
   formData: ApplicationFormData;

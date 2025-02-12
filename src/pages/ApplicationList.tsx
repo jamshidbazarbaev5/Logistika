@@ -103,49 +103,6 @@ interface FirmResponse {
   firm_name: string;
 }
 
-// Update the formData state interface to match the API response
-interface ApplicationFormData {
-  id?: number;
-  firm_id: number;
-  brutto: number | null;
-  netto: number | null;
-  coming_date: string;
-  decloration_file?: string | File;
-  decloration_date: string;
-  decloration_number: string;
-  vip_application: boolean;
-  total_price: number | null;
-  discount_price: number | null;
-  keeping_services: Array<{
-    id?: number;
-    day: number;
-    keeping_services_id: number;
-    application_id?: number;
-  }>;
-  working_services: Array<{
-    id?: number;
-    quantity: number;
-    service_id: number;
-    application_id?: number;
-  }>;
-  photo_report: PhotoReport[];
-  transport: Array<{
-    id?: number;
-    transport_number: string;
-    transport_type: number;
-    application_id?: number;
-  }>;
-  modes: Array<{
-    mode_id: number;
-  }>;
-  products: Array<{
-    id?: number;
-    quantity: number;
-    product_id: number;
-    storage_id: number;
-    application_id?: number;
-  }>;
-}
 
 export default function ApplicationList() {
   const { t } = useTranslation();
@@ -172,33 +129,16 @@ export default function ApplicationList() {
   const [totalPages, setTotalPages] = useState(1);
 
   // Add these new state variables near the top with other state declarations
-  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<ApplicationFormData>({
-    firm_id: 0,
-    brutto: null,
-    netto: null,
-    coming_date: '',
-    decloration_date: '',
-    decloration_number: '',
-    vip_application: false,
-    total_price: null,
-    discount_price: null,
-    keeping_services: [],
-    working_services: [],
-    photo_report: [],
-    transport: [],
-    modes: [],
-    products: [],
-  });
+  const [isFormModalOpen] = useState(false);
+  const [] = useState(false);
+  
 
-  // Add these new state variables at the top of the component
-  const [keepingServices, setKeepingServices] = useState<Array<{ id: number; name: string; base_price: number; extra_price: number }>>([]);
-  const [workingServices, setWorkingServices] = useState<Array<{ id: number; service_name: string; base_price: number; extra_price: number; units: string }>>([]);
-  const [transportTypes, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
-  const [storages, setStorages] = useState<Array<{ id: number; name: string }>>([]);
-  const [products, setProducts] = useState<Array<{ id: number; name: string }>>([]);
-  const [availableModes, setAvailableModes] = useState<Array<{ id: number; name: string }>>([]);
+  const [, setKeepingServices] = useState<Array<{ id: number; name: string; base_price: number; extra_price: number }>>([]);
+  const [, setWorkingServices] = useState<Array<{ id: number; service_name: string; base_price: number; extra_price: number; units: string }>>([]);
+  const [, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
+  const [, setStorages] = useState<Array<{ id: number; name: string }>>([]);
+  const [, setProducts] = useState<Array<{ id: number; name: string }>>([]);
+  const [, setAvailableModes] = useState<Array<{ id: number; name: string }>>([]);
 
   const searchFields: SearchField[] = [
     {
@@ -392,111 +332,13 @@ export default function ApplicationList() {
     );
   };
 
-  // Add this new function after other function declarations
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    try {
-      // Validate required fields
-      if (!formData.firm_id) {
-        throw new Error('Please select a firm');
-      }
 
-      if (isEditing && !formData.id) {
-        throw new Error('Application ID is missing');
-      }
-
-      const formDataObj = new FormData();
-      
-      // Append all form fields
-      Object.entries(formData).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          if (Array.isArray(value)) {
-            // Handle arrays (keeping_services, working_services, photo_report, etc.)
-            if (key === 'photo_report') {
-              // Handle photo files separately
-              value.forEach((photo, index) => {
-                if (photo.photo instanceof File) {
-                  formDataObj.append(`photo_report[${index}]photo`, photo.photo);
-                }
-              });
-            } else {
-              // Handle other arrays
-              formDataObj.append(key, JSON.stringify(value));
-            }
-          } else if (value instanceof File) {
-            // Handle single file uploads
-            formDataObj.append(key, value);
-          } else {
-            // Handle other fields
-            formDataObj.append(key, String(value));
-          }
-        }
-      });
-
-      let response;
-      
-      if (isEditing && formData.id) {
-        // Update existing application
-        response = await api.put(`/application/${formData.id}/`, formDataObj, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        setModalMessage('Application updated successfully!');
-      } else {
-        // Create new application
-        response = await api.post('/application/', formDataObj, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        setModalMessage('Application created successfully!');
-      }
-
-      if (response?.data) {
-        setShowSuccessModal(true);
-        setIsFormModalOpen(false);
-        fetchApplications(); // Refresh the list
-      }
-
-    } catch (error) {
-      console.error('Error submitting application:', error);
-      // Show error message to user
-      setModalMessage(error instanceof Error ? error.message : 'An error occurred while submitting the application');
-      setShowSuccessModal(true); // You might want to create a separate error modal
-    }
-  };
 
   const handleEditClick = (application: Application) => {
     navigate(`/edit-application/${application.id}`);
   };
 
-  // Add these handlers
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData(prev => ({
-        ...prev,
-        decloration_file: file
-      }));
-    }
-  };
 
-  const handlePhotoAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      const newPhotos: PhotoReport[] = Array.from(files).map(file => ({
-        photo: file,
-        application_id: formData.id
-      }));
-
-      setFormData(prev => ({
-        ...prev,
-        photo_report: [...prev.photo_report, ...newPhotos]
-      }));
-    }
-  };
 
   return (
     <div className="p-4 sm:p-6">
