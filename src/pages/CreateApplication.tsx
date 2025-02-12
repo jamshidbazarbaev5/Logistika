@@ -1214,7 +1214,6 @@ export default function CreateApplication() {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [, setKeepingServices] = useState<KeepingService[]>([]);
   const [, setWorkingServices] = useState<WorkingService[]>([]);
-  const [, setProducts] = useState<Product[]>([]);
   const [, setStorages] = useState<any[]>([]);
   const [, setTransportTypes] = useState<TransportType[]>([]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
