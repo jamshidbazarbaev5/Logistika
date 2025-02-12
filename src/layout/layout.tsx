@@ -13,7 +13,8 @@ import {
   RiTBoxFill,
   RiBarChartFill,
   RiUserFill,
-  RiLogoutBoxRFill
+  RiLogoutBoxRFill,
+  RiServiceFill
 } from 'react-icons/ri';
 
 const mainMenuItems = [
@@ -22,9 +23,20 @@ const mainMenuItems = [
   { name: "menu.createApplication", icon: RiFileAddFill, href: "/application-list" },
 ];
 
-const generalItems = [{ name: "menu.account", icon: RiUserFill, href: "/user-list" }];
+const generalItems = [
+  {
+    name: "menu.services",
+    icon: RiUserFill,
+    href: "#",
+    subItems: [
+      { name: "menu.workingServices", icon: RiServiceFill, href: "/working-services" },
+      { name: "menu.keepingServices", icon: RiUserFill, href: "/keeping-services" },
+    ]
+  },
+];
 
 const otherItems = [
+ 
   { 
     name: "menu.settings", 
     icon: RiSettings4Fill, 
@@ -38,11 +50,10 @@ const otherItems = [
       { name: "menu.transport", icon: RiTruckFill, href: "/transport-list" },
       { name: "menu.payment", icon: RiBankCardFill, href: "/payment-list" },
       { name: "menu.createMode", icon: RiSettings4Fill, href: "/modes" },
-      {name:"working services", icon: RiUserFill, href: "/working-services" },
-      {name:"keeping services", icon: RiUserFill, href: "/keeping-services" },
-
+      {name:"menu.createUser", icon:RiUserFill, href:"/user-list  "}
     ]
   },
+  
   { name: "menu.logout", icon: RiLogoutBoxRFill, href: "#" },
 ];
 
@@ -120,8 +131,7 @@ export default function Layout() {
         </select>
       </div>
 
-      {/* Update mobile menu button position - move it before the selectors */}
-      <button
+        <button
         className="fixed right-4 top-4 z-50 lg:hidden"
         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
       >
@@ -193,18 +203,53 @@ export default function Layout() {
               </p>
               <div className="mt-4 space-y-1">
                 {generalItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className="flex items-center px-2 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 w-[150px]
-                      rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 whitespace-nowrap"
-                  >
-                    <item.icon className="h-5 w-5 flex-shrink-0" />
-                    <span className="ml-3">{t(item.name)}</span>
-                  </Link>
+                  <div key={item.name}>
+                    <Link
+                      to={item.href}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setIsMobileMenuOpen(false);
+                        if (item.subItems) {
+                          toggleSubmenu(item.name);
+                        } else {
+                          navigate(item.href);
+                        }
+                      }}
+                      className="flex items-center justify-between px-2 py-2 text-sm font-medium text-gray-600
+                        dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 whitespace-nowrap w-[220px]"
+                    >
+                      <div className="flex items-center">
+                        <item.icon className="h-5 w-5 flex-shrink-0" />
+                        <span className="ml-3">{t(item.name)}</span>
+                      </div>
+                      {item.subItems && (
+                        openSubmenu === item.name ? 
+                          <ChevronUp className="h-4 w-4 mr-[100px]" /> :
+                          <ChevronDown className="h-4 w-4 mr-[100px]" />
+                      )}
+                    </Link>
+                    
+                    {item.subItems && openSubmenu === item.name && (
+                      <div className="ml-6 mt-1 space-y-1">
+                        {item.subItems.map((subItem) => (
+                          <Link
+                            key={subItem.name}
+                            to={subItem.href}
+                            onClick={() => setIsMobileMenuOpen(false)}
+                            className={`flex items-center px-2 py-2 text-sm font-medium rounded-lg whitespace-nowrap ml-[-24px]
+                              ${
+                                window.location.pathname === subItem.href
+                                  ? "text-[#6C5DD3] bg-[#6C5DD3]/10 dark:bg-[#6C5DD3]/20 w-[150px]"
+                                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 w-[150px]"
+                              }`}
+                          >
+                            <subItem.icon className="h-5 w-5 flex-shrink-0" />
+                            <span className="ml-3">{t(subItem.name)}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 ))}
               </div>
             </div>

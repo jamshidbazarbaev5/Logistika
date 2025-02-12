@@ -99,6 +99,10 @@ export default function WorkingServiceList() {
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -128,15 +132,11 @@ export default function WorkingServiceList() {
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("workingService.serviceName")}
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("workingService.baseDay")}
-              </th>
+            
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("workingService.basePrice")}
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("workingService.extraPrice")}
-              </th>
+             
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("workingService.units")}
               </th>
@@ -151,15 +151,11 @@ export default function WorkingServiceList() {
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                   {service.service_name}
                 </td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {service.base_day}
-                </td>
+               
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                   {service.base_price}
                 </td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {service.extra_price}
-                </td>
+               
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                   {service.units}
                 </td>
@@ -265,16 +261,22 @@ export default function WorkingServiceList() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label htmlFor="units" className="block text-sm font-medium text-gray-700 mb-1">
                       {t("workingService.units")}
                     </label>
-                    <input
-                      type="text"
+                    <select
+                      id="units"
+                      name="units"
                       value={formData.units}
-                      onChange={(e) => setFormData({ ...formData, units: e.target.value })}
+                      onChange={handleChange}
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
                       required
-                    />
+                    >
+                      <option value="">{t("common.select")}</option>
+                      <option value="day">{t("workingService.units.day")}</option>
+                      <option value="hour">{t("workingService.units.hour")}</option>
+                      <option value="piece">{t("workingService.units.piece")}</option>
+                    </select>
                   </div>
                 </div>
 

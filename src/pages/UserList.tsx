@@ -3,6 +3,7 @@
   import { Pencil, Trash2, Plus, User, Mail, Key, UserCircle } from 'lucide-react';
   import ConfirmModal from '../components/ConfirmModal';
   import SuccessModal from '../components/SuccessModal';
+import { useTranslation } from 'react-i18next';
 
   interface User {
     id: number;
@@ -21,6 +22,7 @@
   }
 
   export default function Users() {
+    const { t } = useTranslation();
     const [users, setUsers] = useState<User[]>([]);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -115,7 +117,7 @@
     return (
       <div className="container mx-auto p-4">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">Users</h1>
+          <h1 className="text-2xl font-bold">  {t("userManagement.title")}</h1>
           <button
             onClick={() => {
               setIsEditing(false);
@@ -140,11 +142,11 @@
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">#</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Username</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">First Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('userManagement.username')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('userManagement.email')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('userManagement.firstName')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('userManagement.lastName')}</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{t('userManagement.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -273,13 +275,13 @@
                       onClick={() => setIsFormModalOpen(false)}
                       className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
                     >
-                      Cancel
+                      {t('userManagement.cancel')}
                     </button>
                     <button
                       type="submit"
                       className="px-4 py-2 text-sm font-medium text-white bg-[#6C5DD3] rounded-md hover:bg-[#5c4eb8]"
                     >
-                      {isEditing ? 'Update' : 'Create'}
+                      {isEditing ? t('userManagement.update') : t('userManagement.create')}
                     </button>
                   </div>
                 </form>
@@ -296,10 +298,10 @@
             if (selectedUserId) handleDelete(selectedUserId);
             setIsDeleteModalOpen(false);
           }}
-          title="Delete User"
-          message="Are you sure you want to delete this user? This action cannot be undone."
-          confirmText="Delete"
-          cancelText="Cancel"
+          title={t('userManagement.deleteTitle')}
+          message={t('userManagement.deleteSuccess')}
+          confirmText={t('userManagement.delete')}
+          cancelText={t('userManagement.cancel')}
         />
 
         {/* Success Modal */}

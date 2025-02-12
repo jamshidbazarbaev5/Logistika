@@ -47,9 +47,7 @@ interface ApplicationFormData {
 
 interface Firm {
   id: number;
-  firm_name: string;
-  // ... other firm properties if needed
-}
+  firm_name: string}
 
 interface PaymentMethod {
   id: number;
@@ -585,7 +583,8 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   );
 };
 
-const TransportSection = () => {
+const TransportSection = ()  => {
+  const { t } = useTranslation();
   const { formData, setFormData } = useFormContext();
   const [transportNumber, setTransportNumber] = useState('');
   const [transportTypeId, setTransportTypeId] = useState<number>(0);
@@ -629,74 +628,104 @@ const TransportSection = () => {
   };
 
   return (
-    <div className="mt-6 border-t pt-6">
-      <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Transport Information</h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Transport Type</label>
-          <select
-            value={transportTypeId}
-            onChange={(e) => setTransportTypeId(Number(e.target.value))}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
-              focus:border-[#6C5DD3] focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 
-              text-gray-900 dark:text-gray-100 transition-colors"
-          >
-            <option value={0}>Select Transport Type</option>
-            {transportTypes?.map(type => (
-              <option key={type.id} value={type.id}>{type.transport_type}</option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Transport Number</label>
-          <input
-            type="text"
-            value={transportNumber}
-            onChange={(e) => setTransportNumber(e.target.value)}
-            className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
-              focus:border-[#6C5DD3] focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 
-              text-gray-900 dark:text-gray-100 transition-colors"
-          />
-        </div>
-      </div>
-
-      <button
-        onClick={handleAddTransport}
-        disabled={!transportNumber || !transportTypeId}
-        className="mt-4 px-4 py-2 bg-[#6C5DD3] text-white rounded-lg disabled:opacity-50
-          hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out"
-      >
-        Add Transport
-      </button>
-
-      {/* Display selected transports */}
-      {formData.upload_transport.length > 0 && (
-        <div className="mt-4">
-          <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Transports:</h4>
+    <div className="mt-8 border-t pt-8">
+      <div className="space-y-6">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
+          {t('createApplication.transportInfo')}
+        </h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            {formData.upload_transport.map((transport, index) => (
-              <div key={index} className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-                <div className="flex-1">
-                  <span className="font-medium dark:text-gray-100">
-                    {transportTypes.find(t => t.id === transport.transport_type)?.transport_type}
-                  </span>
-                  <span className="mx-2 text-gray-400 dark:text-gray-500">|</span>
-                  <span className="text-gray-600 dark:text-gray-300">
-                    Number: {transport.transport_number}
-                  </span>
-                </div>
-                <button
-                  onClick={() => handleRemoveTransport(index)}
-                  className="text-red-500 hover:text-red-700 p-2"
-                >
-                  Remove
-                </button>
-              </div>
-            ))}
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('createApplication.transportType')}
+            </label>
+            <select
+              value={transportTypeId}
+              onChange={(e) => setTransportTypeId(Number(e.target.value))}
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 
+                px-4 py-2.5 text-sm focus:border-[#6C5DD3] focus:ring-1 
+                focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 
+                text-gray-900 dark:text-gray-100 transition-colors"
+            >
+              <option value={0}>
+                {t('createApplication.selectTransportType')}
+              </option>
+              {transportTypes?.map(type => (
+                <option key={type.id} value={type.id}>
+                  {type.transport_type}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('createApplication.transportNumber')}
+            </label>
+            <div className="flex gap-4">
+              <input
+                type="text"
+                value={transportNumber}
+                onChange={(e) => setTransportNumber(e.target.value)}
+                className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 
+                  px-4 py-2.5 text-sm focus:border-[#6C5DD3] focus:ring-1 
+                  focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 
+                  text-gray-900 dark:text-gray-100 transition-colors"
+                placeholder={t('createApplication.enterTransportNumber')}
+              />
+              <button
+                onClick={handleAddTransport}
+                disabled={!transportNumber || !transportTypeId}
+                className="px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
+                  hover:bg-[#5b4eb3] disabled:opacity-50 disabled:cursor-not-allowed
+                  transition-colors duration-200 ease-in-out shadow-sm
+                  whitespace-nowrap"
+              >
+                {t('createApplication.addTransport')}
+              </button>
+            </div>
           </div>
         </div>
-      )}
+
+        {/* Display selected transports */}
+        {formData.upload_transport.length > 0 && (
+          <div className="mt-6">
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              {t('createApplication.selectedTransports')}:
+            </h4>
+            <div className="space-y-3">
+              {formData.upload_transport.map((transport, index) => (
+                <div 
+                  key={index} 
+                  className="flex justify-between items-center bg-gray-50 
+                    dark:bg-gray-800 p-4 rounded-lg border border-gray-200 
+                    dark:border-gray-700 hover:border-gray-300 
+                    dark:hover:border-gray-600 transition-colors"
+                >
+                  <div className="flex-1">
+                    <span className="font-medium text-gray-900 dark:text-gray-100">
+                      {transportTypes.find(t => t.id === transport.transport_type)?.transport_type}
+                    </span>
+                    <span className="mx-2 text-gray-400 dark:text-gray-500">|</span>
+                    <span className="text-gray-600 dark:text-gray-300">
+                      {t('createApplication.number')}: {transport.transport_number}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveTransport(index)}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 
+                      dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -1026,8 +1055,10 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
 
 const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
   const { formData, setFormData } = useFormContext();
-  const [selectedMode, setSelectedMode] = useState<number>(0);
-  const [modes, setModes] = useState<Array<{ id: number; name_mode: string }>>([]);
+  const [modes, setModes] = useState<Array<{ id: number; name_mode: string; code_mode: string }>>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchModes = async () => {
@@ -1041,79 +1072,133 @@ const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
     fetchModes();
   }, []);
 
-  const handleModeSelect = (selectedModeId: number) => {
-    if (!selectedModeId) return;
-    
-    // Check if mode is already selected
-    const isAlreadySelected = formData.upload_modes.some(
-      mode => mode.mode_id === selectedModeId
-    );
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
 
-    if (!isAlreadySelected) {
-      const newMode = { mode_id: selectedModeId };
-      
-      setFormData(prev => ({
-        ...prev,
-        upload_modes: [...prev.upload_modes, newMode]
-      }));
-      
-      console.log('Added mode:', selectedModeId);
-    }
-    
-    setSelectedMode(0); // Reset selection
-  };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  // Add function to remove mode
-  const handleRemoveMode = (modeId: number) => {
+  const handleModeSelect = (selectedMode: { id: number; name_mode: string; code_mode: string }) => {
+    // Replace the existing mode (if any) with the new one
     setFormData(prev => ({
       ...prev,
-      upload_modes: prev.upload_modes.filter(mode => mode.mode_id !== modeId)
+      upload_modes: [{ mode_id: selectedMode.id }]
     }));
+    
+    setSearchTerm(`${selectedMode.name_mode} (${selectedMode.code_mode})`);
+    setShowDropdown(false);
   };
+
+  const filteredModes = modes.filter(mode =>
+    mode.name_mode.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    mode.code_mode.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleRemoveMode = () => {
+    setFormData(prev => ({
+      ...prev,
+      upload_modes: []
+    }));
+    setSearchTerm('');
+  };
+
+  const selectedMode = modes.find(mode => 
+    formData.upload_modes[0]?.mode_id === mode.id
+  );
 
   return (
     <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
       <div className="max-w-md">
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Mode</label>
-          <select
-            value={selectedMode}
-            onChange={(e) => handleModeSelect(Number(e.target.value))}
-            className="block w-full rounded-lg border-gray-300 dark:border-gray-600 shadow-sm
-              bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-          >
-            <option value={0}>Select Mode</option>
-            {modes.map(mode => (
-              <option key={mode.id} value={mode.id}>
-                {mode.name_mode}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Display selected modes */}
-        <div className="mt-4">
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Modes:</h3>
-          <div className="space-y-2">
-            {formData.upload_modes.map((mode, index) => (
-              <div key={index} className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-                <span className="text-gray-900 dark:text-gray-100">{modes.find(m => m.id === mode.mode_id)?.name_mode}</span>
-                <button
-                  onClick={() => handleRemoveMode(mode.mode_id)}
-                  className="text-red-500 hover:text-red-700 p-2 dark:text-red-400 dark:hover:text-red-300"
-                >
-                  Remove
-                </button>
+        <div className="mb-6">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Select Mode
+          </label>
+          
+          <div className="relative" ref={dropdownRef}>
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setShowDropdown(true);
+              }}
+              onFocus={() => setShowDropdown(true)}
+              placeholder="Search for a mode..."
+              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 
+                px-4 py-2.5 text-sm focus:border-[#6C5DD3] focus:ring-1 focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 
+                placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
+            />
+            
+            {showDropdown && filteredModes.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg 
+                shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
+                {filteredModes.map((mode) => (
+                  <div
+                    key={mode.id}
+                    onClick={() => handleModeSelect(mode)}
+                    className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer
+                      border-b last:border-b-0 border-gray-100 dark:border-gray-700"
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        {mode.name_mode}
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        Code: {mode.code_mode}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </div>
         </div>
 
-        <div className="mt-6 flex justify-end border-t pt-6">
+        {/* Display selected mode */}
+        {selectedMode && (
+          <div className="mb-6">
+            <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              Selected Mode:
+            </h3>
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border 
+              border-gray-200 dark:border-gray-700">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                    {selectedMode.name_mode}
+                  </h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    Code: {selectedMode.code_mode}
+                  </p>
+                </div>
+                <button
+                  onClick={handleRemoveMode}
+                  className="p-1 text-gray-400 hover:text-red-500 rounded-full
+                    hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="mt-6 border-t pt-6">
           <button
             onClick={onSubmit}
-            className="w-full px-6 py-2.5 bg-green-600 text-white rounded-lg font-medium
-              hover:bg-green-700 transition-colors duration-200 ease-in-out shadow-sm"
+            className="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-medium
+              hover:bg-green-700 transition-colors duration-200 ease-in-out shadow-sm
+              focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
+              dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={formData.upload_modes.length === 0}
           >
             Create Application
           </button>
@@ -1179,34 +1264,27 @@ export default function CreateApplication() {
     const fetchData = async () => {
       try {
         const [
-          firmsResponse, 
           paymentMethodsResponse,
           keepingServicesResponse,
           workingServicesResponse,
-          productsResponse,
           storagesResponse,
           transportTypesResponse
         ] = await Promise.all([
-          api.get('/firms/'),
           api.get('/payment_method/'),
           api.get('/keeping_service/'),
           api.get('/working_service/'),
-          api.get('/items/product/'),
           api.get('/storage/'),
           api.get('/transport/type/')
         ]);
         
-        setFirms(firmsResponse.data.results);
         setPaymentMethods(paymentMethodsResponse.data.results || []);
         setKeepingServices(keepingServicesResponse.data.results);
         setWorkingServices(workingServicesResponse.data.results);
-        setProducts(productsResponse.data || []);
         setStorages(storagesResponse.data || []);
         setTransportTypes(transportTypesResponse.data || []);
         
         setFormData(prev => ({
           ...prev,
-          firm_id: firmsResponse.data.results?.[0]?.id || null,
           payment_method: paymentMethodsResponse.data.results?.[0]?.id || null
         }));
       } catch (error) {
@@ -1294,7 +1372,7 @@ export default function CreateApplication() {
 
       const response = await api.post('/application/', requestData, {
         headers: {
-          'Content-Type': 'application/json',
+          // 'Content-Type': 'application/json',
         },
       });
 
@@ -1348,9 +1426,31 @@ export default function CreateApplication() {
     }
   };
 
-  const filteredFirms = firms.filter(firm =>
-    firm.firm_name.toLowerCase().includes(firmSearch.toLowerCase())
-  );
+  const searchFirms = async (searchTerm: string) => {
+    try {
+      if (!searchTerm.trim()) {
+        setFirms([]);
+        setShowFirmDropdown(false);
+        return;
+      }
+      const response = await api.get(`/firms/?firm_name=${searchTerm}`);
+      setFirms(response.data.results || []);
+      setShowFirmDropdown(true);
+    } catch (error) {
+      console.error('Error searching firms:', error);
+      setFirms([]);
+    }
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (firmSearch) {
+        searchFirms(firmSearch);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [firmSearch]);
 
   const handleFirmSelect = (firm: Firm) => {
     console.log('Selected firm:', firm); // Debug log
@@ -1444,7 +1544,7 @@ export default function CreateApplication() {
               }
             >
 
-              {t('createApplication.declaration', 'Declaration')}
+              {t('createApplication.declaration')}
             </Tab>
 
             <Tab
@@ -1566,8 +1666,8 @@ export default function CreateApplication() {
                     
                     {showFirmDropdown && (
                       <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-                        {filteredFirms.length > 0 ? (
-                          filteredFirms.map((firm) => (
+                        {firms.length > 0 ? (
+                          firms.map((firm) => (
                             <div
                               key={firm.id}
                               onClick={() => handleFirmSelect(firm)}

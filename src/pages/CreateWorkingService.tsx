@@ -75,23 +75,7 @@ export default function CreateWorkingService() {
               />
             </div>
 
-            <div>
-              <label htmlFor="base_day" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t("createWorkingService.serviceInfo.baseDay")}
-              </label>
-              <input
-                type="number"
-                id="base_day"
-                name="base_day"
-                value={formData.base_day}
-                onChange={handleChange}
-                min="1"
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                required
-              />
-            </div>
+          
 
             <div>
               <label htmlFor="base_price" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -112,24 +96,7 @@ export default function CreateWorkingService() {
               />
             </div>
 
-            <div>
-              <label htmlFor="extra_price" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t("createWorkingService.serviceInfo.extraPrice")}
-              </label>
-              <input
-                type="number"
-                id="extra_price"
-                name="extra_price"
-                value={formData.extra_price}
-                onChange={handleChange}
-                step="0.01"
-                min="0"
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                required
-              />
-            </div>
+          
 
             <div>
               <label htmlFor="units" className="block text-sm font-medium text-gray-700 dark:text-gray-300">

@@ -1,14 +1,14 @@
 {
   "createFirm": {
-    "title": "Yangi Firma Yaratish",
-    "subtitle": "Yangi firmani ro'yxatdan o'tkazish uchun barcha ma'lumotlarni to'ldiring",
+    "title": "Yangi Organizatsiya Yaratish",
+    "subtitle": "Yangi organizatsiyani ro'yxatdan o'tkazish uchun barcha ma'lumotlarni to'ldiring",
     "companyInfo": {
-      "title": "Kompaniya Ma'lumotlari",
+      "title": "Organizatsiya Ma'lumotlari",
       "inn": "STIR",
       "innPlaceholder": "STIR raqamini kiriting",
-      "firmName": "Firma Nomi",
-      "firmNamePlaceholder": "Firma nomini kiriting",
-      "phoneNumber": "Kompaniya Telefon Raqami",
+      "firmName": "Organizatsiya Nomi",
+      "firmNamePlaceholder": "Organizatsiya nomini kiriting",
+      "phoneNumber": "Organizatsiya Telefon Raqami",
       "phonePlaceholder": "+998 90 123 45 67"
     },
     "directorInfo": {
@@ -37,7 +37,41 @@
     "declarationDate": "Deklaratsiya Sanasi",
     "unloadingQuantity": "Tushirish Miqdori",
     "submit": "Ariza Yaratish",
-    "successMessage": "Ariza muvaffaqiyatli yaratildi!"
+    "successMessage": "Ariza muvaffaqiyatli yaratildi!",
+    "transportInfo": "Transport Ma'lumotlari",
+    "transportType": "Transport Turi",
+    "selectTransportType": "Transport turini tanlang",
+    "transportNumber": "Transport Raqami",
+    "addTransport": "Transport Qo'shish",
+    "selectedTransports": "Tanlangan Transportlar",
+    "number": "Raqam",
+    "basicInfo": "Asosiy Ma'lumotlar",
+    "declaration": "Deklaratsiya",
+    "services": "Xizmatlar",
+    "brutto": "Brutto",
+    "netto": "Netto",
+    "searchFirm": "Organizatsiyani qidirish...",
+    "noFirmsFound": "Organizatsiya topilmadi",
+    "createNewFirm": "Yangi Organizatsiya Yaratish",
+    "paymentMethod": "To'lov Usuli",
+    "searchPaymentMethod": "To'lov usulini qidirish...",
+    "noPaymentMethodsFound": "To'lov usullari topilmadi",
+    "transport": {
+      "type": "Transport Turi",
+      "selectType": "Transport turini tanlang",
+      "number": "Transport Raqami",
+      "add": "Transport Qo'shish",
+      "list": "Tanlangan Transportlar"
+    },
+    "declarationInfos": {
+      "number": "Deklaratsiya Raqami",
+      "date": "Deklaratsiya Sanasi",
+      "file": "Deklaratsiya Fayli",
+      "uploadFile": "Fayl yuklash"
+    },
+    "next": "Keyingi",
+    "back": "Orqaga",
+    "submit": "Yuborish"
   },
   "photoUpload": {
     "title": "Rasm Yuklash",
@@ -264,10 +298,10 @@
     "editError": "O'lchov birligini yangilashda xatolik yuz berdi"
   },
   "firmList": {
-    "title": "Firmalar",
-    "createFirm": "Firma Yaratish",
-    "errorLoading": "Firmalarni yuklashda xatolik yuz berdi",
-    "deleteTitle": "Firmani O'chirish",
+    "title": "Organizatsiyalar",
+    "createFirm": "Organizatsiyani Yaratish",
+    "errorLoading": "Organizatsiyalarni yuklashda xatolik yuz berdi",
+    "deleteTitle": "Organizatsiyani O'chirish",
     "deleteConfirmation": "\"{{name}}\" firmasini o'chirmoqchimisiz? Bu amalni qaytarib bo'lmaydi.",
     "delete": "O'chirish",
     "deleteSuccess": "Firma muvaffaqiyatli o'chirildi",
@@ -277,7 +311,7 @@
     "table": {
       "number": "№",
       "inn": "STIR",
-      "firmName": "Firma Nomi",
+      "firmName": "Organizatsiya Nomi",
       "phoneNumber": "Telefon Raqami",
       "director": "Direktor",
       "trustee": "Ishonchli Vakil",
@@ -343,10 +377,10 @@
     "mainMenu": "ASOSIY MENYU",
     "general": "UMUMIY",
     "others": "BOSHQALAR",
-    "firm": "Firmalar",
+    "firm": "Organizatsiyalar",
     "storage": "Omborlar",
     "transport": "Transport",
-    "payment": "To'lov",
+    "payment": "To'lov Usullari",
     "createMode": "Rejimlar",
     "createApplication": "Arizalar",
     "createProduct": "Mahsulotlar",
@@ -354,7 +388,11 @@
     "measurement": "O'lchov Birliklari",
     "account": "Hisob",
     "settings": "Sozlamalar",
-    "logout": "Chiqish"
+    "logout": "Chiqish",
+    "createUser": "Foydalanuvchilar ro'yxati",
+    "services": "Xizmatlar",
+    "workingServices": "Ish Xizmatlari",
+    "keepingServices": "Saqlash Xizmatlari"
   },
   "workingService": {
     "title": "Ish Xizmatlari",

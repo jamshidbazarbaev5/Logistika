@@ -1,14 +1,14 @@
 {
   "createFirm": {
-    "title": "Jańa Firma Jaratıw",
-    "subtitle": "Jańa firmanı dizimnen ótkiziw ushın barlıq mag'lıwmatlardı toltırıń",
+    "title": "Jańa Organizatsiya Jaratıw",
+    "subtitle": "Jańa organizatsiyani dizimnen ótkiziw ushın barlıq mag'lıwmatlardı toltırıń",
     "companyInfo": {
-      "title": "Kompaniya Mag'lıwmatları",
+      "title": "Organizatsiya Mag'lıwmatları",
       "inn": "STIR",
       "innPlaceholder": "STIR nomerin kiritiń",
-      "firmName": "Firma Atı",
-      "firmNamePlaceholder": "Firma atın kiritiń",
-      "phoneNumber": "Kompaniya Telefon Nomeri",
+      "firmName": "Organizatsiya Atı",
+      "firmNamePlaceholder": "Organizatsiya atın kiritiń",
+      "phoneNumber": "Organizatsiya Telefon Nomeri",
       "phonePlaceholder": "+998 90 123 45 67"
     },
     "directorInfo": {
@@ -37,7 +37,33 @@
     "declarationDate": "Deklaraciya Sánesi",
     "unloadingQuantity": "Túsiriw Mug'darı",
     "submit": "Ótinish Jaratıw",
-    "successMessage": "Ótinish tabıslı jaratıldı!"
+    "successMessage": "Ótinish tabıslı jaratıldı!",
+    "transportInfo": "Transport Mag'lıwmatları",
+    "transportType": "Transport Túri",
+    "selectTransportType": "Transport túrin tańlań",
+    "transportNumber": "Transport Nomeri",
+    "addTransport": "Transport Qosıw",
+    "selectedTransports": "Tańlang'an Transportlar",
+    "number": "Nomer",
+    "basicInfo": "Tiykarǵı Maǵlıwmatlar",
+    "declaration": "Deklaratsiya",
+    "services": "Xızmetler",
+    "brutto": "Brutto",
+    "netto": "Netto",
+    "searchFirm": "Organizatsiyanı izlew...",
+    "noFirmsFound": "Organizatsiya tabılmadı",
+    "createNewFirm": "Jańa Organizatsiya Jaratıw",
+    "paymentMethod": "Tólew Usılı",
+    "searchPaymentMethod": "Tólew usılın izlew...",
+    "noPaymentMethodsFound": "Tólew usılı tabılmadı",
+    "declarationInfos": {
+      "number": "Deklaratsiya Nomeri",
+      "date": "Deklaratsiya Sánesi",
+      "file": "Deklaratsiya Fayli",
+      "uploadFile": "Fayl yuklash"
+    },
+    "next": "Keyingi",
+    "back": "Orqaga"
   },
   "photoUpload": {
     "title": "Súwret Júklew",
@@ -296,11 +322,11 @@
     "deleteSuccess": "Ólshew birligi tabıslı jaratıldı!"
   },
   "firmList": {
-    "title": "Firmalar",
-    "createFirm": "Firma Jaratıw",
-    "errorLoading": "Firmalardı júklewde qátelik júz berdi",
-    "deleteTitle": "Firmanı Óshiriw",
-    "deleteConfirmation": "\"{{name}}\" firmasın óshirmekshimisiz? Bul háreketti qaytarıw múmkin emes.",
+    "title": "Organizaciya",
+    "createFirm": "Organizaciya Jaratıw",
+    "errorLoading": "Organizaciyalardı júklewde qátelik júz berdi",
+    "deleteTitle": "Organizaciyanı Óshiriw",
+    "deleteConfirmation": "\"{{name}}\" organizaciyasın óshirmekshimisiz? Bul háreketti qaytarıw múmkin emes.",
     "delete": "Óshiriw",
     "deleteSuccess": "Firma tabıslı óshirildi",
     "editTitle": "Firmanı Ózgertiw",
@@ -309,7 +335,7 @@
     "table": {
       "number": "№",
       "inn": "STIR",
-      "firmName": "Firma Atı",
+      "firmName": "Organizaciya Atı",
       "phoneNumber": "Telefon Nomeri",
       "director": "Direktor",
       "trustee": "Isenim Wákili",
@@ -365,10 +391,10 @@
     "mainMenu": "BAS MENYU",
     "general": "ULÍWMA",
     "others": "BASQALAR",
-    "firm": "Firmalar",
+    "firm": "Organizatsiyalar",
     "storage": "Qoymalar",
     "transport": "Transport",
-    "payment": "Tólew",
+    "payment": "Tólew Usılları",
     "createMode": "Rejimler",
     "createApplication": "Arızalar",
     "createProduct": "Ónimler",
@@ -376,16 +402,20 @@
     "measurement": "Ólshew Birlikleri",
     "account": "Akkaunt",
     "settings": "Sazlawlar",
-    "logout": "Shıǵıw"
+    "logout": "Shıǵıw",
+    "createUser": "Paydalanıwshılar dizimi",
+    "services": "Xızmetler",
+    "workingServices": "Jumıs Xızmetleri",
+    "keepingServices": "Saqlaw Xızmetleri"
   },
   "productList": {
-    "title": "Ónimler",
+    "title": "Tovarlar",
     "createProduct": "Ónim Jaratıw",
     "errorLoading": "Ónimlerdi júklewde qátelik júz berdi",
     "deleteTitle": "Ónimni Óshiriw",
     "deleteConfirmation": "\"{{name}}\" ónimini óshirmekshimisiz? Bul háreketti qaytarıw múmkin emes.",
     "deleteSuccess": "Ónim tabıslı óshirildi",
-    "name": "Ónim Atı",
+    "name": "Tovar Atı",
     "units": "Ólshem Birlikleri",
     "category": "Kategoriya",
     "actions": "Háreketler",
@@ -400,6 +430,24 @@
     "unauthorizedError": "Iltimos, transport turini yaratish uchun avtorizatsiya qiling",
     "error": "Transport turini yaratishda xatolik yuz berdi",
     "placeholder": "Transport turini kiriting"
-  }
+  },
+  "userManagement": {
 
+    "title": "Foydalanuvchilar",
+    "createUser": "Foydalanuvchini Yaratish",
+    "editUser": "Foydalanuvchini Jańalaw",
+    "cancel": "Biykar etiw",
+    "email": "Elektron pochta",
+    "firstName": "Ism",
+    "lastName": "Familiya",
+    "username": "Paydalanıwshı atı",
+    "password": "Parol",
+    "update": "Jańalaw",
+    "actions": "Háreketler",
+    "delete": "Óshiriw",
+    "deleteTitle": "Foydalanuvchini Óshiriw",
+    "deleteSuccess": "Foydalanuvchi tabıslı óshirildi",
+    "deleteConfirmation": "Haqıyqattan da \"{{name}}\" foydalanuvchisini óshiriwdi qáleysizbe? Bul háreketti qaytarıw múmkin emes.",
+    "deleteError": "Foydalanuvchini óshiriwda xatolik yuz berdi"
+  }
 }
