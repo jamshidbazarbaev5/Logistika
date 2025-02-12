@@ -11,12 +11,6 @@ import ProductsTab from "../components/ProductsTab";
 import ModesTab from "../components/ModesTab";
 import { useFormContext } from "../context/FormContext";
 
-interface ModesTabProps {
-  formData: ApplicationFormData;
-  setFormData: React.Dispatch<React.SetStateAction<ApplicationFormData>>;
-  onSubmit: (e: React.FormEvent) => Promise<void>;
-  availableModes: Array<{ id: number; name_mode: string; code_mode: string }>;
-}
 
 export default function EditApplication() {
   const { id } = useParams<{ id: string }>();
@@ -57,7 +51,7 @@ export default function EditApplication() {
   const [firms, setFirms] = useState<Array<{ id: number; firm_name: string }>>([]);
   const [keepingServices, setKeepingServices] = useState<Array<{ id: number; name: string; base_price: number }>>([]);
   const [workingServices, setWorkingServices] = useState<Array<{ id: number; service_name: string; base_price: number }>>([]);
-  const [transportTypes, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
+  const [, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
   const [storages, setStorages] = useState<Array<{ id: number; name: string }>>([]);
   const [products, setProducts] = useState<Array<{
     id: number;
