@@ -50,6 +50,9 @@
     "services": "Услуги",
     "brutto": "Брутто",
     "netto": "Нетто",
+    "photos": "Фотографии",
+    "products": "Товары",
+    "modes": "Режимы",
     "searchFirm": "Поиск организации...",
     "noFirmsFound": "Организации не найдены",
     "createNewFirm": "Создать Новую Организацию",
@@ -70,7 +73,29 @@
       "uploadFile": "Загрузить файл"
     },
     "next": "Далее",
-    "back": "Назад"
+    "back": "Назад",
+    "select":"Выбрать режим",
+    "input": "Введите режим ",
+    "code": "Код режима",
+    "productInput": "Введите наименование товара",
+    "storageInput": "Введите наименование склада",
+    "quantityInput": "Введите количество товара",
+    "selectedStorage": "Выбранный склад",
+    "selectedProduct": "Выбранный товар",
+    "selectedQuantity": "Выбранное количество",
+    "selectedMode": "Выбранный режим",
+    "selectedTransport": "Выбранный транспорт",
+    "selectedServices": "Выбранные услуги",
+    "storageServices": "Услуги склада",
+    "workingServices": "Рабочие услуги",
+    "declorationNumber": "Номер Декларации",
+    "declorationDate": "Дата Декларации",
+    "declorationFile": "Файл Декларации",
+    "declorationNumberPlaceholder": "Введите номер декларации",
+    "declorationDatePlaceholder": "Введите дату декларации",
+    "declorationFilePlaceholder": "Загрузить файл",
+    "noDeclorationFileChosen": "Файл не выбран"
+
   },
   "photoUpload": {
     "title": "Загрузка Фото",
@@ -86,6 +111,10 @@
     "successMessage": "Фото успешно загружено!"
   },
   "createKeepingService": {
+    "name": "Название Услуги",
+    "baseDay": "Базовые Дни",
+    "basePrice": "Базовая Цена",
+    "extraPrice": "Дополнительная Цена",
     "title": "Создать Услугу Хранения",
     "subtitle": "Добавить новую услугу хранения",
     "serviceInfo": {
@@ -112,7 +141,7 @@
       "basePrice": "Базовая Цена",
       "extraPrice": "Дополнительная Цена",
       "units": "Единицы Измерения",
-      "units": {
+      "unitsSelect": {
         "day": "День",
         "hour": "Час",
         "piece": "Штука"
@@ -123,13 +152,21 @@
   },
   "workingService":{
     "title": "Рабочие Услуги",
+    "edit": "Изменить Рабочую Услугу",
+    "create": "Создать Рабочую Услугу",
+    "serviceName": "Название Услуги",
     "subtitle": "Добавить новую рабочую услугу",
     "name": "Название Услуги",
     "price": "Цена",
     "baseDay": "Базовые Дни",
     "basePrice": "Базовая Цена",
     "extraPrice": "Дополнительная Цена",
-    "units": "Единицы Измерения"
+    "units": "Единицы Измерения",
+    "unitsSelect": {
+      "day": "День",
+      "hour": "Час",
+      "piece": "Штука"
+    }
   },
   "createItemCategory": {
     "title": "Создать Категорию",
@@ -185,7 +222,14 @@
   "common": {
     "success": "Успешно!",
     "ok": "OK",
-    "actions": "Действия"
+    "actions": "Действия",
+    "select": "Выбрать",
+    "cancel": "Отмена",
+    "update": "Обновить",
+    "edit": "Изменить",
+    "save": "Сохранить",
+    "delete": "Удалить",
+    "create": "Создать"
   },
   "login": {
     "title": "Войти в аккаунт",
@@ -413,21 +457,7 @@
     "updateSuccess": "Услуга хранения успешно обновлена",
     "createSuccess": "Услуга хранения успешно создана"
   },
-  "workingService": {
-    "title": "Рабочие Услуги",
-    "create": "Создать Рабочую Услугу",
-    "edit": "Редактировать Рабочую Услугу",
-    "serviceName": "Название Услуги",
-    "baseDay": "Базовый День",
-    "basePrice": "Базовая Цена",
-    "extraPrice": "Дополнительная Цена",
-    "units": "Единица Измерения",
-    "deleteTitle": "Удалить Рабочую Услугу",
-    "deleteConfirmation": "Вы уверены, что хотите удалить рабочую услугу \"{{name}}\"? Это действие нельзя отменить.",
-    "deleteSuccess": "Рабочая услуга успешно удалена",
-    "updateSuccess": "Рабочая услуга успешно обновлена",
-    "createSuccess": "Рабочая услуга успешно создана"
-  },
+
   "productList": {
     "title": "Товары",
     "createProduct": "Создать Продукт",
@@ -449,7 +479,8 @@
     "successMessage": "Тип транспорта успешно создан!",
     "unauthorizedError": "Пожалуйста, авторизуйтесь для создания типа транспорта",
     "error": "Ошибка при создании типа транспорта",
-    "placeholder": "Введите тип транспорта"
+    "placeholder": "Введите тип транспорта",
+    "submit": "Создать Тип Транспорта"
   },
   "userManagement": {
     "title": "Пользователи",
@@ -471,4 +502,4 @@
     "updateSuccess": "Пользователь успешно обновлен",
     "createSuccess": "Пользователь успешно создан"
   }
-} 
+}

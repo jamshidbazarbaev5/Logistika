@@ -181,7 +181,7 @@ export default function TransportList() {
                                     active ? "bg-gray-100 dark:bg-gray-700" : ""
                                   } flex w-full items-center px-4 py-2 text-sm text-blue-600 dark:text-blue-400`}
                                 >
-                                  {t("transportList.edit", "Edit")}
+                                  {t("common.edit")}
                                 </button>
                               )}
                             </Menu.Item>
@@ -193,7 +193,7 @@ export default function TransportList() {
                                     active ? "bg-gray-100 dark:bg-gray-700" : ""
                                   } flex w-full items-center px-4 py-2 text-sm text-red-600 dark:text-red-400`}
                                 >
-                                  {t("transportList.delete", "Delete")}
+                                  {t("common.delete")}
                                 </button>
                               )}
                             </Menu.Item>
@@ -238,7 +238,7 @@ export default function TransportList() {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto w-full max-w-md rounded-lg bg-white dark:bg-gray-800 p-6">
             <Dialog.Title className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
-              {t("transportList.editTitle", "Edit Transport Type")}
+              {t("common.edit")}
             </Dialog.Title>
 
             <form onSubmit={handleEditSubmit} className="space-y-6">

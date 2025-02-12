@@ -149,7 +149,7 @@ export default function Layout() {
       {/* Sidebar */}
       <div
         className={`${
-          isOpen ? "w-64" : "w-[240px] md:w-70"
+          isOpen ? "w-64" : "w-[245px] md:w-70"
         } h-screen bg-white dark:bg-gray-800 fixed left-0 top-0 transition-all duration-300 
         border-r border-gray-200  dark:border-gray-700 z-30
         ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"} 

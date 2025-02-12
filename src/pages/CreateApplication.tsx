@@ -146,6 +146,7 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) 
   const { formData, setFormData } = useFormContext();
   const [previews, setPreviews] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const {t} = useTranslation();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!formData.firm_id) {
@@ -218,7 +219,6 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) 
               Upload Photos
             </label>
             
-            {/* File Input */}
             <div className="flex items-center justify-center w-full">
               <label className="flex flex-col w-full h-32 border-2 border-dashed border-gray-300 rounded-lg 
                 cursor-pointer hover:bg-gray-50 transition-colors">
@@ -241,14 +241,12 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) 
               </label>
             </div>
 
-            {/* Error Message */}
             {error && (
               <div className="mt-2 text-sm text-red-600">
                 {error}
               </div>
             )}
 
-            {/* Preview Grid */}
             {previews.length > 0 && (
               <div className="mt-6">
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
@@ -281,14 +279,14 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) 
             )}
           </div>
 
-          {/* Action Buttons */}
           <div className="flex justify-between items-center mt-6 pt-6 border-t">
             <button
               onClick={handleNext}
               className="px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
                 hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out shadow-sm"
             >
-              Next
+              {t('createApplication.next')}
+              {/*next*/}
             </button>
           </div>
         </>
@@ -311,8 +309,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const [showStorageDropdown, setShowStorageDropdown] = useState(false);
   const productDropdownRef = useRef<HTMLDivElement>(null);
   const storageDropdownRef = useRef<HTMLDivElement>(null);
-
-  // Add function to fetch single product details
+  const {t} = useTranslation();
   const fetchProductDetails = async (productId: number) => {
     try {
       const response = await api.get(`/items/product/${productId}/`);
@@ -323,7 +320,6 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     }
   };
 
-  // Fetch product details for all products in formData on mount
   useEffect(() => {
     formData.upload_products.forEach(product => {
       if (!productDetails.has(product.product_id)) {
@@ -332,7 +328,6 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     });
   }, []);
 
-  // Add useEffect to fetch storages
   useEffect(() => {
     const fetchStorages = async () => {
       try {
@@ -576,7 +571,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           className="px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
             hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out shadow-sm"
         >
-          Next
+          {t('createApplication.next')}
         </button>
       </div>
     </div>
@@ -615,7 +610,6 @@ const TransportSection = ()  => {
       upload_transport: [...prev.upload_transport, newTransport]
     }));
 
-    // Reset form
     setTransportNumber('');
     setTransportTypeId(0);
   };
@@ -671,7 +665,7 @@ const TransportSection = ()  => {
                   px-4 py-2.5 text-sm focus:border-[#6C5DD3] focus:ring-1 
                   focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 
                   text-gray-900 dark:text-gray-100 transition-colors"
-                placeholder={t('createApplication.enterTransportNumber')}
+                placeholder={t('createApplication.number')}
               />
               <button
                 onClick={handleAddTransport}
@@ -738,6 +732,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const [workingServicesOpen, setWorkingServicesOpen] = useState(false);
   const keepingServicesRef = useRef<HTMLDivElement>(null);
   const workingServicesRef = useRef<HTMLDivElement>(null);
+  const {t} = useTranslation()
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -1045,7 +1040,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
               hover:bg-[#5b4eb3] transition-all duration-200 ease-in-out 
               shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
           >
-            Continue to Next Step
+            {t('createApplication.next')}
           </button>
         </div>
       </div>
@@ -1059,6 +1054,7 @@ const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const {t} = useTranslation();
 
   useEffect(() => {
     const fetchModes = async () => {
@@ -1116,7 +1112,7 @@ const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
       <div className="max-w-md">
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-            Select Mode
+            {t('createApplication.select')}
           </label>
           
           <div className="relative" ref={dropdownRef}>
@@ -1128,7 +1124,7 @@ const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
                 setShowDropdown(true);
               }}
               onFocus={() => setShowDropdown(true)}
-              placeholder="Search for a mode..."
+              placeholder={t('createApplication.input')}
               className="w-full rounded-lg border border-gray-300 dark:border-gray-600 
                 px-4 py-2.5 text-sm focus:border-[#6C5DD3] focus:ring-1 focus:ring-[#6C5DD3]
                 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 
@@ -1150,7 +1146,7 @@ const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
                         {mode.name_mode}
                       </span>
                       <span className="text-sm text-gray-500 dark:text-gray-400">
-                        Code: {mode.code_mode}
+                        {t('createApplication.code')}: {mode.code_mode}
                       </span>
                     </div>
                   </div>
@@ -1200,7 +1196,7 @@ const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
               dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={formData.upload_modes.length === 0}
           >
-            Create Application
+            {t('createApplication.title')}
           </button>
         </div>
       </div>
@@ -1324,24 +1320,7 @@ export default function CreateApplication() {
 
   const handleSubmit = async () => {
     try {
-      // Check if we have any files to upload
-      // const hasFiles = formData.decloration_file || selectedFiles.length > 0;
 
-      // if (hasFiles) {
-      //   // Handle file upload separately if needed
-      //   const formDataToSend = new FormData();
-      //   if (formData.decloration_file) {
-      //     formDataToSend.append('decloration_file', formData.decloration_file);
-      //   }
-      //   if (selectedFiles.length > 0) {
-      //     selectedFiles.forEach(file => {
-      //       formDataToSend.append('upload_photos', file);
-      //     });
-      //   }
-      //   // Handle file upload logic here
-      // }
-
-      // Prepare the JSON data
       const requestData = {
         firm_id: formData.firm_id,
         brutto: formData.brutto,
@@ -1371,7 +1350,7 @@ export default function CreateApplication() {
 
       const response = await api.post('/application/', requestData, {
         headers: {
-          // 'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
         },
       });
 
@@ -1452,21 +1431,21 @@ export default function CreateApplication() {
   }, [firmSearch]);
 
   const handleFirmSelect = (firm: Firm) => {
-    console.log('Selected firm:', firm); // Debug log
+    console.log('Selected firm:', firm);
     
     if (!firm.id) {
       console.error('Invalid firm selected - firm.id is falsy');
       return;
     }
     
-    const firmId = Number(firm.id); // Ensure it's a number
+    const firmId = Number(firm.id);
     
     setFormData(prev => {
       const updated = {
         ...prev,
         firm_id: firmId
       };
-      console.log('Updated form data:', updated); // Debug log
+      console.log('Updated form data:', updated);
       return updated;
     });
     
@@ -1492,7 +1471,6 @@ export default function CreateApplication() {
 
   
 
-  // Update the common input class styles with dark theme support
   const inputClassName = `mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
     px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
     focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
@@ -1508,7 +1486,6 @@ export default function CreateApplication() {
   };
 
   const handleTabChange = (index: number) => {
-    // Remove the condition that prevents going back to tabs 0-2
     setSelectedTab(index);
   };
 
@@ -1570,7 +1547,7 @@ export default function CreateApplication() {
                 )
               }
             >
-              {t('createApplication.photos', 'Photos')}
+              {t('createApplication.photos')}
             </Tab>
             <Tab
               className={({ selected }) =>
@@ -1583,7 +1560,7 @@ export default function CreateApplication() {
                 )
               }
             >
-              {t('createApplication.products', 'Products')}
+              {t('createApplication.products',)}
             </Tab>
             <Tab
               className={({ selected }) =>
@@ -1596,7 +1573,7 @@ export default function CreateApplication() {
                 )
               }
             >
-              {t('createApplication.modes', 'Modes')}
+              {t('createApplication.modes',)}
             </Tab>
           </Tab.List>
 
@@ -1743,7 +1720,7 @@ export default function CreateApplication() {
                     focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
                     dark:focus:ring-offset-gray-800"
                 >
-                  Next
+                  {t('createApplication.next')}
                 </button>
               </div>
             </Tab.Panel>
@@ -1810,7 +1787,7 @@ export default function CreateApplication() {
                       focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
                       dark:focus:ring-offset-gray-800"
                   >
-                    Next
+                    {t('createApplication.next')}
                   </button>
                 </div>
               </div>

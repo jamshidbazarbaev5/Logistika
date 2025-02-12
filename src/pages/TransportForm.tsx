@@ -94,7 +94,7 @@ export default function TransportForm() {
           >
             {mutation.isPending 
               ? t('createTransport.submitting', 'Creating...')
-              : t('createTransport.submit', 'Create Transport Type')}
+              : t('createTransport.submit')}
           </button>
         </div>
       </form>

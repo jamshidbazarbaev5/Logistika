@@ -197,7 +197,6 @@ export default function WorkingServiceList() {
         message={modalMessage}
       />
 
-      {/* Add Form Modal */}
       {isFormModalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto">
           <div className="flex items-center justify-center min-h-screen p-4">
@@ -221,18 +220,7 @@ export default function WorkingServiceList() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("workingService.baseDay")}
-                    </label>
-                    <input
-                      type="number"
-                      value={formData.base_day}
-                      onChange={(e) => setFormData({ ...formData, base_day: parseInt(e.target.value) })}
-                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
-                      required
-                    />
-                  </div>
+
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -247,18 +235,7 @@ export default function WorkingServiceList() {
                     />
                   </div>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t("workingService.extraPrice")}
-                    </label>
-                    <input
-                      type="text"
-                      value={formData.extra_price}
-                      onChange={(e) => setFormData({ ...formData, extra_price: e.target.value })}
-                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
-                      required
-                    />
-                  </div>
+
 
                   <div>
                     <label htmlFor="units" className="block text-sm font-medium text-gray-700 mb-1">
@@ -273,9 +250,9 @@ export default function WorkingServiceList() {
                       required
                     >
                       <option value="">{t("common.select")}</option>
-                      <option value="day">{t("workingService.units.day")}</option>
-                      <option value="hour">{t("workingService.units.hour")}</option>
-                      <option value="piece">{t("workingService.units.piece")}</option>
+                      <option value="day">{t("workingService.unitsSelect.day")}</option>
+                      <option value="hour">{t("workingService.unitsSelect.hour")}</option>
+                      <option value="piece">{t("workingService.unitsSelect.piece")}</option>
                     </select>
                   </div>
                 </div>

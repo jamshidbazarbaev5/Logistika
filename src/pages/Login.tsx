@@ -36,13 +36,10 @@ export default function Login() {
       localStorage.setItem('accessToken', response.data.access);
       localStorage.setItem('refreshToken', response.data.refresh);
 
-      // Set the token in axiosInstance headers
       axios.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
       
-      // Set it for api instance as well
       api.defaults.headers.common['Authorization'] = `Bearer ${response.data.access}`;
 
-      // Redirect to home page or dashboard
       navigate('/');
     } catch (error: any) {
       if (error.response?.data?.detail) {
@@ -63,6 +60,10 @@ export default function Login() {
   return (
     <div className="p-4 sm:p-6 min-h-screen flex items-center justify-center bg-gray-50">
       <div className="w-full max-w-md space-y-6">
+        <div className="text-center mb-4">
+          <h1 className="text-2xl font-bold text-[#6C5DD3]">Cargo-Calc</h1>
+        </div>
+
         <div className="mb-6 sm:mb-8">
           <h1 className="text-lg sm:text-xl font-semibold text-gray-900 text-center">
             {t('login.title', 'Sign in to your account')}
@@ -119,6 +120,20 @@ export default function Login() {
               {t('login.signIn', 'Sign in')}
             </button>
           </form>
+        </div>
+
+        <div className="text-center text-sm text-gray-500">
+          <p>
+            Created by{' '}
+            <a 
+              href="https://softium.uz" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[#6C5DD3] hover:underline"
+            >
+              Softium
+            </a>
+          </p>
         </div>
       </div>
     </div>

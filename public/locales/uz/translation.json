@@ -50,6 +50,9 @@
     "services": "Xizmatlar",
     "brutto": "Brutto",
     "netto": "Netto",
+    "photos": "Rasmlar",
+    "products": "Mahsulotlar",
+    "modes": "Rejimlar",
     "searchFirm": "Organizatsiyani qidirish...",
     "noFirmsFound": "Organizatsiya topilmadi",
     "createNewFirm": "Yangi Organizatsiya Yaratish",
@@ -71,7 +74,29 @@
     },
     "next": "Keyingi",
     "back": "Orqaga",
-    "submit": "Yuborish"
+    "submit": "Yuborish",
+    "select": "Rejimni tanlash",
+    "input": "Rejimni kiriting",
+    "code": "Rejim Kodı",
+    "productInput": "Mahsulot nomini kiriting",
+    "storageInput": "Ombor nomini kiriting",
+    "quantityInput": "Mahsulot miqdori kiriting",
+    "selectedStorage": "Ombor",
+    "selectedProduct": "Mahsulot",
+    "selectedQuantity": "Mahsulot miqdori",
+    "selectedMode": "Rejim",
+    "selectedTransport": "Transport",
+    "selectedServices": "Xizmatlar",
+    "storageServices": "Ombor Xizmatlari",
+    "workingServices": "Ish Xizmatlari",
+    "declorationNumber": "Deklaratsiya nomeri",
+    "declorationDate": "Deklaratsiya sanasi",
+    "declorationFile": "Deklaratsiya fayli",
+    "declorationNumberPlaceholder": "Deklaratsiya nomerini kiriting",
+    "declorationDatePlaceholder": "Deklaratsiya sanasini kiriting",
+    "declorationFilePlaceholder": "Fayl yuklash",
+    "noDeclorationFileChosen": "Fayl tanlanmadi"
+
   },
   "photoUpload": {
     "title": "Rasm Yuklash",
@@ -87,6 +112,10 @@
     "successMessage": "Rasm muvaffaqiyatli yuklandi!"
   },
   "createKeepingService": {
+    "name": "Xizmat Nomi",
+    "baseDay": "Asosiy Kunlar",
+    "basePrice": "Asosiy Narx",
+    "extraPrice": "Qo'shimcha Narx",
     "title": "Saqlash Xizmatini Yaratish",
     "subtitle": "Yangi saqlash xizmatini qo'shish",
     "serviceInfo": {
@@ -108,7 +137,7 @@
       "basePrice": "Asosiy Narx",
       "extraPrice": "Qo'shimcha Narx",
       "units": "O'lchov Birliklari",
-      "units": {
+      "unitsSelect": {
         "day": "kun",
         "hour": "soat",
         "piece": "shtuk"
@@ -176,7 +205,11 @@
     "create": "Yaratish",
     "update": "Yangilash",
     "cancel": "Bekor qilish",
-    "actions": "Amallar"
+    "actions": "Amallar",
+    "edit": "Tahrirlash",
+    "save": "Saqlash",
+    "delete": "O'chirish"    
+
   },
   "login": {
     "title": "Hisobingizga kiring",
@@ -345,12 +378,14 @@
   },
   "createTransport": {
     "title": "Transport Turini Yaratish",
+    "submit": "Transport Turini Yaratish",
     "subtitle": "Tizimga yangi transport turini qo'shing",
     "transportType": "Transport Turi",
     "successMessage": "Transport turi muvaffaqiyatli yaratildi!",
     "unauthorizedError": "Iltimos, transport turini yaratish uchun avtorizatsiya qiling",
     "error": "Transport turini yaratishda xatolik yuz berdi",
-    "placeholder": "Transport turini kiriting"
+    "placeholder": "Transport turini kiriting",
+    "submitting": "Transport turini yaratmoqda..."  
   },
   "storageList": {
     "title": "Omborlar",
@@ -404,6 +439,7 @@
     "extraPrice": "Qo'shimcha Narx",
     "units": "O'lchov Birligi",
 
+
     "deleteTitle": "Ish Xizmatini O'chirish",
     "deleteConfirmation": "Haqiqatan ham \"{{name}}\" ish xizmatini o'chirishni xohlaysizmi? Bu amalni qaytarib bo'lmaydi.",
     "deleteSuccess": "Ish xizmati muvaffaqiyatli o'chirildi",
@@ -438,5 +474,6 @@
     "edit": "Tahrirlash",
     "delete": "O'chirish",
     "input":"Mahsulot nomini kiriting"
+
   }
 } 

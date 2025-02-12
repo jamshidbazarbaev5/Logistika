@@ -51,7 +51,7 @@ export default function CreateProduct() {
         );
         setCategories(sortedCategories);
         setMeasurements(measurementsData.results);
-        navigate('products-list')
+        // navigate('products-list')
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -79,6 +79,7 @@ export default function CreateProduct() {
           measurement_id: null,
         });
         setShowSuccessModal(true);
+        navigate("/products-list");
       }
     } catch (error: any) {
       console.error('Error creating product:', error);

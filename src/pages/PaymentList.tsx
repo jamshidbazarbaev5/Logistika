@@ -114,8 +114,7 @@ export default function PaymentMethodList() {
               hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 
               focus:ring-offset-2 focus:ring-[#6C5DD3]"
           >
-            <PlusIcon className="h-5 w-5 mr-2" />
-            {t("paymentMethodList.createButton", "Create Payment Method")}
+            {t("paymentMethodList.createPaymentMethod")}
           </button>
         </div>
       </div>

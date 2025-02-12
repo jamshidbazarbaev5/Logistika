@@ -50,6 +50,9 @@
     "services": "Xızmetler",
     "brutto": "Brutto",
     "netto": "Netto",
+    "photos": "Súwretler",
+    "products": "Ónimler",
+    "modes": "Rejimler",
     "searchFirm": "Organizatsiyanı izlew...",
     "noFirmsFound": "Organizatsiya tabılmadı",
     "createNewFirm": "Jańa Organizatsiya Jaratıw",
@@ -63,7 +66,23 @@
       "uploadFile": "Fayl yuklash"
     },
     "next": "Keyingi",
-    "back": "Orqaga"
+    "back": "Orqaga",
+    "submit": "Yuborish",
+    "select": "Rejimni tanlań",
+    "input": "Rejimni kiritiń",
+    "code": "Rejim Kodı",
+    "declorationNumberPlaceholder": "Deklaratsiya nomerini kiritiń",
+    "declorationDatePlaceholder": "Deklaratsiya sánesini kiritiń",
+    "declorationFilePlaceholder": "Fayl yuklash",
+    "noDeclorationFileChosen": "Fayl tanlanmady",
+    "selectedStorage": "Qoyma",
+    "selectedProduct": "Ónim",
+    "selectedQuantity": "Mug'darı",
+    "selectedMode": "Rejim",
+    "selectedTransport": "Transport",
+    "selectedServices": "Xızmetler",
+    "storageServices": "Qoyma Xızmetleri",
+    "workingServices": "Jumıs Xızmetleri"
   },
   "photoUpload": {
     "title": "Súwret Júklew",
@@ -95,6 +114,8 @@
   "workingService": {
     "title": "Jumıs Xızmetleri",
     "subtitle": "Jańa jumıs xızmetin qosıw",
+    "edit": "Jumıs Xızmetin Ózgertiw",
+    "create": "Jumıs Xızmetin Jaratıw",
     "serviceName": "Xızmet Atı",
     "baseDay": "Tiykarg'ı Kúnler",
     "basePrice": "Tiykarg'ı Baha",
@@ -127,7 +148,7 @@
       "basePrice": "Tiykarg'ı Baha",
       "extraPrice": "Qosımsha Baha",
       "units": "Ólshem Birlikleri",
-      "units": {
+      "unitsSelect": {
         "day": "kun",
         "hour": "sag'at",
         "piece": "shtuk"
@@ -195,7 +216,10 @@
     "create": "Jaratıw",
     "update": "Jańalaw",
     "cancel": "Biykar etiw",
-    "actions": "Háreketler"
+    "actions": "Háreketler",
+    "edit": "Ózgertiw",
+    "save": "Saqlaw",
+    "delete": "Óshiriw"
   },
   "login": {
     "title": "Esapqa kiriw",
@@ -397,7 +421,7 @@
     "payment": "Tólew Usılları",
     "createMode": "Rejimler",
     "createApplication": "Arızalar",
-    "createProduct": "Ónimler",
+    "createProduct": "Tovarlar",
     "createCategory": "Kategoriyalar",
     "measurement": "Ólshew Birlikleri",
     "account": "Akkaunt",

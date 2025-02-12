@@ -261,9 +261,9 @@ export default function ProductList() {
                     >
                       <Menu.Items className={`absolute z-50 mt-2 w-36 rounded-md bg-white dark:bg-gray-800 
                         shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none
-                        ${products.indexOf(product) >= products.length - 3 ? "bottom-full mb-2" : "top-full"} 
+                        ${products.indexOf(product) >= products.length - 3 ? "bottom-[-23px] mb-2" : "top-full"} 
                         ${products.indexOf(product) >= products.length - 3 ? "origin-bottom-right" : "origin-top-right"}
-                        right-0`}>
+                        right-[34px]`}>
                         <div className="py-1">
                           <Menu.Item>
                             {({ active }) => (
