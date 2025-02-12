@@ -71,17 +71,6 @@ interface WorkingService {
   units: string;
 }
 
-// interface ProductQuantity {
-//   quantity: number;
-//   product_id: number;
-//   storage_id: number;
-// }
-
-// interface TransportNumber {
-//   transport_number: string;
-//   transport_type: number;
-// }
-
 interface Product {
   id: number;
   name: string;
@@ -101,31 +90,6 @@ interface TabPanelProps {
     setModeId?: (id: number) => void;
     setSelectedTab?: (index: number) => void;
 }
-
-// interface KeepingServiceQuantity {
-//   day: number;
-//   keeping_services_id: number;
-// }
-
-// interface WorkingServiceQuantity {
-//   quantity: number;
-//   service_id: number;
-// }
-
-// interface TransportUpload {
-//   transport_number: string;
-//   transport_type: number;
-// }
-
-// interface ModeUpload {
-//   mode_id: number;
-// }
-
-// interface ProductUpload {
-//   quantity: number;
-//   product_id: number;
-//   storage_id: number;
-// }
 
 interface FormContextType {
   formData: ApplicationFormData;
@@ -286,7 +250,6 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) 
                 hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out shadow-sm"
             >
               {t('createApplication.next')}
-              {/*next*/}
             </button>
           </div>
         </>
@@ -1227,9 +1190,7 @@ export default function CreateApplication() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [, setApplicationId] = useState<number | null>(null);
   const navigate = useNavigate();
-  // const [selectedFiles] = useState<File[]>([]);
 
-  // Format current date to YYYY-MM-DD
   const getCurrentDate = () => {
     const today = new Date();
     return today.toISOString().split('T')[0];
@@ -1320,46 +1281,58 @@ export default function CreateApplication() {
 
   const handleSubmit = async () => {
     try {
+      const formDataObj = new FormData();
 
-      const requestData = {
-        firm_id: formData.firm_id,
-        brutto: formData.brutto,
-        netto: formData.netto,
-        vip_application: formData.vip_application,
-        total_price: formData.total_price,
-        discount_price: formData.discount_price,
-        coming_date: formData.coming_date,
-        decloration_date: formData.decloration_date,
-        decloration_number: formData.decloration_number,
-        keeping_services: formData.upload_keeping_services_quantity.map(item => ({
-          day: item.day,
-          keeping_services_id: item.keeping_services_id
-        })),
-        working_services: formData.upload_working_services_quantity.map(item => ({
-          quantity: item.quantity,
-          service_id: item.service_id
-        })),
-        upload_keeping_services_quantity: formData.upload_keeping_services_quantity,
-        upload_working_services_quantity: formData.upload_working_services_quantity,
-        upload_transport: formData.upload_transport,
-        upload_modes: formData.upload_modes,
-        upload_products: formData.upload_products,
-      };
+      formDataObj.append('firm_id', formData.firm_id.toString());
+      formDataObj.append('brutto', formData.brutto?.toString() || '');
+      formDataObj.append('netto', formData.netto?.toString() || '');
+      formDataObj.append('vip_application', formData.vip_application ? 'true' : 'false');
+      formDataObj.append('total_price', formData.total_price?.toString() || '');
+      formDataObj.append('coming_date', formData.coming_date || '');
+      formDataObj.append('decloration_date', formData.decloration_date || '');
+      formDataObj.append('decloration_number', formData.decloration_number || '');
 
-      console.log('Sending data:', requestData);
+      formDataObj.append('upload_keeping_services_quantity', 
+        JSON.stringify(formData.upload_keeping_services_quantity));
+      
+      formDataObj.append('upload_working_services_quantity', 
+        JSON.stringify(formData.upload_working_services_quantity));
+      
+      formDataObj.append('upload_transport', 
+        JSON.stringify(formData.upload_transport));
+      
+      formDataObj.append('upload_modes', 
+        JSON.stringify(formData.upload_modes));
+      
+      formDataObj.append('upload_products', 
+        JSON.stringify(formData.upload_products));
 
-      const response = await api.post('/application/', requestData, {
+      if (formData.decloration_file) {
+        formDataObj.append('decloration_file', formData.decloration_file);
+      }
+
+      if (formData.upload_photos?.length) {
+        formData.upload_photos.forEach(photo => {
+          formDataObj.append('upload_photos', photo);
+        });
+      }
+
+      const endpoint = '/application/';
+      const method = 'post';
+
+      const response = await api[method](endpoint, formDataObj, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      console.log('Response:', response.data);
+      console.log(`Application created successfully:`, response.data);
       setApplicationId(response.data.id);
       setShowSuccessModal(true);
       navigate('/application-list');
+
     } catch (error: any) {
-      console.error('Error submitting application:', error);
+      console.error(`Error submitting application:`, error);
       if (error.response) {
         console.error('Server error details:', {
           status: error.response.status,

@@ -30,7 +30,7 @@ interface WorkingService {
 
 interface PhotoReport {
   id?: number;
-  photo: string;
+  photo: string | File;
   application_id?: number;
 }
 
@@ -103,6 +103,50 @@ interface FirmResponse {
   firm_name: string;
 }
 
+// Update the formData state interface to match the API response
+interface ApplicationFormData {
+  id?: number;
+  firm_id: number;
+  brutto: number | null;
+  netto: number | null;
+  coming_date: string;
+  decloration_file?: string | File;
+  decloration_date: string;
+  decloration_number: string;
+  vip_application: boolean;
+  total_price: number | null;
+  discount_price: number | null;
+  keeping_services: Array<{
+    id?: number;
+    day: number;
+    keeping_services_id: number;
+    application_id?: number;
+  }>;
+  working_services: Array<{
+    id?: number;
+    quantity: number;
+    service_id: number;
+    application_id?: number;
+  }>;
+  photo_report: PhotoReport[];
+  transport: Array<{
+    id?: number;
+    transport_number: string;
+    transport_type: number;
+    application_id?: number;
+  }>;
+  modes: Array<{
+    mode_id: number;
+  }>;
+  products: Array<{
+    id?: number;
+    quantity: number;
+    product_id: number;
+    storage_id: number;
+    application_id?: number;
+  }>;
+}
+
 export default function ApplicationList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -130,29 +174,31 @@ export default function ApplicationList() {
   // Add these new state variables near the top with other state declarations
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [formData, setFormData] = useState<Application>({
-    id: 0,
-    decloration_file: '',
+  const [formData, setFormData] = useState<ApplicationFormData>({
+    firm_id: 0,
     brutto: null,
     netto: null,
     coming_date: '',
     decloration_date: '',
     decloration_number: '',
-    vip_application: null,
+    vip_application: false,
     total_price: null,
     discount_price: null,
-    keeping_days: 0,
-    workers_hours: 0,
-    unloading_quantity: 0,
-    loading_quantity: 0,
-    firm_id: 0,
-    payment_method: 0,
     keeping_services: [],
     working_services: [],
     photo_report: [],
     transport: [],
+    modes: [],
     products: [],
   });
+
+  // Add these new state variables at the top of the component
+  const [keepingServices, setKeepingServices] = useState<Array<{ id: number; name: string; base_price: number; extra_price: number }>>([]);
+  const [workingServices, setWorkingServices] = useState<Array<{ id: number; service_name: string; base_price: number; extra_price: number; units: string }>>([]);
+  const [transportTypes, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
+  const [storages, setStorages] = useState<Array<{ id: number; name: string }>>([]);
+  const [products, setProducts] = useState<Array<{ id: number; name: string }>>([]);
+  const [availableModes, setAvailableModes] = useState<Array<{ id: number; name: string }>>([]);
 
   const searchFields: SearchField[] = [
     {
@@ -244,6 +290,41 @@ export default function ApplicationList() {
     fetchApplications();
   }, [searchParams, currentPage]);
 
+  useEffect(() => {
+    const fetchFormData = async () => {
+      try {
+        const [
+          keepingRes,
+          workingRes,
+          transportTypesRes,
+          storagesRes,
+          productsRes,
+          modesRes
+        ] = await Promise.all([
+          api.get('/keeping_service/'),
+          api.get('/working_service/'),
+          api.get('/transport/type/'),
+          api.get('/storage/'),
+          api.get('/items/product/'),
+          api.get('/modes/')
+        ]);
+
+        setKeepingServices(keepingRes.data.results);
+        setWorkingServices(workingRes.data.results);
+        setTransportTypes(transportTypesRes.data.results);
+        setStorages(storagesRes.data.results);
+        setProducts(productsRes.data.results);
+        setAvailableModes(modesRes.data.results);
+      } catch (error) {
+        console.error('Error fetching form data:', error);
+      }
+    };
+
+    if (isFormModalOpen) {
+      fetchFormData();
+    }
+  }, [isFormModalOpen]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -314,23 +395,107 @@ export default function ApplicationList() {
   // Add this new function after other function declarations
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     try {
-      if (isEditing) {
-        await api.put(`/application/${formData.id}/`, formData);
-        setModalMessage(t("applicationList.updateSuccess", "Application updated successfully"));
+      // Validate required fields
+      if (!formData.firm_id) {
+        throw new Error('Please select a firm');
       }
-      setIsFormModalOpen(false);
-      setShowSuccessModal(true);
-      fetchApplications();
+
+      if (isEditing && !formData.id) {
+        throw new Error('Application ID is missing');
+      }
+
+      const formDataObj = new FormData();
+      
+      // Append all form fields
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (Array.isArray(value)) {
+            // Handle arrays (keeping_services, working_services, photo_report, etc.)
+            if (key === 'photo_report') {
+              // Handle photo files separately
+              value.forEach((photo, index) => {
+                if (photo.photo instanceof File) {
+                  formDataObj.append(`photo_report[${index}]photo`, photo.photo);
+                }
+              });
+            } else {
+              // Handle other arrays
+              formDataObj.append(key, JSON.stringify(value));
+            }
+          } else if (value instanceof File) {
+            // Handle single file uploads
+            formDataObj.append(key, value);
+          } else {
+            // Handle other fields
+            formDataObj.append(key, String(value));
+          }
+        }
+      });
+
+      let response;
+      
+      if (isEditing && formData.id) {
+        // Update existing application
+        response = await api.put(`/application/${formData.id}/`, formDataObj, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setModalMessage('Application updated successfully!');
+      } else {
+        // Create new application
+        response = await api.post('/application/', formDataObj, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        });
+        setModalMessage('Application created successfully!');
+      }
+
+      if (response?.data) {
+        setShowSuccessModal(true);
+        setIsFormModalOpen(false);
+        fetchApplications(); // Refresh the list
+      }
+
     } catch (error) {
-      console.error('Error saving application:', error);
+      console.error('Error submitting application:', error);
+      // Show error message to user
+      setModalMessage(error instanceof Error ? error.message : 'An error occurred while submitting the application');
+      setShowSuccessModal(true); // You might want to create a separate error modal
     }
   };
 
-  const openEditModal = (application: Application) => {
-    setFormData(application);
-    setIsEditing(true);
-    setIsFormModalOpen(true);
+  const handleEditClick = (application: Application) => {
+    navigate(`/edit-application/${application.id}`);
+  };
+
+  // Add these handlers
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData(prev => ({
+        ...prev,
+        decloration_file: file
+      }));
+    }
+  };
+
+  const handlePhotoAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      const newPhotos: PhotoReport[] = Array.from(files).map(file => ({
+        photo: file,
+        application_id: formData.id
+      }));
+
+      setFormData(prev => ({
+        ...prev,
+        photo_report: [...prev.photo_report, ...newPhotos]
+      }));
+    }
   };
 
   return (
@@ -449,7 +614,7 @@ export default function ApplicationList() {
                             <Menu.Item>
                               {({ active }) => (
                                 <button
-                                  onClick={() => openEditModal(application)}
+                                  onClick={() => handleEditClick(application)}
                                   className={`${
                                     active ? "bg-gray-100 dark:bg-gray-700" : ""
                                   } flex w-full items-center px-4 py-2 text-sm text-blue-600 dark:text-blue-400`}
@@ -485,211 +650,13 @@ export default function ApplicationList() {
         cancelText={t("common.cancel", "Cancel")}
       />
 
-      {/* Updated Form Modal */}
-      {isFormModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-screen p-4">
-            <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsFormModalOpen(false)} />
-            <div className="relative bg-white rounded-lg shadow-xl w-full max-w-4xl p-6">
-              <h2 className="text-xl font-semibold mb-4">{isEditing ? 'Edit Application' : 'Create Application'}</h2>
-              <form onSubmit={handleSubmit} className="overflow-y-auto max-h-[80vh]">
-                <div className="grid grid-cols-2 gap-4">
-                  {/* Basic Information */}
-                  <div className="space-y-4">
-                    <h3 className="font-medium text-lg">Basic Information</h3>
-                    
-                    <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Firm</label>
-                      <select
-                        value={formData.firm_id}
-                        onChange={(e) => setFormData({ ...formData, firm_id: Number(e.target.value) })}
-                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
-                        required
-                      >
-                        <option value="">Select Firm</option>
-                        {Object.entries(firms).map(([id, name]) => (
-                          <option key={id} value={id}>{name}</option>
-                        ))}
-                      </select>
-                    </div>
-
-                    <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Declaration Number</label>
-                      <input
-                        type="text"
-                        value={formData.decloration_number}
-                        onChange={(e) => setFormData({ ...formData, decloration_number: e.target.value })}
-                        className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
-                        required
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Brutto</label>
-                        <input
-                          type="number"
-                          value={formData.brutto || ''}
-                          onChange={(e) => setFormData({ ...formData, brutto: Number(e.target.value) })}
-                          className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
-                        />
-                      </div>
-
-                      <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Netto</label>
-                        <input
-                          type="number"
-                          value={formData.netto || ''}
-                          onChange={(e) => setFormData({ ...formData, netto: Number(e.target.value) })}
-                          className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Coming Date</label>
-                        <input
-                          type="date"
-                          value={formData.coming_date}
-                          onChange={(e) => setFormData({ ...formData, coming_date: e.target.value })}
-                          className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
-                          required
-                        />
-                      </div>
-
-                      <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Declaration Date</label>
-                        <input
-                          type="date"
-                          value={formData.decloration_date || ''}
-                          onChange={(e) => setFormData({ ...formData, decloration_date: e.target.value })}
-                          className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="relative">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">VIP Application</label>
-                      <input
-                        type="checkbox"
-                        checked={formData.vip_application || false}
-                        onChange={(e) => setFormData({ ...formData, vip_application: e.target.checked })}
-                        className="rounded border-gray-300 text-[#6C5DD3] focus:ring-[#6C5DD3]"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Services and Pricing */}
-                  <div className="space-y-4">
-                    <h3 className="font-medium text-lg">Services and Pricing</h3>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Total Price</label>
-                        <input
-                          type="number"
-                          value={formData.total_price || ''}
-                          onChange={(e) => setFormData({ ...formData, total_price: Number(e.target.value) })}
-                          className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
-                        />
-                      </div>
-
-                      <div className="relative">
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Discount Price</label>
-                        <input
-                          type="number"
-                          value={formData.discount_price || ''}
-                          onChange={(e) => setFormData({ ...formData, discount_price: Number(e.target.value) })}
-                          className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Add sections for keeping_services, working_services, transport, and products */}
-                    {/* These would likely be implemented as dynamic form arrays */}
-                    
-                    {/* Example for Transport section */}
-                    <div className="space-y-2">
-                      <h4 className="font-medium">Transport</h4>
-                      {formData.transport.map((t, index) => (
-                        <div key={t.id || index} className="flex gap-2">
-                          <input
-                            type="text"
-                            value={t.transport_number}
-                            onChange={(e) => {
-                              const newTransport = [...formData.transport];
-                              newTransport[index].transport_number = e.target.value;
-                              setFormData({ ...formData, transport: newTransport });
-                            }}
-                            placeholder="Transport Number"
-                            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
-                          />
-                          <select
-                            value={t.transport_type}
-                            onChange={(e) => {
-                              const newTransport = [...formData.transport];
-                              newTransport[index].transport_type = Number(e.target.value);
-                              setFormData({ ...formData, transport: newTransport });
-                            }}
-                            className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm"
-                          >
-                            <option value="1">Type 1</option>
-                            <option value="2">Type 2</option>
-                          </select>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              const newTransport = formData.transport.filter((_, i) => i !== index);
-                              setFormData({ ...formData, transport: newTransport });
-                            }}
-                            className="p-2 text-red-600 hover:text-red-800"
-                          >
-                            Remove
-                          </button>
-                        </div>
-                      ))}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setFormData({
-                            ...formData,
-                            transport: [...formData.transport, { transport_number: '', transport_type: 1 }]
-                          });
-                        }}
-                        className="text-sm text-[#6C5DD3] hover:text-[#5c4eb8]"
-                      >
-                        + Add Transport
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 flex justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setIsFormModalOpen(false)}
-                    className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-                  >
-                    {t("common.cancel", "Cancel")}
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 text-sm font-medium text-white bg-[#6C5DD3] rounded-md hover:bg-[#5c4eb8]"
-                  >
-                    {isEditing ? t("common.update", "Update") : t("common.create", "Create")}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
       <SuccessModal
         isOpen={showSuccessModal}
-        onClose={() => setShowSuccessModal(false)}
-        title={t("common.success")}
+        onClose={() => {
+          setShowSuccessModal(false);
+          setModalMessage('');
+        }}
+        title={modalMessage.includes('error') || modalMessage.includes('Error') ? 'Error' : 'Success'}
         message={modalMessage}
       />
     </div>

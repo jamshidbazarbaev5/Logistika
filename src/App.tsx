@@ -38,6 +38,7 @@ import KeepingServiceList from './pages/KeepingServiceList'
 import CreateKeepingService from './pages/CreateKeepingService'
 import WorkingServiceList from './pages/WorkinServiceList'
 import CreateWorkingService from './pages/CreateWorkingService'
+import EditApplication from "./pages/EditApplication";
 const queryClient = new QueryClient();
 
 function App() {
@@ -85,6 +86,7 @@ function App() {
                 <Route path="/keeping-services/create" element={<CreateKeepingService />} />
                 <Route path="/working-services" element={<WorkingServiceList />} />
                 <Route path="/working-services/create" element={<CreateWorkingService />} />
+                <Route path="/edit-application/:id" element={<EditApplication />} />
               </Route>
             </Routes>
           </Router>

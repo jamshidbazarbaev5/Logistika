@@ -134,7 +134,6 @@
     "baseDay": "Tiykarg'ı Kúnler",
     "basePrice": "Tiykarg'ı Baha",
     "extraPrice": "Qosımsha Baha"
-
   },
   
     
@@ -473,5 +472,36 @@
     "deleteSuccess": "Foydalanuvchi tabıslı óshirildi",
     "deleteConfirmation": "Haqıyqattan da \"{{name}}\" foydalanuvchisini óshiriwdi qáleysizbe? Bul háreketti qaytarıw múmkin emes.",
     "deleteError": "Foydalanuvchini óshiriwda xatolik yuz berdi"
+  },
+  "editApplication": {
+    "title": "Ótinishti Ózgertiw",
+    "subtitle": "Ótinish mag'lıwmatların ózgertiw",
+    "basicInfo": "Tiykarǵı Maǵlıwmatlar",
+    "products": "Ónimleri",
+    "services": "Xızmetler",
+    "transport": "Transport",
+    "modes": "Rejimler",
+    "photoReport": "Foto Esabat",
+    "next": "Keyingi",
+    "saveChanges": "Ózgerislerdi Saqlaw",
+    "firm": "Shólkem",
+    "searchFirm": "Shólkemdi izlew",
+    "comingDate": "Keliw Sánesi",
+    "netto": "Netto",
+    "brutto": "Brutto",
+    "transportInfo": "Transport Maǵlıwmatları",
+    "transportType": "Transport Túri",
+    "selectTransportType": "Transport túrin tańlań",
+    "transportNumber": "Transport Nomeri",
+    "addTransport": "Transport Qosıw",
+    "selectedTransports": "Tańlanǵan Transportlar",
+    "quantity_short": "San",
+    "storage": "Sklad",
+    "selectMode": "Rejimdi Tańlań",
+    "workingServices": "Jumıs Xızmetleri",
+    "keepingServices": "Saqlaw Xızmetleri",
+    "selectedProducts": "Tańlanǵan Ónimler",
+    "addProduct": "Ónim Qosıw",
+    "input": "Maǵlıwmatlardı kiritiń"
   }
 }

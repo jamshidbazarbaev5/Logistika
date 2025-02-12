@@ -2,7 +2,6 @@ import { useState, useEffect, Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/api";
-import { PlusIcon } from "@heroicons/react/24/outline";
 import { Menu, Transition } from "@headlessui/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import ConfirmModal from "../components/ConfirmModal";

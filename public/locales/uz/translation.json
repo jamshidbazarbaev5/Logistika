@@ -96,7 +96,6 @@
     "declorationDatePlaceholder": "Deklaratsiya sanasini kiriting",
     "declorationFilePlaceholder": "Fayl yuklash",
     "noDeclorationFileChosen": "Fayl tanlanmadi"
-
   },
   "photoUpload": {
     "title": "Rasm Yuklash",
@@ -146,7 +145,6 @@
     "submit": "Xizmat Yaratish",
     "successMessage": "Ish xizmati muvaffaqiyatli yaratildi!"
   },
-
   "createItemCategory": {
     "title": "Kategoriya Yaratish",
     "subtitle": "Mahsulotlar uchun yangi kategoriya yaratish",
@@ -208,8 +206,7 @@
     "actions": "Amallar",
     "edit": "Tahrirlash",
     "save": "Saqlash",
-    "delete": "O'chirish"    
-
+    "delete": "O'chirish"
   },
   "login": {
     "title": "Hisobingizga kiring",
@@ -373,7 +370,6 @@
       "type": "Transport Turi",
       "number": "Transport Raqami"
     },
-  
     "actions": "Amallar"
   },
   "createTransport": {
@@ -385,7 +381,7 @@
     "unauthorizedError": "Iltimos, transport turini yaratish uchun avtorizatsiya qiling",
     "error": "Transport turini yaratishda xatolik yuz berdi",
     "placeholder": "Transport turini kiriting",
-    "submitting": "Transport turini yaratmoqda..."  
+    "submitting": "Transport turini yaratmoqda..."
   },
   "storageList": {
     "title": "Omborlar",
@@ -438,8 +434,6 @@
     "basePrice": "Asosiy Narx",
     "extraPrice": "Qo'shimcha Narx",
     "units": "O'lchov Birligi",
-
-
     "deleteTitle": "Ish Xizmatini O'chirish",
     "deleteConfirmation": "Haqiqatan ham \"{{name}}\" ish xizmatini o'chirishni xohlaysizmi? Bu amalni qaytarib bo'lmaydi.",
     "deleteSuccess": "Ish xizmati muvaffaqiyatli o'chirildi",
@@ -460,7 +454,7 @@
     "updateSuccess": "Saqlash xizmati muvaffaqiyatli yangilandi",
     "createSuccess": "Saqlash xizmati muvaffaqiyatli yaratildi"
   },
-  "productList":{
+  "productList": {
     "title": "Mahsulotlar",
     "createProduct": "Mahsulot Yaratish",
     "errorLoading": "Mahsulotlarni yuklashda xatolik yuz berdi",
@@ -473,7 +467,37 @@
     "actions": "Amallar",
     "edit": "Tahrirlash",
     "delete": "O'chirish",
-    "input":"Mahsulot nomini kiriting"
-
+    "input": "Mahsulot nomini kiriting"
+  },
+  "editApplication": {
+    "title": "Arizani Tahrirlash",
+    "subtitle": "Ariza ma'lumotlarini tahrirlash",
+    "basicInfo": "Asosiy Ma'lumotlar",
+    "products": "Mahsulotlar",
+    "services": "Xizmatlar",
+    "transport": "Transport",
+    "modes": "Rejimlar",
+    "photoReport": "Foto Hisobot",
+    "next": "Keyingi",
+    "saveChanges": "O'zgarishlarni Saqlash",
+    "firm": "Tashkilot",
+    "searchFirm": "Tashkilotni qidirish",
+    "comingDate": "Kelish Sanasi",
+    "netto": "Netto",
+    "brutto": "Brutto",
+    "transportInfo": "Transport Ma'lumotlari",
+    "transportType": "Transport Turi",
+    "selectTransportType": "Transport turini tanlang",
+    "transportNumber": "Transport Raqami",
+    "addTransport": "Transport Qo'shish",
+    "selectedTransports": "Tanlangan Transportlar",
+    "quantity_short": "Soni",
+    "storage": "Ombor",
+    "selectMode": "Rejimni Tanlang",
+    "workingServices": "Ish Xizmatlari",
+    "keepingServices": "Saqlash Xizmatlari",
+    "selectedProducts": "Tanlangan Mahsulotlar",
+    "addProduct": "Mahsulot Qo'shish",
+    "input": "Ma'lumotlarni kiriting"
   }
 } 
