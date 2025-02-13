@@ -181,7 +181,7 @@ export default function EditApplication() {
       if (formData.photo_report && formData.photo_report.length > 0) {
         const photoData: any[] = [];
         
-        formData.photo_report.forEach((photo: any, index: number) => {
+        formData.photo_report.forEach((photo: any) => {
           if (photo.isNew && photo.photo instanceof File) {
             formDataObj.append(`upload_photos`, photo.photo);
           } else if (typeof photo.photo === 'string') {

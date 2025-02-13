@@ -42,7 +42,6 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   const [showProductDropdown, setShowProductDropdown] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState<ProductDisplay[]>(initialProducts);
   const productDropdownRef = useRef<HTMLDivElement>(null);
-  const storageDropdownRef = useRef<HTMLDivElement>(null);
 
   const getProductName = (productId: number) => {
     const product = initialProducts.find(p => p.id === productId);
@@ -142,6 +141,50 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
                 ))}
               </div>
             )}
+          </div>
+        </div>
+
+        <div className="space-y-2 sm:space-y-4">
+          <label className="block text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
+            {t('editApplication.storage')}
+          </label>
+          <select
+            value={selectedStorage}
+            onChange={(e) => setSelectedStorage(Number(e.target.value))}
+            className="w-full rounded-md border border-gray-300 dark:border-gray-600 
+              px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+          >
+            <option value={0}>{t('editApplication.selectStorage')}</option>
+            {storages.map((storage) => (
+              <option key={storage.id} value={storage.id}>
+                {storage.storage_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="space-y-2 sm:space-y-4">
+          <label className="block text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
+            {t('editApplication.quantity')}
+          </label>
+          <div className="flex gap-4">
+            <input
+              type="number"
+              min="0"
+              value={quantity}
+              onChange={(e) => setQuantity(Number(e.target.value))}
+              className="flex-1 rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+            />
+            <button
+              onClick={handleAddProduct}
+              disabled={!quantity || !selectedProduct || !selectedStorage}
+              className="px-6 py-2 bg-[#6C5DD3] text-white rounded-lg font-medium
+                hover:bg-[#5b4eb3] disabled:opacity-50 disabled:cursor-not-allowed
+                transition-colors duration-200 ease-in-out shadow-sm whitespace-nowrap"
+            >
+              {t('editApplication.addProduct')}
+            </button>
           </div>
         </div>
 

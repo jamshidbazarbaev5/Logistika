@@ -24,7 +24,6 @@ export function SearchBar<T extends Record<keyof T, string>>({
   initialValues, 
   onSearch, 
   className = "",
-  t = (_, fallback) => fallback 
 }: SearchBarProps<T>) {
   const [localValues, setLocalValues] = useState<T>(initialValues);
 
