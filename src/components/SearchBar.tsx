@@ -52,7 +52,7 @@ export function SearchBar<T extends Record<keyof T, string>>({
             htmlFor={field.name}
             className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
           >
-            {t(`search.${field.label}`, field.label)}
+            {field.label}
           </label>
           <div className="relative group">
             {field.type === 'date' ? (
@@ -68,7 +68,7 @@ export function SearchBar<T extends Record<keyof T, string>>({
               name={field.name}
               value={localValues[field.name as keyof T] || ''}
               onChange={handleInputChange}
-              placeholder={t(`search.${field.placeholder}`, field.placeholder)}
+              placeholder={field.placeholder}
               className={`
                 w-full rounded-lg border border-gray-300 bg-white py-2
                 pl-10 pr-3 text-sm placeholder-gray-400

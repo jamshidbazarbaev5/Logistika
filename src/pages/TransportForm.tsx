@@ -4,6 +4,7 @@ import { api } from '../api/api';
 import { useState } from 'react';
 import SuccessModal from "../components/SuccessModal";
 import ErrorModal from "../components/ErrorModal";
+import {useNavigate} from "react-router-dom";
 
 
 export default function TransportForm() {
@@ -12,7 +13,7 @@ export default function TransportForm() {
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [error, setError] = useState<string>("");
   const [transportType, setTransportType] = useState("");
-
+  const navigate = useNavigate();
   const mutation = useMutation({
     mutationFn: (data: { transport_type: string }) => 
       api.post('/transport/type/', data),
@@ -20,6 +21,9 @@ export default function TransportForm() {
       setShowSuccessModal(true);
       setTransportType(""); 
       setError("");
+      navigate('transport-list');
+
+
     },
     onError: (error: any) => {
       setError(

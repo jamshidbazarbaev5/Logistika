@@ -7,11 +7,14 @@ import { api } from "../api/api";
 import ConfirmModal from "../components/ConfirmModal";
 import SuccessModal from "../components/SuccessModal";
 import { SearchBar, SearchField } from "../components/SearchBar";
+import { Crown, User } from "lucide-react";
 
 interface ApplicationMode {
   id: number;
   mode_id: number;
   application_id: number;
+  mode_name: string;
+  name_mode: string;
 }
 
 interface KeepingService {
@@ -103,6 +106,17 @@ interface FirmResponse {
   firm_name: string;
 }
 
+// Update the interface to include name_mode and code_mode
+interface Mode {
+  id: number;
+  name_mode: string;
+  code_mode: string;
+}
+
+// Update the interface for the modes API response
+interface ModesResponse {
+  results: Mode[];
+}
 
 export default function ApplicationList() {
   const { t } = useTranslation();
@@ -138,38 +152,41 @@ export default function ApplicationList() {
   const [, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
   const [, setStorages] = useState<Array<{ id: number; name: string }>>([]);
   const [, setProducts] = useState<Array<{ id: number; name: string }>>([]);
-  const [, setAvailableModes] = useState<Array<{ id: number; name: string }>>([]);
+  // const [, setAvailableModes] = useState<Array<{ id: number; name: string }>>([]);
+
+  // Add state for available modes
+  const [availableModes, setAvailableModes] = useState<Mode[]>([]);
 
   const searchFields: SearchField[] = [
     {
       name: 'firm_name',
-      label: 'Firm Name',
-      placeholder: 'Search by firm name',
+      label: t('applicationList.table.firmName', 'Firm Name'),
+      placeholder: t('applicationList.searchFirm', 'Search by firm name'),
       className: 'col-span-4',
     },
     {
       name: 'decloration_number',
-      label: 'Declaration Number',
-      placeholder: 'Search by declaration number',
+      label: t('applicationList.table.declarationNumber', 'Declaration Number'),
+      placeholder: t('createApplication.declorationNumberPlaceholder', 'Enter declaration number'),
       className: 'col-span-4',
     },
     {
       name: 'firm_INN',
-      label: 'Firm INN',
-      placeholder: 'Search by INN',
+      label: t('createFirm.companyInfo.inn', 'INN'),
+      placeholder: t('createFirm.companyInfo.innPlaceholder', 'Enter INN number'),
       className: 'col-span-4',
     },
     {
       name: 'decloration_date_gte',
-      label: 'Declaration Date From',
-      placeholder: 'From date',
+      label: t('applicationList.table.dates', 'Declaration Date From'),
+      placeholder: t('createApplication.declorationDatePlaceholder', 'Enter declaration date'),
       type: 'date',
       className: 'col-span-6',
     },
     {
       name: 'decloration_date_lte',
-      label: 'Declaration Date To',
-      placeholder: 'To date',
+      label: t('applicationList.table.dates', 'Declaration Date To'),
+      placeholder: t('createApplication.declorationDatePlaceholder', 'Enter declaration date'),
       type: 'date',
       className: 'col-span-6',
     },
@@ -183,10 +200,11 @@ export default function ApplicationList() {
       });
       params.append('page', currentPage.toString());
 
-      const [applicationsResponse, firmsResponse, modesResponse] = await Promise.all([
+      const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse] = await Promise.all([
         api.get<PaginatedResponse<Application>>(`/application/?${params.toString()}`),
         api.get<PaginatedResponse<FirmResponse>>('/firms/'),
-        api.get<PaginatedResponse<ApplicationMode>>('/modes/application_modes/')
+        api.get<PaginatedResponse<ApplicationMode>>('/modes/application_modes/'),
+        api.get<ModesResponse>('/modes/modes/')
       ]);
 
       // Add type checking and error handling for firms data
@@ -214,10 +232,14 @@ export default function ApplicationList() {
 
       setFirms(firmMap);
       setModes(modesMap);
-      setApplications(Array.isArray(applicationsResponse.data?.results) ? applicationsResponse.data.results : []);
+      setAvailableModes(Array.isArray(availableModesResponse.data.results) 
+        ? availableModesResponse.data.results 
+        : []);
+      setApplications(Array.isArray(applicationsResponse.data?.results) 
+        ? applicationsResponse.data.results 
+        : []);
       setLoading(false);
 
-      // Update pagination state
       setTotalPages(applicationsResponse.data.total_pages);
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -292,7 +314,6 @@ export default function ApplicationList() {
     setShowDeleteModal(false);
   };
 
-  // Add pagination controls component
   const PaginationControls = () => {
     const pageNumbers = [];
     for (let i = 1; i <= totalPages; i++) {
@@ -380,14 +401,15 @@ export default function ApplicationList() {
                 {t("applicationList.table.firmName", "Firm Name")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t("applicationList.table.vipStatus", "VIP Status")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("applicationList.table.brutto", "Brutto")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("applicationList.table.dates", "Dates")}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("applicationList.table.quantities", "Quantities")}
-              </th>
+            
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("applicationList.table.modes", "Modes")}
               </th>
@@ -411,6 +433,19 @@ export default function ApplicationList() {
                     {firms[application.firm_id] || t("applicationList.unknownFirm", "Unknown Firm")}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {application.vip_application ? (
+                      <div className="flex items-center text-yellow-600 dark:text-yellow-500">
+                        <Crown className="w-5 h-5 mr-1" />
+                        <span>{t("applicationList.vip", "VIP")}</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center text-gray-500 dark:text-gray-400">
+                        <User className="w-5 h-5 mr-1" />
+                        <span>{t("applicationList.regular", "Regular")}</span>
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {application.brutto || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
@@ -419,23 +454,21 @@ export default function ApplicationList() {
                       Declaration: {application.decloration_date}
                     </div>
                   </td>
+                 
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    <div>Unloading: {application.unloading_quantity}</div>
-                    <div className="text-gray-500 dark:text-gray-400">
-                      Loading: {application.loading_quantity}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {modes[application.id]?.map((mode) => (
-                      <span
-                        key={mode.id}
-                        className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-2 mb-1"
-                      >
-                        Mode {mode.mode_id}
-                      </span>
-                    )) || (
-                      <span className="text-gray-400">-</span>
-                    )}
+                    {application.modes?.map((mode) => {
+                      const modeInfo = Array.isArray(availableModes) 
+                        ? availableModes.find(m => m.id === mode.mode_id)
+                        : undefined;
+                      return (
+                        <span
+                          key={mode.mode_id}
+                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-2 mb-1"
+                        >
+                          {modeInfo ? `  (${modeInfo.code_mode})` : `Mode ${mode.mode_id}`}
+                        </span>
+                      );
+                    })}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     <Menu as="div" className="relative inline-block text-left">

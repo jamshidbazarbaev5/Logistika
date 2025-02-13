@@ -1074,6 +1074,24 @@ const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
     <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
       <div className="max-w-md">
         <div className="mb-6">
+          <label className="flex items-center space-x-3">
+            <input
+              type="checkbox"
+              checked={formData.vip_application}
+              onChange={(e) => setFormData(prev => ({
+                ...prev,
+                vip_application: e.target.checked
+              }))}
+              className="w-4 h-4 text-[#6C5DD3] border-gray-300 rounded 
+                focus:ring-[#6C5DD3] dark:focus:ring-[#6C5DD3] dark:border-gray-600"
+            />
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              {t('createApplication.vipApplication', 'VIP Application')}
+            </span>
+          </label>
+        </div>
+
+        <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {t('createApplication.select')}
           </label>

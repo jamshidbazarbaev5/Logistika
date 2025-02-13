@@ -16,6 +16,7 @@ const PhotoReportTab: React.FC<PhotoReportTabProps> = ({
 }) => {
   const { t } = useTranslation();
   const [error, setError] = useState<string | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!formData.firm_id) {
@@ -25,7 +26,8 @@ const PhotoReportTab: React.FC<PhotoReportTabProps> = ({
 
     if (e.target.files) {
       const newPhotos = Array.from(e.target.files).map(file => ({
-        photo: file
+        photo: file,
+        isNew: true  // Add flag to identify new photos
       }));
 
       setFormData((prev:any) => ({
@@ -48,6 +50,13 @@ const PhotoReportTab: React.FC<PhotoReportTabProps> = ({
     if (setSelectedTab) {
       setSelectedTab(0);
     }
+  };
+
+  const openPhotoModal = (photo: any) => {
+    const photoUrl = typeof photo.photo === 'string' 
+      ? photo.photo 
+      : URL.createObjectURL(photo.photo);
+    setSelectedPhoto(photoUrl);
   };
 
   return (
@@ -109,7 +118,10 @@ const PhotoReportTab: React.FC<PhotoReportTabProps> = ({
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {formData.photo_report.map((photo: any, index: number) => (
                     <div key={index} className="relative group">
-                      <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200">
+                      <div 
+                        className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200 cursor-pointer"
+                        onClick={() => openPhotoModal(photo)}
+                      >
                         {typeof photo.photo === 'string' ? (
                           <img
                             src={photo.photo}
@@ -125,7 +137,10 @@ const PhotoReportTab: React.FC<PhotoReportTabProps> = ({
                         )}
                       </div>
                       <button
-                        onClick={() => removePhoto(index)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removePhoto(index);
+                        }}
                         className="absolute top-2 right-2 p-1 bg-red-500 rounded-full text-white 
                           opacity-0 group-hover:opacity-100 transition-opacity duration-200
                           hover:bg-red-600"
@@ -150,6 +165,32 @@ const PhotoReportTab: React.FC<PhotoReportTabProps> = ({
               {t('editApplication.next', 'Next')}
             </button>
           </div>
+
+          {/* Photo Modal */}
+          {selectedPhoto && (
+            <div 
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+              onClick={() => setSelectedPhoto(null)}
+            >
+              <div className="relative max-w-[90vw] max-h-[90vh]">
+                <button
+                  onClick={() => setSelectedPhoto(null)}
+                  className="absolute top-4 right-4 p-2 bg-black bg-opacity-50 rounded-full text-white
+                    hover:bg-opacity-75 transition-all"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+                <img
+                  src={selectedPhoto}
+                  alt="Full size"
+                  className="max-w-full max-h-[90vh] object-contain"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>

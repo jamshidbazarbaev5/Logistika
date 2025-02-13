@@ -68,21 +68,27 @@
     "next": "Keyingi",
     "back": "Orqaga",
     "submit": "Yuborish",
-    "select": "Rejimni tanlań",
-    "input": "Rejimni kiritiń",
-    "code": "Rejim Kodı",
-    "declorationNumberPlaceholder": "Deklaratsiya nomerini kiritiń",
-    "declorationDatePlaceholder": "Deklaratsiya sánesini kiritiń",
-    "declorationFilePlaceholder": "Fayl yuklash",
-    "noDeclorationFileChosen": "Fayl tanlanmady",
-    "selectedStorage": "Qoyma",
-    "selectedProduct": "Ónim",
-    "selectedQuantity": "Mug'darı",
-    "selectedMode": "Rejim",
-    "selectedTransport": "Transport",
-    "selectedServices": "Xızmetler",
-    "storageServices": "Qoyma Xızmetleri",
-    "workingServices": "Jumıs Xızmetleri"
+    "select": "Rejimdi tańlań",
+    "input": "Rejimdi kiritiń",
+    "code": "Rejim kodı",
+    "productInput": "Ónim atın kiritiń",
+    "storageInput": "Qoyma atın kiritiń",
+    "quantityInput": "Ónim mug'darın kiritiń",
+    "selectedStorage": "Tańlanǵan qoyma",
+    "selectedProduct": "Tańlanǵan ónim",
+    "selectedQuantity": "Tańlanǵan mug'dar",
+    "selectedMode": "Tańlanǵan rejim",
+    "selectedTransport": "Tańlanǵan transport",
+    "selectedServices": "Tańlanǵan xızmetler",
+    "storageServices": "Qoyma xızmetleri",
+    "workingServices": "Jumıs xızmetleri",
+    "declorationNumber": "Deklaraciya nomeri",
+    "declorationDate": "Deklaraciya sánesi",
+    "declorationFile": "Deklaraciya faylı",
+    "declorationNumberPlaceholder": "Deklaraciya nomerin kiritiń",
+    "declorationDatePlaceholder": "Deklaraciya sánesin kiritiń",
+    "declorationFilePlaceholder": "Fayl júklew",
+    "noDeclorationFileChosen": "Fayl tańlanmadı"
   },
   "photoUpload": {
     "title": "Súwret Júklew",
@@ -245,6 +251,7 @@
     "delete": "Óshiriw",
     "deleteSuccess": "Ótinish tabıslı óshirildi",
     "unknownFirm": "Belgisiz Firma",
+    "edit": "Ózgertiw",
     "table": {
       "number": "№",
       "declarationNumber": "Deklaraciya Nomeri",
@@ -252,8 +259,33 @@
       "brutto": "Brutto",
       "dates": "Sáneler",
       "quantities": "Mug'darlar",
-      "actions": "Háreketler",
-      "modes": "Rejimler"
+      "modes": "Rejimler",
+      "actions": "Háreketler"
+    },
+    "searchFields": {
+      "firmName": "Firma atı boyınsha izlew",
+      "declarationNumber": "Deklaraciya nomeri boyınsha izlew",
+      "firmINN": "STIR boyınsha izlew",
+      "dateRange": {
+        "from": "Sáneden",
+        "to": "Sánege"
+      }
+    },
+    "pagination": {
+      "previous": "Aldıńǵı",
+      "next": "Keyingi",
+      "page": "Bet {{page}}"
+    },
+    "dates": {
+      "coming": "Keliw",
+      "declaration": "Deklaraciya"
+    },
+    "quantities": {
+      "unloading": "Túsiriw",
+      "loading": "Júklew"
+    },
+    "mode": {
+      "label": "Rejim {{id}}"
     }
   },
   "categoryList": {
@@ -473,17 +505,9 @@
     "deleteConfirmation": "Haqıyqattan da \"{{name}}\" foydalanuvchisini óshiriwdi qáleysizbe? Bul háreketti qaytarıw múmkin emes.",
     "deleteError": "Foydalanuvchini óshiriwda xatolik yuz berdi"
   },
-  "editApplication": {
+  "c": {
     "title": "Ótinishti Ózgertiw",
-    "subtitle": "Ótinish mag'lıwmatların ózgertiw",
-    "basicInfo": "Tiykarǵı Maǵlıwmatlar",
-    "products": "Ónimleri",
-    "services": "Xızmetler",
-    "transport": "Transport",
-    "modes": "Rejimler",
-    "photoReport": "Foto Esabat",
-    "next": "Keyingi",
-    "saveChanges": "Ózgerislerdi Saqlaw",
+    "subtitle": "Ótinish maǵlıwmatların ózgertiń",
     "firm": "Shólkem",
     "searchFirm": "Shólkemdi izlew",
     "comingDate": "Keliw Sánesi",
@@ -495,13 +519,71 @@
     "transportNumber": "Transport Nomeri",
     "addTransport": "Transport Qosıw",
     "selectedTransports": "Tańlanǵan Transportlar",
-    "quantity_short": "San",
+    "product": "Ónim",
     "storage": "Sklad",
     "selectMode": "Rejimdi Tańlań",
     "workingServices": "Jumıs Xızmetleri",
     "keepingServices": "Saqlaw Xızmetleri",
     "selectedProducts": "Tańlanǵan Ónimler",
     "addProduct": "Ónim Qosıw",
-    "input": "Maǵlıwmatlardı kiritiń"
+    "next": "Keyingi",
+    "declarationNumber": "Deklaraciya Nomeri",
+    "declarationDate": "Deklaraciya Sánesi",
+    "declarationFile": "Deklaraciya Faylı",
+    "saveChanges": "Ózgerislerdi Saqlaw"
+  },
+  "successModal": {
+    "success": "Tabıslı!",
+    "error": "Qátelik!",
+    "close": "Jabıw"
+  },
+  "common": {
+    "loading": "Júklenip atır...",
+    "error": "Qátelik júz berdi",
+    "success": "Tabıslı!",
+    "cancel": "Biykar etiw",
+    "save": "Saqlaw",
+    "edit": "Ózgertiw",
+    "delete": "Óshiriw",
+    "actions": "Háreketler",
+    "search": "Izlew",
+    "filter": "Filtrlew",
+    "clear": "Tazalaw",
+    "apply": "Qollanıw"
+  },
+  "editApplication": {
+    "title": "Ótinishti Ózgertiw",
+    "subtitle": "Ótinish mag'lıwmatların ózgertiw",
+    "firm": "Shólkem",
+    "searchFirm": "Shólkemdi izlew",
+    "comingDate": "Keliw Sánesi",
+    "netto": "Netto",
+    "brutto": "Brutto",
+    "transportInfo": "Transport Mag'lıwmatları",
+    "transportType": "Transport Túri",
+    "selectTransportType": "Transport túrin tańlań",
+    "transportNumber": "Transport Nomeri",
+    "addTransport": "Transport Qosıw",
+    "selectedTransports": "Tańlanǵan Transportlar",
+    "product": "Ónim",
+    "storage": "Qoyma",
+    "selectMode": "Rejimdi Tańlań",
+    "workingServices": "Jumıs Xızmetleri",
+    "keepingServices": "Saqlaw Xızmetleri",
+    "selectedProducts": "Tańlanǵan Ónimler",
+    "addProduct": "Ónim Qosıw",
+    "next": "Keyingi",
+    "declaration": "Deklaraciya",
+    "declarationNumber": "Deklaraciya Nomeri",
+    "declarationDate": "Deklaraciya Sánesi",
+    "declarationFile": "Deklaraciya Faylı",
+    "saveChanges": "Ózgerislerdi Saqlaw",
+    "photoReport": "Foto Esabat",
+    "products": "Ónimler",
+    "services": "Xızmetler",
+    "modes": "Rejimler",
+    "basicInfo": "Tiykarǵı Mag'lıwmatlar",
+    "selectedMode": "Tańlanǵan Rejim",
+    "searchModes": "Rejimlardi izlew"
   }
 }

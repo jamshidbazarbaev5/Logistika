@@ -14,7 +14,8 @@ interface Product {
 
 interface Storage {
   id: number;
-  name: string;
+  storage_name: string;
+  storage_location: string;
 }
 
 interface ProductDisplay {
@@ -38,9 +39,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   const [selectedProduct, setSelectedProduct] = useState<number>(0);
   const [selectedStorage, setSelectedStorage] = useState<number>(0);
   const [productSearch, setProductSearch] = useState('');
-  const [storageSearch, setStorageSearch] = useState('');
   const [showProductDropdown, setShowProductDropdown] = useState(false);
-  const [showStorageDropdown, setShowStorageDropdown] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState<ProductDisplay[]>(initialProducts);
   const productDropdownRef = useRef<HTMLDivElement>(null);
   const storageDropdownRef = useRef<HTMLDivElement>(null);
@@ -52,10 +51,9 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
 
   const getStorageName = (storageId: number) => {
     const storage = storages.find(s => s.id === storageId);
-    return storage ? storage.name : 'Unknown Storage';
+    return storage ? storage.storage_name : 'Unknown Storage';
   };
 
-  // Updated searchProducts function
   const searchProducts = async (searchTerm: string) => {
     try {
       if (!searchTerm.trim()) {
@@ -86,12 +84,6 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
     setShowProductDropdown(false);
   };
 
-  const handleStorageSelect = (storage: Storage) => {
-    setSelectedStorage(storage.id);
-    setStorageSearch(storage.name);
-    setShowStorageDropdown(false);
-  };
-
   const handleAddProduct = () => {
     if (!quantity || !selectedProduct || !selectedStorage) return;
 
@@ -111,7 +103,6 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
     setSelectedProduct(0);
     setSelectedStorage(0);
     setProductSearch('');
-    setStorageSearch('');
   };
   const handleRemoveProduct = (index: number) => {
     const updatedProducts = formData.products.filter((_, i) => i !== index);
@@ -122,132 +113,71 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div className="relative" ref={productDropdownRef}>
-          <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
-            {t('editApplication.product', 'Product')}
+    <div className="bg-white dark:bg-gray-900 p-3 sm:p-6 rounded-lg shadow-sm">
+      <div className="grid grid-cols-1 gap-4 sm:gap-6">
+        <div className="space-y-2 sm:space-y-4">
+          <label className="block text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
+            {t('editApplication.product')}
           </label>
-          <input
-            type="text"
-            value={productSearch}
-            onChange={(e) => setProductSearch(e.target.value)}
-            className="w-full rounded-md border border-gray-300 dark:border-gray-600 
-              px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
-            placeholder="Search for a product..."
-          />
-          {showProductDropdown && filteredProducts.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
-              border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-              {filteredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  onClick={() => handleProductSelect(product)}
-                  className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-                >
-                  {product.name}
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Storage Search */}
-        <div className="relative" ref={storageDropdownRef}>
-          <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
-            {t('editApplication.storage', 'Storage')}
-          </label>
-          <input
-            type="text"
-            value={storageSearch}
-            onChange={(e) => {
-              setStorageSearch(e.target.value);
-              setShowStorageDropdown(true);
-            }}
-            className="w-full rounded-md border border-gray-300 dark:border-gray-600 
-              px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
-            placeholder="Search for a storage..."
-          />
-          {showStorageDropdown && (
-            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
-              border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-              {storages
-                .filter(storage => 
-                  storage.name.toLowerCase().includes(storageSearch.toLowerCase())
-                )
-                .map((storage) => (
+          <div className="relative" ref={productDropdownRef}>
+            <input
+              type="text"
+              value={productSearch}
+              onChange={(e) => setProductSearch(e.target.value)}
+              className="w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+              placeholder="Search for a product..."
+            />
+            {showProductDropdown && filteredProducts.length > 0 && (
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
+                border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
+                {filteredProducts.map((product) => (
                   <div
-                    key={storage.id}
-                    onClick={() => handleStorageSelect(storage)}
+                    key={product.id}
+                    onClick={() => handleProductSelect(product)}
                     className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
                   >
-                    {storage.name}
+                    {product.name}
                   </div>
                 ))}
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
 
-        {/* Quantity Input */}
-        <div>
-          <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">
-            {t('editApplication.quantity', 'Quantity')}
-          </label>
-          <input
-            type="number"
-            min="1"
-            value={quantity || ''}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-            className="w-full rounded-md border border-gray-300 dark:border-gray-600 
-              px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
-          />
-        </div>
-      </div>
-
-      {/* Add Product Button */}
-      <button
-        onClick={handleAddProduct}
-        disabled={!selectedProduct || !selectedStorage || !quantity}
-        className="px-4 py-2 bg-[#6C5DD3] text-white rounded-lg 
-          disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#5b4eb3]"
-      >
-        {t('editApplication.addProduct', 'Add Product')}
-      </button>
-
-      {/* Products List */}
-      <div className="mt-6">
-        <h3 className="text-lg font-medium mb-4">
-          {t('editApplication.selectedProducts', 'Selected Products')}
-        </h3>
         <div className="space-y-3">
           {formData.products.map((product: any, index: number) => (
-            <div key={index} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-              <div className="flex-1">
-                <span className="font-medium">
+            <div key={index} 
+              className="flex flex-col sm:flex-row sm:items-center justify-between 
+                p-2 sm:p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-xs sm:text-sm"
+            >
+              <div className="flex-1 mb-2 sm:mb-0">
+                <span className="block sm:inline font-medium">
                   {getProductName(product.product_id)}
                 </span>
-                <span className="mx-2">-</span>
+                <span className="block sm:inline sm:mx-2">-</span>
                 <span className="text-gray-600 dark:text-gray-400">
                   {getStorageName(product.storage_id)}
                 </span>
-                <span className="ml-2 text-gray-600 dark:text-gray-400">
-                  ({t('editApplication.quantity_short', 'Qty')}: {product.quantity})
-                </span>
               </div>
-              <button
-                onClick={() => handleRemoveProduct(index)}
-                className="text-red-500 hover:text-red-700"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              <div className="flex items-center justify-between sm:justify-end">
+                <span className="text-gray-600 dark:text-gray-400">
+                  Qty: {product.quantity}
+                </span>
+                <button
+                  onClick={() => handleRemoveProduct(index)}
+                  className="ml-3 p-1 text-red-500 hover:text-red-700"
+                >
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Next Button */}
       <div className="mt-6 flex justify-end">
         <button
           onClick={onSuccess}
