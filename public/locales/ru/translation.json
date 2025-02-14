@@ -29,6 +29,27 @@
   },
   "createApplication": {
     "title": "Создать Заявку",
+    "storage": "Склад",
+    "product": "Товар",
+    "remove": "Удалить",
+    "quantity": "Количество",
+    "addProduct": "Добавить Товар",
+    "selectedProducts": "Выбранные Товары",
+    "laborServices": "Рабочие Услуги",
+    "storageServices": "Услуги Хранения",
+    "workingServices": "Рабочие Услуги",
+    "base": "Базовая",
+    "extra": "Дополнительная",
+    "days": "Дней",
+    "hours": "Часов",
+    "pieces": "Штук",
+    "selectPhotos": "Выберите фотографии",
+    "selectedPhotos": "Выбранные Фотографии",
+    "uploadPhotos": "Загрузить Фотографии",
+    "goToBasicInfo": "Перейти к Основной Информации",
+    "selectFirm": "Пожалуйста, выберите компанию в разделе Основная Информация",
+    "storageSearchPlaceholder": "Введите название склада",
+    "productSearchPlaceholder": "Введите наименование товара",
     "subtitle": "Заполните форму для создания новой заявки",
     "comingDate": "Дата Прибытия",
     "declarationInfo": "Информация о Декларации",
@@ -86,8 +107,6 @@
     "selectedMode": "Выбранный режим",
     "selectedTransport": "Выбранный транспорт",
     "selectedServices": "Выбранные услуги",
-    "storageServices": "Услуги склада",
-    "workingServices": "Рабочие услуги",
     "declorationNumber": "Номер декларации",
     "declorationDate": "Дата декларации",
     "declorationFile": "Файл декларации",
@@ -247,6 +266,8 @@
     "cancelText": "Отмена"
   },
   "applicationList": {
+    "previous": "Предыдущий",
+    "next": "Следующий",
     "title": "Заявки",
     "createApplication": "Создать Заявку",
     "errorLoading": "Ошибка при загрузке заявок",
@@ -258,13 +279,18 @@
     "table": {
       "number": "№",
       "declarationNumber": "Номер Декларации",
-      "firmName": "Название Компании",
+      "firmName": "Название Организации",
       "brutto": "Брутто",
       "dates": "Даты",
       "quantities": "Количество",
       "actions": "Действия",
-      "modes": "Режимы"
-    }
+      "modes": "Режимы",
+      "vipStatus": "VIP "
+    },
+    "regular": "Обычный",
+    "vip": "VIP",
+    "comingDate": "Прибытие",
+    "declarationDate": "Декларация"
   },
   "categoryList": {
     "title": "Категории Товаров",
@@ -386,7 +412,9 @@
     },
     "edit": "Изменить",
     "save": "Сохранить",
-    "cancel": "Отмена"
+    "cancel": "Отмена",
+    "firmInputPlaceholder": "Введите название организации",
+    "INNInputPlaceholder": "Введите ИНН"
   },
   "transportList": {
     "title": "Транспорты",
@@ -469,7 +497,8 @@
     "category": "Категория",
     "actions": "Действия",
     "edit": "Изменить",
-    "delete": "Удалить"
+    "delete": "Удалить",
+    "inputPlaceholder": "Введите название товара"
   },
   "createTransport": {
     "title": "Создать Тип Транспорта",
@@ -509,6 +538,15 @@
     "comingDate": "Дата Прибытия",
     "netto": "Нетто",
     "brutto": "Брутто",
+    "quantity": "Количество",
+    "searchProduct": "Поиск товара",
+    "selectPhotos": "Выберите фото",
+    "goToBasicInfo": "Перейти к Основной Информации",
+    "days": "Дней",
+    "quantity": "Количество",
+    "uploadPhotos": "Загрузить фото",
+    "photos": "Фото",
+    "selectStorage": "Выберите Склад",
     "transportInfo": "Информация о Транспорте",
     "transportType": "Тип Транспорта",
     "selectTransportType": "Выберите тип транспорта",
@@ -526,6 +564,7 @@
     "declaration": "Декларация",
     "declarationNumber": "Номер Декларации",
     "declarationDate": "Дата Декларации",
+    "vipApplication": "VIP Заявка",
     "declarationFile": "Файл Декларации",
     "saveChanges": "Сохранить Изменения",
     "photoReport": "Фотоотчет",
@@ -534,6 +573,8 @@
     "modes": "Режимы",
     "basicInfo": "Основная Информация",
     "selectedMode": "Выбранный Режим",
-    "searchModes": "Поиск режимов"
+    "searchModes": "Поиск режимов",
+    "selectedFile": "Выбранный Файл",
+    "back": "Назад"
   }
 }

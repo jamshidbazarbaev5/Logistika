@@ -69,8 +69,8 @@ export default function ProductList() {
   const searchFields: SearchField[] = [
     {
       name: 'name',
-      label: 'Search by Product Name',
-      placeholder: 'Enter product name...'
+      label: t("productList.inputPlaceholder"),
+      placeholder: t("productList.inputPlaceholder")
     }
   ];
 

@@ -29,6 +29,27 @@
   },
   "createApplication": {
     "title": "Ótinish Jaratıw",
+    "storage": "Ombor",
+    "remove": "Óshiriw",
+    "product": "Mahsulot",
+    "quantity": "Mug'dar",
+    "laborServices": "Jumıs Xızmetleri",
+    "storageServices": "Qoyma Xızmetleri",
+    "workingServices": "Jumıs Xızmetleri",
+    "base": "Asırı",
+    "extra": "Qosımsha",
+    "days": "Kún",
+    "hours": "Sag'at",
+    "selectPhotos": "Fotografiyaları tanlash",
+    "selectedPhotos": "Tanlangan Fotografiyalar",
+    "uploadPhotos": "Fotografiyalarni yuklash",
+    "goToBasicInfo": "Asırı ma'lumotlarga o'tish",
+    "selectFirm": "Asırı ma'lumotlarga o'tish",
+    "pieces": "Shtuk",
+    "addProduct": "Ónim Qosıw",
+    "selectedProducts": "Tanlangan Mahsulotlar",
+    "storageSearchPlaceholder": "Ombor nomini kiriting",
+    "productSearchPlaceholder": "Mahsulot nomini kiriting",
     "subtitle": "Jańa ótinish jaratıw ushın formanı toltırıń",
     "comingDate": "Keliw Sánesi",
     "declarationInfo": "Deklaraciya Mag'lıwmatları",
@@ -243,6 +264,8 @@
     "cancelText": "Biykarlaw"
   },
   "applicationList": {
+    "previous": "Aldıńǵı",
+    "next": "Keyingi",
     "title": "Ótinishler",
     "createApplication": "Ótinish Jaratıw",
     "errorLoading": "Ótinishlerdi júklewde qátelik júz berdi",
@@ -255,13 +278,17 @@
     "table": {
       "number": "№",
       "declarationNumber": "Deklaraciya Nomeri",
-      "firmName": "Firma Atı",
+      "firmName": "Organizaciya ",
       "brutto": "Brutto",
       "dates": "Sáneler",
       "quantities": "Mug'darlar",
       "modes": "Rejimler",
       "actions": "Háreketler"
     },
+    "regular": "Oddiy",
+    "vip": "VIP",
+    "comingDate": "Keliw",
+    "declarationDate": "Deklaraciya",
     "searchFields": {
       "firmName": "Firma atı boyınsha izlew",
       "declarationNumber": "Deklaraciya nomeri boyınsha izlew",
@@ -407,8 +434,11 @@
     },
     "edit": "Ózgertiw",
     "save": "Saqlaw",
-    "cancel": "Biykarlaw"
+    "cancel": "Biykarlaw",
+    "firmInputPlaceholder": "Organizaciya nomini kiritiń",
+    "INNInputPlaceholder": "STIR raqamini kiritiń"
   },
+
   "transportList": {
     "title": "Transportlar",
     "createTransport": "Transport Túrin Jaratıw",
@@ -475,7 +505,8 @@
     "category": "Kategoriya",
     "actions": "Háreketler",
     "edit": "Ózgertiw",
-    "delete": "Óshiriw"
+    "delete": "Óshiriw",
+    "inputPlaceholder": "Ónim atın kiritiń"
   },
   "createTransport": {
     "title": "Transport Turini Yaratish",
@@ -552,12 +583,20 @@
     "apply": "Qollanıw"
   },
   "editApplication": {
+    "selectPhotos": "Foto tanlash",
+    "uploadPhotos": "Foto yuklash",
+    "photos": "Foto",
+    "goToBasicInfo": "Asosiy Ma'lumotlar",
     "title": "Ótinishti Ózgertiw",
     "subtitle": "Ótinish mag'lıwmatların ózgertiw",
     "firm": "Shólkem",
     "searchFirm": "Shólkemdi izlew",
     "comingDate": "Keliw Sánesi",
     "netto": "Netto",
+    "searchProduct": "Ónimdi izlew",
+    "quantity": "Mug'dari",
+    "selectStorage": "Qoymanı Tanlang",
+    "vipApplication": "VIP Arizani Qosıw",
     "brutto": "Brutto",
     "transportInfo": "Transport Mag'lıwmatları",
     "transportType": "Transport Túri",
@@ -584,6 +623,11 @@
     "modes": "Rejimler",
     "basicInfo": "Tiykarǵı Mag'lıwmatlar",
     "selectedMode": "Tańlanǵan Rejim",
-    "searchModes": "Rejimlardi izlew"
+    "searchModes": "Rejimlardi izlew",
+    "days": "Kun",
+    "back":"Artqa",
+    "selectedFile": "Tanlanğan Fayl",
+    "view": "Ko'riw"
+
   }
 }

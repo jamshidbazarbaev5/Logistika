@@ -49,13 +49,13 @@ export default function FirmList() {
   const searchFields: SearchField[] = [
     {
       name: 'firm_name',
-      label: 'Search by Firm Name',
-      placeholder: 'Enter firm name...'
+      label: t('firmList.firmInputPlaceholder' ),
+      placeholder: t("firmList.firmInputPlaceholder")
     },
     {
       name: 'INN',
-      label: 'Search by INN',
-      placeholder: 'Enter INN...'
+      label: t('firmList.INNInputPlaceholder'),
+      placeholder: t("firmList.INNInputPlaceholder")
     }
   ];
 

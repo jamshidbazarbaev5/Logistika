@@ -162,37 +162,38 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) 
   };
 
   return (
-    <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
+    <div className="p-6 bg-transparent rounded-lg shadow-sm">
       {!formData.firm_id ? (
         <div className="text-center p-6">
-          <div className="text-red-600 mb-4">
-            Please select a firm in the Basic Info tab first
+          <div className="text-red-600 dark:text-red-400 mb-4">
+            {t('createApplication.selectFirm')}
           </div>
           <button
             onClick={handleGoToBasicInfo}
             className="px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
               hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out shadow-sm"
           >
-            Go to Basic Info
+            {t('createApplication.goToBasicInfo')}
           </button>
         </div>
       ) : (
         <>
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Upload Photos
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+              {t('createApplication.uploadPhotos')}
             </label>
             
             <div className="flex items-center justify-center w-full">
-              <label className="flex flex-col w-full h-32 border-2 border-dashed border-gray-300 rounded-lg 
-                cursor-pointer hover:bg-gray-50 transition-colors">
+              <label className="flex flex-col w-full h-32 border-2 border-dashed 
+                border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer 
+                dark:hover:border-gray-500 transition-colors">
                 <div className="flex flex-col items-center justify-center pt-7">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-8 h-8 text-gray-400 dark:text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" 
                       d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  <p className="pt-1 text-sm tracking-wider text-gray-400">
-                    Select photos
+                  <p className="pt-1 text-sm tracking-wider text-gray-400 dark:text-gray-500">
+                    {t('createApplication.selectPhotos')}
                   </p>
                 </div>
                 <input 
@@ -206,20 +207,21 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) 
             </div>
 
             {error && (
-              <div className="mt-2 text-sm text-red-600">
+              <div className="mt-2 text-sm text-red-600 dark:text-red-400">
                 {error}
               </div>
             )}
 
             {previews.length > 0 && (
               <div className="mt-6">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                  Selected Photos ({previews.length})
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
+                  {t('createApplication.selectedPhotos')} ({previews.length})
                 </h4>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {previews.map((preview, index) => (
                     <div key={index} className="relative group">
-                      <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg bg-gray-200">
+                      <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-lg 
+                        bg-gray-200 dark:bg-gray-800">
                         <img
                           src={preview}
                           alt={`Preview ${index + 1}`}
@@ -229,8 +231,8 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) 
                       <button
                         onClick={() => removePhoto(index)}
                         className="absolute top-2 right-2 p-1 bg-red-500 rounded-full text-white 
-                          opacity-0 group-hover:opacity-100 transition-opacity duration-200
-                          hover:bg-red-600"
+                          opacity-0 group-hover:opacity-100 dark:group-hover:opacity-75 
+                          transition-opacity duration-200"
                       >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -243,7 +245,7 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) 
             )}
           </div>
 
-          <div className="flex justify-between items-center mt-6 pt-6 border-t">
+          <div className="flex justify-between items-center mt-6 pt-6 border-t dark:border-gray-700">
             <button
               onClick={handleNext}
               className="px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
@@ -392,7 +394,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="relative" ref={productDropdownRef}>
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-            Product
+           {t('createApplication.product')}
           </label>
           <input
             type="text"
@@ -410,7 +412,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
               px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
               focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
               dark:text-gray-100 transition-colors"
-            placeholder="Search for a product..."
+            placeholder={t("createApplication.productSearchPlaceholder")}
           />
           
           {showProductDropdown && products.length > 0 && (
@@ -432,7 +434,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
 
         <div className="relative" ref={storageDropdownRef}>
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-            Storage
+           {t('createApplication.storage')}
           </label>
           <input
             type="text"
@@ -446,7 +448,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
               px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
               focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
               dark:text-gray-100 transition-colors"
-            placeholder="Search for a storage..."
+            placeholder={t("createApplication.storageSearchPlaceholder")}
           />
           
           {showStorageDropdown && (
@@ -472,7 +474,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
 
         <div>
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-            Quantity
+            {t('createApplication.quantity')}
           </label>
           <input
             type="number"
@@ -494,12 +496,14 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           font-medium hover:bg-[#5b4eb3] disabled:opacity-50 disabled:cursor-not-allowed
           transition-colors duration-200 ease-in-out shadow-sm"
       >
-        Add Product
+        {t('createApplication.addProduct')}
       </button>
 
       {/* Display selected products */}
       <div className="mt-6">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Selected Products:</h3>
+        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          {t('createApplication.selectedProducts')}
+        </h3>
         <div className="space-y-2">
           {formData.upload_products.map((product, index) => {
             const details = getProductDetails(product.product_id, product.storage_id);
@@ -511,16 +515,18 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
                   </span>
                   <span className="mx-2 text-gray-400 dark:text-gray-500">|</span>
                   <span className="text-gray-600 dark:text-gray-300">
-                    Storage: {details.storageName}
+                    {t('createApplication.storage')}: {details.storageName}
                   </span>
                   <span className="mx-2 text-gray-400 dark:text-gray-500">|</span>
-                  <span className="text-gray-600 dark:text-gray-300">Quantity: {product.quantity}</span>
+                  <span className="text-gray-600 dark:text-gray-300">
+                    {t('createApplication.quantity')}: {product.quantity}
+                  </span>
                 </div>
                 <button
                   onClick={() => handleRemoveProduct(index)}
                   className="text-red-500 hover:text-red-700 p-2 dark:text-red-400 dark:hover:text-red-300"
                 >
-                  Remove
+                  {t('createApplication.remove')}
                 </button>
               </div>
             );
@@ -713,8 +719,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     fetchServices();
   }, []);
 
-  // Close dropdowns when clicking outside
-  useEffect(() => {
+    useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (keepingServicesRef.current && !keepingServicesRef.current.contains(event.target as Node)) {
         setKeepingServicesOpen(false);
@@ -795,17 +800,20 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   };
 
   return (
-    <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
+    <div className="p-6 bg-transparent rounded-lg shadow-sm">
       <div className="space-y-8">
         {/* Keeping Services Dropdown */}
         <div ref={keepingServicesRef} className="relative">
           <button
             onClick={() => setKeepingServicesOpen(!keepingServicesOpen)}
-            className="w-full flex justify-between items-center px-6 py-4 border-2 border-gray-100 
-              rounded-xl bg-white hover:bg-gray-50 transition-all duration-200 group"
+            className="w-full flex justify-between items-center px-6 py-4 border-2 
+              border-gray-100 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 
+              hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 group"
           >
             <div className="flex items-center space-x-3">
-              <span className="text-lg font-medium text-gray-700">Storage Services</span>
+              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                {t('createApplication.storageServices')}
+              </span>
               {formData.upload_keeping_services_quantity.length > 0 && (
                 <span className="bg-[#6C5DD3] text-white px-2.5 py-1 rounded-full text-sm">
                   {formData.upload_keeping_services_quantity.length}
@@ -813,7 +821,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
               )}
             </div>
             <svg
-              className={`w-5 h-5 text-gray-500 transition-transform duration-200 
+              className={`w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform duration-200 
                 ${keepingServicesOpen ? 'transform rotate-180' : ''} 
                 group-hover:text-[#6C5DD3]`}
               fill="none"
@@ -825,28 +833,34 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           </button>
           
           {keepingServicesOpen && (
-            <div className="absolute z-10 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-lg 
-              divide-y divide-gray-100 transform transition-all duration-200 ease-out">
+            <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 
+              border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg 
+              divide-y divide-gray-100 dark:divide-gray-700">
               {keepingServices.map(service => (
-                <div key={service.id} className="p-4 hover:bg-gray-50 transition-colors duration-150">
+                <div key={service.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 
+                  transition-colors duration-150">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{service.name}</h4>
-                      <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500">
-                        <span>Base: {service.base_price}</span>
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100">{service.name}</h4>
+                      <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                        <span>{t('createApplication.base')}: {service.base_price}</span>
                         <span>•</span>
-                        <span>Extra: {service.extra_price}</span>
+                        <span>{t('createApplication.extra')}: {service.extra_price}</span>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <label className="text-sm font-medium text-gray-700">Days:</label>
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {t('createApplication.days')}:
+                      </label>
                       <input
                         type="number"
                         min="0"
                         value={getSelectedKeepingService(service.id)}
                         onChange={(e) => handleKeepingServiceChange(service.id, parseInt(e.target.value) || 0)}
-                        className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm
-                          focus:ring-2 focus:ring-[#6C5DD3] focus:border-[#6C5DD3] outline-none"
+                        className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 
+                          rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 
+                          dark:text-gray-100 focus:ring-2 focus:ring-[#6C5DD3] 
+                          focus:border-[#6C5DD3] outline-none"
                       />
                     </div>
                   </div>
@@ -860,11 +874,14 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
         <div ref={workingServicesRef} className="relative">
           <button
             onClick={() => setWorkingServicesOpen(!workingServicesOpen)}
-            className="w-full flex justify-between items-center px-6 py-4 border-2 border-gray-100 
-              rounded-xl bg-white hover:bg-gray-50 transition-all duration-200 group"
+            className="w-full flex justify-between items-center px-6 py-4 border-2 
+              border-gray-100 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 
+              hover:bg-gray-50 dark:hover:bg-gray-800 transition-all duration-200 group"
           >
             <div className="flex items-center space-x-3">
-              <span className="text-lg font-medium text-gray-700">Labor Services</span>
+              <span className="text-lg font-medium text-gray-700 dark:text-gray-200">
+                {t('createApplication.laborServices')}
+              </span>
               {formData.upload_working_services_quantity.length > 0 && (
                 <span className="bg-[#6C5DD3] text-white px-2.5 py-1 rounded-full text-sm">
                   {formData.upload_working_services_quantity.length}
@@ -872,7 +889,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
               )}
             </div>
             <svg
-              className={`w-5 h-5 text-gray-500 transition-transform duration-200 
+              className={`w-5 h-5 text-gray-500 dark:text-gray-400 transition-transform duration-200 
                 ${workingServicesOpen ? 'transform rotate-180' : ''} 
                 group-hover:text-[#6C5DD3]`}
               fill="none"
@@ -884,28 +901,34 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           </button>
           
           {workingServicesOpen && (
-            <div className="absolute z-10 w-full mt-2 bg-white border border-gray-100 rounded-xl shadow-lg 
-              divide-y divide-gray-100 transform transition-all duration-200 ease-out">
+            <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 
+              border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg 
+              divide-y divide-gray-100 dark:divide-gray-700">
               {workingServices.map(service => (
-                <div key={service.id} className="p-4 hover:bg-gray-50 transition-colors duration-150">
+                <div key={service.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 
+                  transition-colors duration-150">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{service.service_name}</h4>
-                      <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500">
-                        <span>Base: {service.base_price}</span>
-                        <span>•</span>
-                        <span>Extra: {service.extra_price}</span>
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                        {service.service_name}
+                      </h4>
+                      <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                        <span>{t('createApplication.base')}: {service.base_price}</span>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
-                      <label className="text-sm font-medium text-gray-700">Quantity:</label>
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {t('createApplication.quantity')}
+                      </label>
                       <input
                         type="number"
                         min="0"
                         value={getSelectedWorkingService(service.id)}
                         onChange={(e) => handleWorkingServiceChange(service.id, parseInt(e.target.value) || 0)}
-                        className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm
-                          focus:ring-2 focus:ring-[#6C5DD3] focus:border-[#6C5DD3] outline-none"
+                        className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 
+                          rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 
+                          dark:text-gray-100 focus:ring-2 focus:ring-[#6C5DD3] 
+                          focus:border-[#6C5DD3] outline-none"
                       />
                     </div>
                   </div>
@@ -917,33 +940,40 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
 
         {/* Selected Services Summary */}
         <div className="mt-8 space-y-6">
-          <h3 className="text-lg font-medium text-gray-900 border-b pb-3">Selected Services</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white border-b 
+            dark:border-gray-700 pb-3">
+            {t('createApplication.selectedServices')}
+          </h3>
           
           {/* Selected Keeping Services */}
           {formData.upload_keeping_services_quantity.length > 0 && (
             <div className="space-y-4">
-              <h4 className="font-medium text-gray-700 text-sm uppercase tracking-wider">Storage Services</h4>
+              <h4 className="font-medium text-gray-700 dark:text-white text-sm uppercase tracking-wider">
+                {t('createApplication.storageServices')}
+              </h4>
               <div className="grid gap-3">
                 {formData.upload_keeping_services_quantity.map((item) => {
                   const service = keepingServices.find(s => s.id === item.keeping_services_id);
                   return (
                     <div key={item.keeping_services_id} 
-                      className="flex justify-between items-center bg-gray-50 p-4 rounded-xl
-                        border border-gray-100 hover:border-gray-200 transition-colors duration-200"
+                      className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-4 
+                        rounded-xl border border-gray-100 dark:border-gray-700 
+                        hover:border-gray-200 dark:hover:border-gray-700 transition-colors duration-200"
                     >
                       <div className="flex flex-col">
-                        <span className="font-medium text-gray-900">{service?.name}</span>
-                        <div className="mt-1 flex items-center space-x-3 text-sm text-gray-500">
-                          <span>{item.day} days</span>
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {service?.name}
+                        </span>
+                        <div className="mt-1 flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-300">
+                          <span>{item.day} {t('createApplication.days')}</span>
                           <span>•</span>
-                          <span>Base: {service?.base_price}</span>
-                          <span>•</span>
-                          <span>Extra: {service?.extra_price}</span>
+                          <span>{t('createApplication.base')}: {service?.base_price}</span>
                         </div>
                       </div>
                       <button
                         onClick={() => handleRemoveKeepingService(item.keeping_services_id)}
-                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 
+                        className="p-2 text-gray-400 hover:text-red-500 dark:text-gray-300 
+                          dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 
                           rounded-lg transition-colors duration-200"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -960,28 +990,32 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           {/* Selected Working Services */}
           {formData.upload_working_services_quantity.length > 0 && (
             <div className="space-y-4">
-              <h4 className="font-medium text-gray-700 text-sm uppercase tracking-wider">Labor Services</h4>
+                <h4 className="font-medium text-gray-700 dark:text-white text-sm uppercase tracking-wider">
+                {t('createApplication.workingServices')}
+              </h4>
               <div className="grid gap-3">
                 {formData.upload_working_services_quantity.map((item) => {
                   const service = workingServices.find(s => s.id === item.service_id);
                   return (
                     <div key={item.service_id} 
-                      className="flex justify-between items-center bg-gray-50 p-4 rounded-xl
-                        border border-gray-100 hover:border-gray-200 transition-colors duration-200"
+                      className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-4 
+                        rounded-xl border border-gray-100 dark:border-gray-700 
+                        hover:border-gray-200 dark:hover:border-gray-700 transition-colors duration-200"
                     >
                       <div className="flex flex-col">
-                        <span className="font-medium text-gray-900">{service?.service_name}</span>
-                        <div className="mt-1 flex items-center space-x-3 text-sm text-gray-500">
+                        <span className="font-medium text-gray-900 dark:text-white">
+                          {service?.service_name}
+                        </span>
+                        <div className="mt-1 flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-300">
                           <span>{item.quantity} {service?.units}</span>
                           <span>•</span>
-                          <span>Base: {service?.base_price}</span>
-                          <span>•</span>
-                          <span>Extra: {service?.extra_price}</span>
+                          <span>{t('createApplication.base')}: {service?.base_price}</span>
                         </div>
                       </div>
                       <button
                         onClick={() => handleRemoveWorkingService(item.service_id)}
-                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 
+                        className="p-2 text-gray-400 hover:text-red-500 dark:text-gray-300 
+                          dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 
                           rounded-lg transition-colors duration-200"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -999,9 +1033,8 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
         <div className="flex justify-end pt-6 border-t">
           <button
             onClick={onSuccess}
-            className="px-6 py-2.5 bg-[#6C5DD3] text-white rounded-xl font-medium
-              hover:bg-[#5b4eb3] transition-all duration-200 ease-in-out 
-              shadow-sm hover:shadow-md transform hover:-translate-y-0.5"
+            className="px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
+              hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out shadow-sm"
           >
             {t('createApplication.next')}
           </button>
@@ -1071,26 +1104,8 @@ const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
   );
 
   return (
-    <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
+    <div className="p-6 bg-transparent rounded-lg shadow-sm">
       <div className="max-w-md">
-        <div className="mb-6">
-          <label className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              checked={formData.vip_application}
-              onChange={(e) => setFormData(prev => ({
-                ...prev,
-                vip_application: e.target.checked
-              }))}
-              className="w-4 h-4 text-[#6C5DD3] border-gray-300 rounded 
-                focus:ring-[#6C5DD3] dark:focus:ring-[#6C5DD3] dark:border-gray-600"
-            />
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              {t('createApplication.vipApplication', 'VIP Application')}
-            </span>
-          </label>
-        </div>
-
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
             {t('createApplication.select')}
@@ -1108,18 +1123,18 @@ const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
               placeholder={t('createApplication.input')}
               className="w-full rounded-lg border border-gray-300 dark:border-gray-600 
                 px-4 py-2.5 text-sm focus:border-[#6C5DD3] focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 
+                bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 
                 placeholder-gray-400 dark:placeholder-gray-500 transition-colors"
             />
             
             {showDropdown && filteredModes.length > 0 && (
-              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg 
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-900 rounded-lg 
                 shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
                 {filteredModes.map((mode) => (
                   <div
                     key={mode.id}
                     onClick={() => handleModeSelect(mode)}
-                    className="px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer
+                    className="px-4 py-3 hover:bg-gray-50 dark:bg-gray-900 cursor-pointer
                       border-b last:border-b-0 border-gray-100 dark:border-gray-700"
                   >
                     <div className="flex flex-col">
@@ -1137,13 +1152,12 @@ const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
           </div>
         </div>
 
-        {/* Display selected mode */}
         {selectedMode && (
           <div className="mb-6">
             <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
               Selected Mode:
             </h3>
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 border 
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 border 
               border-gray-200 dark:border-gray-700">
               <div className="flex justify-between items-start">
                 <div>
@@ -1156,8 +1170,8 @@ const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
                 </div>
                 <button
                   onClick={handleRemoveMode}
-                  className="p-1 text-gray-400 hover:text-red-500 rounded-full
-                    hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                  className="p-1 text-gray-400 hover:text-red-500 dark:text-red-400 rounded-full
+                    hover:bg-red-50 dark:hover:bg-transparent transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1172,7 +1186,7 @@ const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
           <button
             onClick={onSubmit}
             className="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-medium
-              hover:bg-green-700 transition-colors duration-200 ease-in-out shadow-sm
+              hover:bg-green-700 dark:hover:bg-green-600 transition-colors duration-200 ease-in-out shadow-sm
               focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
               dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={formData.upload_modes.length === 0}
@@ -1491,8 +1505,8 @@ export default function CreateApplication() {
                   'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                   'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                   selected
-                    ? 'bg-white text-[#6C5DD3] shadow'
-                    : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
+                    ? 'bg-white dark:bg-gray-700 text-[#6C5DD3] shadow'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-white/[0.12] dark:hover:bg-transparent hover:text-[#6C5DD3]'
                 )
               }
             >
@@ -1505,13 +1519,13 @@ export default function CreateApplication() {
                   'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                   'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                   selected
-                    ? 'bg-white text-[#6C5DD3] shadow'
-                    : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
+                    ? 'bg-white dark:bg-gray-700 text-[#6C5DD3] shadow'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-white/[0.12] dark:hover:bg-transparent hover:text-[#6C5DD3]'
                 )
               }
             >
 
-              {t('createApplication.declaration')}
+              {t('createApplication.declarationInfo')}
             </Tab>
 
             <Tab
@@ -1520,8 +1534,8 @@ export default function CreateApplication() {
                   'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                   'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                   selected
-                    ? 'bg-white text-[#6C5DD3] shadow'
-                    : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
+                    ? 'bg-white dark:bg-gray-700 text-[#6C5DD3] shadow'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-white/[0.12] dark:hover:bg-transparent hover:text-[#6C5DD3]'
                 )
               }
             >
@@ -1533,8 +1547,8 @@ export default function CreateApplication() {
                   'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                   'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                   selected
-                    ? 'bg-white text-[#6C5DD3] shadow'
-                    : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
+                    ? 'bg-white dark:bg-gray-700 text-[#6C5DD3] shadow'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-white/[0.12] dark:hover:bg-transparent hover:text-[#6C5DD3]'
                 )
               }
             >
@@ -1546,8 +1560,8 @@ export default function CreateApplication() {
                   'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                   'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                   selected
-                    ? 'bg-white text-[#6C5DD3] shadow'
-                    : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
+                    ? 'bg-white dark:bg-gray-700 text-[#6C5DD3] shadow'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-white/[0.12] dark:hover:bg-transparent hover:text-[#6C5DD3]'
                 )
               }
             >
@@ -1559,8 +1573,8 @@ export default function CreateApplication() {
                   'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
                   'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                   selected
-                    ? 'bg-white text-[#6C5DD3] shadow'
-                    : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
+                    ? 'bg-white dark:bg-gray-700 text-[#6C5DD3] shadow'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-white/[0.12] dark:hover:bg-transparent hover:text-[#6C5DD3]'
                 )
               }
             >
@@ -1721,7 +1735,7 @@ export default function CreateApplication() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="decloration_number" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-                      {t('createApplication.declaration.number', 'Declaration Number')}
+                      {t('createApplication.declorationNumber')}
                     </label>
                     <input
                       type="text"
@@ -1735,7 +1749,7 @@ export default function CreateApplication() {
 
                   <div>
                     <label htmlFor="decloration_date" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-                      {t('createApplication.declaration.date', 'Declaration Date')}
+                      {t('createApplication.declorationDate')}
                     </label>
                     <input
                       type="date"
@@ -1749,7 +1763,7 @@ export default function CreateApplication() {
 
                   <div className="md:col-span-2">
                     <label htmlFor="decloration_file" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-                      {t('createApplication.declaration.file', 'Declaration File')}
+                      {t('createApplication.declarationFile')}
                     </label>
                     <input
                       type="file"

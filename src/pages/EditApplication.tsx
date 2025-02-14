@@ -312,14 +312,14 @@ export default function EditApplication() {
     };
 
     return (
-      <div className="mt-6 sm:mt-8 border-t pt-6 sm:pt-8">
-        <div className="space-y-4">
+      <div className="mt-4 sm:mt-6 border-t pt-4 sm:pt-6">
+        <div className="space-y-3 sm:space-y-4">
           <h3 className="text-base font-medium text-gray-900 dark:text-gray-100">
             {t('editApplication.transportInfo')}
           </h3>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <div className="space-y-1 sm:space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('editApplication.transportType')}
               </label>
@@ -342,17 +342,17 @@ export default function EditApplication() {
               </select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1 sm:space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 {t('editApplication.transportNumber')}
               </label>
-              <div className="flex gap-4">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
                 <input
                   type="text"
                   value={transportNumber}
                   onChange={(e) => setTransportNumber(e.target.value)}
                   className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 
-                    px-4 py-2.5 text-sm focus:border-[#6C5DD3] focus:ring-1 
+                    px-3 sm:px-4 py-2 sm:py-2.5 text-sm focus:border-[#6C5DD3] focus:ring-1 
                     focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 
                     text-gray-900 dark:text-gray-100 transition-colors"
                   placeholder={t('editApplication.transportNumber')}
@@ -360,10 +360,10 @@ export default function EditApplication() {
                 <button
                   onClick={handleAddTransport}
                   disabled={!transportNumber || !transportTypeId}
-                  className="px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
-                    hover:bg-[#5b4eb3] disabled:opacity-50 disabled:cursor-not-allowed
-                    transition-colors duration-200 ease-in-out shadow-sm
-                    whitespace-nowrap"
+                  className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-[#6C5DD3] text-white 
+                    rounded-lg font-medium hover:bg-[#5b4eb3] disabled:opacity-50 
+                    disabled:cursor-not-allowed transition-colors duration-200 ease-in-out 
+                    shadow-sm whitespace-nowrap text-sm"
                 >
                   {t('editApplication.addTransport')}
                 </button>
@@ -372,11 +372,11 @@ export default function EditApplication() {
           </div>
 
           {formData.transport.length > 0 && (
-            <div className="mt-6">
-              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+            <div className="mt-4 sm:mt-6">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                 {t('editApplication.selectedTransports')}:
               </h4>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2">
                 {formData.transport.map((transport:any, index:number) => (
                   <div 
                     key={index} 
@@ -427,13 +427,16 @@ export default function EditApplication() {
 
   return (
     <FormContext.Provider value={{ formData, setFormData }}>
-      <div className="p-2 sm:p-4 md:p-6">
+      <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
         <Tab.Group selectedIndex={selectedTab} onChange={handleTabChange}>
-          <Tab.List className="flex space-x-1 rounded-xl bg-gray-100 dark:bg-gray-800 p-1 overflow-x-auto sticky top-0 z-10 mb-4">
+          <Tab.List className="flex space-x-1 rounded-xl bg-gray-100 dark:bg-gray-800 p-1 
+            overflow-x-auto sticky top-0 z-10 mb-4 -mx-2 sm:mx-0 
+            scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
             <Tab
               className={({ selected }) =>
                 classNames(
-                  'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5 min-w-[120px]',
+                  'whitespace-nowrap rounded-lg py-2 px-3 sm:py-2.5 sm:px-4 text-xs sm:text-sm font-medium leading-5',
+                  'min-w-[100px] sm:min-w-[120px] flex-shrink-0',
                   'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                   'transition-all duration-200 ease-in-out',
                   selected
@@ -447,7 +450,8 @@ export default function EditApplication() {
             <Tab
               className={({ selected }) =>
                 classNames(
-                  'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5 min-w-[120px]',
+                  'whitespace-nowrap rounded-lg py-2 px-3 sm:py-2.5 sm:px-4 text-xs sm:text-sm font-medium leading-5',
+                  'min-w-[100px] sm:min-w-[120px] flex-shrink-0',
                   'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                   'transition-all duration-200 ease-in-out',
                   selected
@@ -461,7 +465,8 @@ export default function EditApplication() {
             <Tab
               className={({ selected }) =>
                 classNames(
-                  'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5 min-w-[120px]',
+                  'whitespace-nowrap rounded-lg py-2 px-3 sm:py-2.5 sm:px-4 text-xs sm:text-sm font-medium leading-5',
+                  'min-w-[100px] sm:min-w-[120px] flex-shrink-0',
                   'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                   'transition-all duration-200 ease-in-out',
                   selected
@@ -475,7 +480,8 @@ export default function EditApplication() {
             <Tab
               className={({ selected }) =>
                 classNames(
-                  'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5 min-w-[120px]',
+                  'whitespace-nowrap rounded-lg py-2 px-3 sm:py-2.5 sm:px-4 text-xs sm:text-sm font-medium leading-5',
+                  'min-w-[100px] sm:min-w-[120px] flex-shrink-0',
                   'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                   'transition-all duration-200 ease-in-out',
                   selected
@@ -489,7 +495,8 @@ export default function EditApplication() {
             <Tab
               className={({ selected }) =>
                 classNames(
-                  'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5 min-w-[120px]',
+                  'whitespace-nowrap rounded-lg py-2 px-3 sm:py-2.5 sm:px-4 text-xs sm:text-sm font-medium leading-5',
+                  'min-w-[100px] sm:min-w-[120px] flex-shrink-0',
                   'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                   'transition-all duration-200 ease-in-out',
                   selected
@@ -503,7 +510,8 @@ export default function EditApplication() {
             <Tab
               className={({ selected }) =>
                 classNames(
-                  'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5 min-w-[120px]',
+                  'whitespace-nowrap rounded-lg py-2 px-3 sm:py-2.5 sm:px-4 text-xs sm:text-sm font-medium leading-5',
+                  'min-w-[100px] sm:min-w-[120px] flex-shrink-0',
                   'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
                   'transition-all duration-200 ease-in-out',
                   selected
@@ -519,7 +527,7 @@ export default function EditApplication() {
           <Tab.Panels className="mt-4">
             <Tab.Panel>
               <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow-sm">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="relative">
                     <label htmlFor="firm_search" className="block text-sm font-medium text-gray-600 dark:text-gray-300">
                       {t('editApplication.firm')}
@@ -585,7 +593,7 @@ export default function EditApplication() {
 
             <Tab.Panel>
               <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow-sm">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700">
                       {t('editApplication.comingDate')}
@@ -636,54 +644,56 @@ export default function EditApplication() {
                             rel="noopener noreferrer"
                             className="px-3 py-1 text-sm text-[#6C5DD3] hover:bg-[#6C5DD3]/10 rounded-lg transition-colors"
                           >
-                            View
+                           {t('editApplication.view')}
                           </a>
                         </div>
                       </div>
                     )}
 
                     <div className="flex items-center justify-center w-full">
-                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700">
-                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                          <svg className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      <label className="flex flex-col items-center justify-center w-full h-24 sm:h-32 
+                        border-2 border-gray-300 border-dashed rounded-lg cursor-pointer 
+                        bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <div className="flex flex-col items-center justify-center pt-4 pb-5 sm:pt-5 sm:pb-6">
+                          <svg className="w-6 h-6 sm:w-8 sm:h-8 mb-2 sm:mb-4 text-gray-500 dark:text-gray-400" 
+                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                           </svg>
-                          <p className="mb-2 text-sm text-gray-500 dark:text-gray-400">
+                          <p className="mb-1 sm:mb-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                             <span className="font-semibold">Click to upload</span> or drag and drop
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
                             PDF, JPG, PNG (MAX. 10MB)
                           </p>
                         </div>
-                        <input
-                          type="file"
-                          className="hidden"
-                          onChange={handleFileChange}
-                          accept=".pdf,.jpg,.jpeg,.png"
-                        />
+                        <input type="file" className="hidden" onChange={handleFileChange} 
+                          accept=".pdf,.jpg,.jpeg,.png" />
                       </label>
                     </div>
                     
                     {formData.decloration_file instanceof File && (
                       <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                        Selected file: {formData.decloration_file.name}
+                      {t('editApplication.selectedFile')}: {formData.decloration_file.name}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className="mt-6 flex justify-end space-x-4">
+                <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
                   <button
                     type="button"
                     onClick={() => setSelectedTab(0)}
-                    className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 border border-gray-300 
+                      rounded-lg text-gray-700 hover:bg-gray-50 text-sm font-medium"
                   >
                     {t('editApplication.back')}
                   </button>
                   <button
                     type="button"
                     onClick={() => setSelectedTab(2)}
-                    className="bg-[#6C5DD3] text-white px-6 py-2 rounded-lg hover:bg-[#5b4eb3]"
+                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-[#6C5DD3] 
+                      text-white rounded-lg hover:bg-[#5b4eb3] text-sm font-medium"
                   >
                     {t('editApplication.next')}
                   </button>
@@ -722,8 +732,7 @@ export default function EditApplication() {
 
             <Tab.Panel>
               <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow-sm">
-                {/* Add VIP Application toggle before the modes section */}
-                <div className="mb-6 flex items-center justify-between">
+                <div className="mb-6 flex items-center justify-between ml-8">
                   <div className="flex items-center">
                     <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-3">
                       {t('editApplication.vipApplication')}

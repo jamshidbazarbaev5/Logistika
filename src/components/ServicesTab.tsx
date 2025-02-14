@@ -76,7 +76,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({
                   className="w-32 rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
                     focus:border-[#6C5DD3] focus:ring-[#6C5DD3] dark:bg-gray-700 
                     dark:text-gray-100"
-                  placeholder="Days"
+                  placeholder={t('editApplication.days')}
                 />
               </div>
             );
@@ -105,7 +105,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({
                   className="w-32 rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
                     focus:border-[#6C5DD3] focus:ring-[#6C5DD3] dark:bg-gray-700 
                     dark:text-gray-100"
-                  placeholder="Quantity"
+                  placeholder={t('editApplication.quantity')}
                 />
               </div>
             );

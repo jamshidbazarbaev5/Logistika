@@ -159,36 +159,36 @@ export default function ApplicationList() {
 
   const searchFields: SearchField[] = [
     {
-      name: 'firm_name',
-      label: t('applicationList.table.firmName', 'Firm Name'),
-      placeholder: t('applicationList.searchFirm', 'Search by firm name'),
-      className: 'col-span-4',
+      name: t('applicationList.table.firmName'),
+      label: t('applicationList.table.firmName'),
+      placeholder: t('applicationList.table.firmName'),
+      className: 'col-span-12 sm:col-span-6 lg:col-span-4',
     },
     {
       name: 'decloration_number',
       label: t('applicationList.table.declarationNumber', 'Declaration Number'),
       placeholder: t('createApplication.declorationNumberPlaceholder', 'Enter declaration number'),
-      className: 'col-span-4',
+      className: 'col-span-12 sm:col-span-6 lg:col-span-4',
     },
     {
       name: 'firm_INN',
       label: t('createFirm.companyInfo.inn', 'INN'),
       placeholder: t('createFirm.companyInfo.innPlaceholder', 'Enter INN number'),
-      className: 'col-span-4',
+      className: 'col-span-12 sm:col-span-6 lg:col-span-4',
     },
     {
       name: 'decloration_date_gte',
       label: t('applicationList.table.dates', 'Declaration Date From'),
       placeholder: t('createApplication.declorationDatePlaceholder', 'Enter declaration date'),
       type: 'date',
-      className: 'col-span-6',
+      className: 'col-span-12 sm:col-span-6',
     },
     {
       name: 'decloration_date_lte',
       label: t('applicationList.table.dates', 'Declaration Date To'),
       placeholder: t('createApplication.declorationDatePlaceholder', 'Enter declaration date'),
       type: 'date',
-      className: 'col-span-6',
+      className: 'col-span-12 sm:col-span-6',
     },
   ];
 
@@ -327,7 +327,7 @@ export default function ApplicationList() {
           disabled={currentPage === 1}
           className="px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700 disabled:opacity-50"
         >
-          Previous
+          {t("applicationList.previous")}
         </button>
         {pageNumbers.map(number => (
           <button
@@ -347,7 +347,7 @@ export default function ApplicationList() {
           disabled={currentPage === totalPages}
           className="px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700 disabled:opacity-50"
         >
-          Next
+          {t("applicationList.next")}
         </button>
       </div>
     );
@@ -362,14 +362,14 @@ export default function ApplicationList() {
 
 
   return (
-    <div className="p-4 sm:p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-2 sm:p-4 md:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
         <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
           {t("applicationList.title", "Applications")}
         </h1>
         <button
           onClick={() => navigate("/create-application")}
-          className="bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
+          className="w-full sm:w-auto bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
           hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
           dark:focus:ring-offset-gray-800 transition-all duration-200"
         >
@@ -377,12 +377,12 @@ export default function ApplicationList() {
         </button>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow p-4">
         <SearchBar
           fields={searchFields}
           initialValues={searchParams}
           onSearch={setSearchParams}
-          className="grid-cols-12 gap-4"
+          className="grid grid-cols-12 gap-3"
           t={t}
         />
       </div>
@@ -449,9 +449,9 @@ export default function ApplicationList() {
                     {application.brutto || '-'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    <div>Coming: {application.coming_date}</div>
+                    <div>{t("applicationList.comingDate", "Coming")}: {application.coming_date}</div>
                     <div className="text-gray-500 dark:text-gray-400">
-                      Declaration: {application.decloration_date}
+                      {t("applicationList.declarationDate", "Declaration")}: {application.decloration_date}
                     </div>
                   </td>
                  

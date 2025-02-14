@@ -29,6 +29,22 @@
   },
   "createApplication": {
     "title": "Ariza Yaratish",
+    "storage": "Ombor",
+    "product": "Mahsulot",
+    "remove": "Óshiriw",
+    "quantity": "Miqdori",
+    "addProduct": "Mahsulot Qo'shish",
+    "selectedProducts": "Tanlangan Mahsulotlar",
+    "selectPhotos": "Fotografiyaları tanlash",
+    "selectedPhotos": "Tanlangan Fotografiyalar",
+    "uploadPhotos": "Fotografiyalarni yuklash",
+    "goToBasicInfo": "Asırı ma'lumotlarga o'tish",
+    "selectFirm": "Asırı ma'lumotlarga o'tish",
+    "days": "Kun",
+    "hours": "Soat",
+    "pieces": "Shtuk",
+    "storageSearchPlaceholder": "Ombor nomini kiriting",
+    "productSearchPlaceholder": "Mahsulot nomini kiriting",
     "subtitle": "Yangi ariza yaratish uchun formani to'ldiring",
     "comingDate": "Kelish Sanasi",
     "declarationInfo": "Deklaratsiya Ma'lumotlari",
@@ -219,6 +235,8 @@
     "error": "Noto'g'ri foydalanuvchi nomi yoki parol"
   },
   "applicationList": {
+    "previous": "Oldingi",
+    "next": "Keyingi",
     "title": "Arizalar",
     "createApplication": "Ariza Yaratish",
     "errorLoading": "Arizalarni yuklashda xatolik yuz berdi",
@@ -230,13 +248,19 @@
     "table": {
       "number": "№",
       "declarationNumber": "Deklaratsiya Raqami",
-      "firmName": "Firma Nomi",
+      "firmName": "Organizatsiya Nomi",
       "brutto": "Brutto",
       "dates": "Sanalar",
       "quantities": "Miqdorlar",
       "actions": "Amallar",
-      "modes": "Rejimlar"
-    }
+      "modes": "Rejimlar",
+      "vipStatus": "VIP "
+
+    },
+    "regular": "Oddiy",
+    "vip": "VIP",
+    "comingDate": "Kelish",
+    "declarationDate": "Deklaratsiya"
   },
   "categoryList": {
     "title": "Mahsulot Kategoriyalari",
@@ -358,7 +382,9 @@
     },
     "edit": "Tahrirlash",
     "save": "Saqlash",
-    "cancel": "Bekor qilish"
+    "cancel": "Bekor qilish",
+    "firmInputPlaceholder": "Organizatsiya nomini kiriting",
+    "INNInputPlaceholder": "STIR raqamini kiriting"
   },
   "transportList": {
     "title": "Transportlar",
@@ -467,7 +493,7 @@
     "actions": "Amallar",
     "edit": "Tahrirlash",
     "delete": "O'chirish",
-    "input": "Mahsulot nomini kiriting"
+    "inputPlaceholder": "Mahsulot nomini kiriting"
   },
   "editApplication": {
     "title": "Arizani Tahrirlash",
@@ -502,6 +528,20 @@
     "modes": "Rejimlar",
     "basicInfo": "Asosiy Ma'lumotlar",
     "selectedMode": "Tanlangan Rejim",
-    "searchModes": "Rejimlarni qidirish"
+    "searchModes": "Rejimlarni qidirish",
+    "vipApplication": "VIP Arizani Qo'shish",
+    "selectStorage": "Omborni Tanlang",
+    "searchProduct": "Mahsulotni qidirish",
+    "goToBasicInfo": "Asosiy Ma'lumotlar",
+    "selectPhotos": "Foto tanlash",
+    "uploadPhotos": "Foto yuklash",
+    "photos": "Foto",
+    "days": "Kun",
+    "quantity": "Miqdori",
+    "view": "Ko'rish",
+    "selectedFile": "Tanlangan Fayl",
+    "back": "Ortga"
+    
   }
+
 } 

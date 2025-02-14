@@ -125,7 +125,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
               onChange={(e) => setProductSearch(e.target.value)}
               className="w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
-              placeholder="Search for a product..."
+              placeholder={t('editApplication.searchProduct')}
             />
             {showProductDropdown && filteredProducts.length > 0 && (
               <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
@@ -205,7 +205,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
               </div>
               <div className="flex items-center justify-between sm:justify-end">
                 <span className="text-gray-600 dark:text-gray-400">
-                  Qty: {product.quantity}
+                   {t('editApplication.quantity')} {product.quantity}
                 </span>
                 <button
                   onClick={() => handleRemoveProduct(index)}
