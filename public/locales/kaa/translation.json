@@ -629,5 +629,20 @@
     "selectedFile": "Tanlanğan Fayl",
     "view": "Ko'riw"
 
+  },
+  "createProduct": {
+    "title": "Ónim Jaratıw",
+    "subtitle": "Jańa ónim qosıw",
+    "name": "Ónim Atı",
+    "namePlaceholder": "Ónim atın kiritiń",
+    "category": "Kategoriya",
+    "selectCategory": "Kategoriyanı tańlań",
+    "description": "Táriyp",
+    "descriptionPlaceholder": "Ónim táriypin kiritiń",
+    "measurement": "Ólshew Birligi",
+    "selectMeasurement": "Ólshew birligin tańlań",
+    "submit": "Ónim Jaratıw",
+    "successMessage": "Ónim tabıslı jaratıldı!",
+    "errorMessage": "Ónim jaratıwda qátelik júz berdi. Iltimas, qaytadan urınıp kóriń."
   }
 }

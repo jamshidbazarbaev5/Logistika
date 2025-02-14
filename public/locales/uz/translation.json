@@ -542,6 +542,20 @@
     "selectedFile": "Tanlangan Fayl",
     "back": "Ortga"
     
+  },
+  "createProduct": {
+    "title": "Mahsulot Yaratish",
+    "subtitle": "Yangi mahsulot qo'shish",
+    "name": "Mahsulot Nomi",
+    "namePlaceholder": "Mahsulot nomini kiriting",
+    "category": "Kategoriya",
+    "selectCategory": "Kategoriyani tanlang",
+    "description": "Tavsif",
+    "descriptionPlaceholder": "Mahsulot tavsifini kiriting",
+    "measurement": "O'lchov Birligi",
+    "selectMeasurement": "O'lchov birligini tanlang",
+    "submit": "Mahsulot Yaratish",
+    "successMessage": "Mahsulot muvaffaqiyatli yaratildi!",
+    "errorMessage": "Mahsulot yaratishda xatolik yuz berdi. Iltimos, qaytadan urinib ko'ring."
   }
-
 } 
