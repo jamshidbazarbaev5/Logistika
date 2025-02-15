@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ApplicationFormData } from '../context/FormContext';
 
@@ -24,6 +24,18 @@ const ModesTab: React.FC<ModesTabProps> = ({
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Sort modes by code_mode for better organization
   const sortedModes = [...availableModes].sort((a, b) => 
@@ -55,7 +67,7 @@ const ModesTab: React.FC<ModesTabProps> = ({
           {t('editApplication.selectMode')}
         </h2>
 
-        <div className="relative">
+        <div className="relative" ref={dropdownRef}>
           <input
             type="text"
             value={searchTerm}
@@ -63,32 +75,40 @@ const ModesTab: React.FC<ModesTabProps> = ({
               setSearchTerm(e.target.value);
               setShowDropdown(true);
             }}
+            onClick={() => setShowDropdown(true)}
             className="w-full rounded-lg px-3 py-2 sm:px-4 sm:py-2.5 text-xs sm:text-sm 
-              border border-gray-300 dark:border-gray-600 focus:outline-none
+              border border-gray-300 dark:border-gray-600 focus:outline-none bg-white
+              dark:bg-gray-800 dark:text-gray-100 dark:placeholder-gray-400
               focus:border-[#6C5DD3] focus:ring-1 focus:ring-[#6C5DD3]"
             placeholder={t('editApplication.searchModes')}
           />
           
-          {showDropdown && filteredModes.length > 0 && (
-            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg 
+          {showDropdown && (
+            <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg 
               shadow-lg border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-              {filteredModes.map((mode) => (
-                <button
-                  key={mode.id}
-                  onClick={() => handleModeSelect(mode)}
-                  className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700
-                    border-b last:border-b-0 border-gray-100 dark:border-gray-700"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {mode.name_mode}
-                    </span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
-                      {mode.code_mode}
-                    </span>
-                  </div>
-                </button>
-              ))}
+              {filteredModes.length > 0 ? (
+                filteredModes.map((mode) => (
+                  <button
+                    key={mode.id}
+                    onClick={() => handleModeSelect(mode)}
+                    className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700
+                      border-b last:border-b-0 border-gray-100 dark:border-gray-700"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-gray-900 dark:text-gray-100">
+                        {mode.name_mode}
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
+                        {mode.code_mode}
+                      </span>
+                    </div>
+                  </button>
+                ))
+              ) : (
+                <div className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                  {t('editApplication.noModesFound', 'No modes found')}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -112,8 +132,8 @@ const ModesTab: React.FC<ModesTabProps> = ({
                 </div>
                 <button
                   onClick={() => setFormData(prev => ({ ...prev, modes: [] }))}
-                  className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 
-                    dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                  className="p-2 text-gray-400 hover:text-red-500 dark:hover:text-red-400 
+                    hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -124,13 +144,13 @@ const ModesTab: React.FC<ModesTabProps> = ({
           </div>
         )}
 
-        <div className="mt-6 border-t pt-6">
+        <div className="mt-6 border-t dark:border-gray-700 pt-6">
           <button
             onClick={onSubmit}
-            className="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-medium
-              hover:bg-green-700 transition-colors duration-200 ease-in-out shadow-sm
-              focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2
-              dark:focus:ring-offset-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-6 py-3 bg-green-600 dark:bg-green-500 text-white rounded-lg font-medium
+              hover:bg-green-700 dark:hover:bg-green-600 transition-colors duration-200 ease-in-out shadow-sm
+              focus:outline-none focus:ring-2 focus:ring-green-500 dark:focus:ring-green-400 focus:ring-offset-2
+              dark:focus:ring-offset-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={!selectedMode}
           >
             {t('editApplication.saveChanges', 'Save Changes')}

@@ -558,32 +558,38 @@ export default function EditApplication() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Declaration Number</label>
-                    <input
-                      type="text"
-                      value={formData.decloration_number}
-                      onChange={(e) => setFormData({ ...formData, decloration_number: e.target.value })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700">Brutto</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t('editApplication.brutto')}
+                    </label>
                     <input
                       type="number"
                       value={formData.brutto || ''}
                       onChange={(e) => setFormData({ ...formData, brutto: Number(e.target.value) })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+                      className={inputClassName}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Netto</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t('editApplication.netto')}
+                    </label>
                     <input
                       type="number"
                       value={formData.netto || ''}
                       onChange={(e) => setFormData({ ...formData, netto: Number(e.target.value) })}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+                      className={inputClassName}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t('editApplication.comingDate')}
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.coming_date || ''}
+                      onChange={(e) => handleDateChange(e, 'coming_date')}
+                      className={inputClassName}
                     />
                   </div>
                 </div>
@@ -608,19 +614,19 @@ export default function EditApplication() {
               <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow-sm">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
-                      {t('editApplication.comingDate')}
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t('editApplication.declarationNumber')}
                     </label>
                     <input
-                      type="date"
-                      value={formData.coming_date}
-                      onChange={(e) => handleDateChange(e, 'coming_date')}
+                      type="text"
+                      value={formData.decloration_number}
+                      onChange={(e) => setFormData({ ...formData, decloration_number: e.target.value })}
                       className={inputClassName}
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       {t('editApplication.declarationDate')}
                     </label>
                     <input

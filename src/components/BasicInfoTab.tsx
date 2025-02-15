@@ -117,7 +117,7 @@ const BasicInfoTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           <input
             type="number"
             value={formData.netto || ''}
-            onChange={(e) => setFormData((prev :any)=> ({ ...prev, netto: Number(e.target.value) || null }))}
+            onChange={(e) => setFormData((prev:any) => ({ ...prev, netto: Number(e.target.value) || null }))}
             className={inputClassName}
           />
         </div>

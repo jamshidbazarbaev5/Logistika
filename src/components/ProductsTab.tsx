@@ -124,7 +124,8 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
               value={productSearch}
               onChange={(e) => setProductSearch(e.target.value)}
               className="w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               placeholder={t('editApplication.searchProduct')}
             />
             {showProductDropdown && filteredProducts.length > 0 && (
@@ -134,7 +135,8 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
                   <div
                     key={product.id}
                     onClick={() => handleProductSelect(product)}
-                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
+                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer
+                      text-gray-900 dark:text-gray-100"
                   >
                     {product.name}
                   </div>
@@ -152,11 +154,12 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
             value={selectedStorage}
             onChange={(e) => setSelectedStorage(Number(e.target.value))}
             className="w-full rounded-md border border-gray-300 dark:border-gray-600 
-              px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+              px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]
+              bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
           >
-            <option value={0}>{t('editApplication.selectStorage')}</option>
+            <option value={0} className="dark:bg-gray-700">{t('editApplication.selectStorage')}</option>
             {storages.map((storage) => (
-              <option key={storage.id} value={storage.id}>
+              <option key={storage.id} value={storage.id} className="dark:bg-gray-700">
                 {storage.storage_name}
               </option>
             ))}
@@ -174,7 +177,8 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
               value={quantity}
               onChange={(e) => setQuantity(Number(e.target.value))}
               className="flex-1 rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
             />
             <button
               onClick={handleAddProduct}
