@@ -494,7 +494,7 @@ export default function ApplicationList() {
                                     active ? "bg-gray-100 dark:bg-gray-700" : ""
                                   } flex w-full items-center px-4 py-2 text-sm text-blue-600 dark:text-blue-400`}
                                 >
-                                  {t("applicationList.edit", "Edit")}
+                                  {t("applicationList.edit")}
                                 </button>
                               )}
                             </Menu.Item>

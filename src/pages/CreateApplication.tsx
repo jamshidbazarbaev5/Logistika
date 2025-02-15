@@ -1586,6 +1586,32 @@ export default function CreateApplication() {
             <Tab.Panel>
               <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="sm:col-span-2 mb-4">
+                    <div className="flex items-center">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-3">
+                        {t('createApplication.vipApplication')}
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, vip_application: !prev.vip_application }))}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 
+                          border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          formData.vip_application ? 'bg-[#6C5DD3]' : 'bg-gray-200 dark:bg-gray-700'
+                        }`}
+                        role="switch"
+                        aria-checked={formData.vip_application}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full 
+                            bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                            formData.vip_application ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+
                   <div>
                     <label htmlFor="brutto" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
                       {t('createApplication.brutto', 'Brutto')}

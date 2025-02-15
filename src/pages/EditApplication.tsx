@@ -49,7 +49,7 @@ export default function EditApplication() {
   const [firms, setFirms] = useState<Array<{ id: number; firm_name: string }>>([]);
   const [keepingServices, setKeepingServices] = useState<Array<{ id: number; name: string; base_price: number }>>([]);
   const [workingServices, setWorkingServices] = useState<Array<{ id: number; service_name: string; base_price: number }>>([]);
-  const [, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
+  const [transportTypes, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
   const [storages, setStorages] = useState<Array<{ id: number; storage_name: string; storage_location: string }>>([]);
   const [products, setProducts] = useState<Array<{
     id: number;
@@ -263,19 +263,6 @@ export default function EditApplication() {
     const { formData, setFormData } = useFormContext();
     const [transportNumber, setTransportNumber] = useState('');
     const [transportTypeId, setTransportTypeId] = useState<number>(0);
-    const [transportTypes, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
-
-    useEffect(() => {
-      const fetchTransportTypes = async () => {
-        try {
-          const response = await api.get('/transport/type/');
-          setTransportTypes(response.data.results);
-        } catch (error) {
-          console.error('Error fetching transport types:', error);
-        }
-      };
-      fetchTransportTypes();
-    }, []);
 
     const handleAddTransport = () => {
       if (!transportNumber || !transportTypeId) return;
@@ -528,6 +515,32 @@ export default function EditApplication() {
             <Tab.Panel>
               <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow-sm">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="sm:col-span-2 mb-4">
+                    <div className="flex items-center">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-3">
+                        {t('editApplication.vipApplication')}
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, vip_application: !prev.vip_application }))}
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 
+                          border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                          formData.vip_application ? 'bg-[#6C5DD3]' : 'bg-gray-200 dark:bg-gray-700'
+                        }`}
+                        role="switch"
+                        aria-checked={formData.vip_application}
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full 
+                            bg-white shadow ring-0 transition duration-200 ease-in-out ${
+                            formData.vip_application ? 'translate-x-5' : 'translate-x-0'
+                          }`}
+                        />
+                      </button>
+                    </div>
+                  </div>
+
                   <div className="relative">
                     <label htmlFor="firm_search" className="block text-sm font-medium text-gray-600 dark:text-gray-300">
                       {t('editApplication.firm')}
@@ -631,7 +644,7 @@ export default function EditApplication() {
                             </svg>
                             <div>
                               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                Current Declaration File
+                                {t('editApplication.currentDeclorationFile')}
                               </p>
                               <p className="text-xs text-gray-500 dark:text-gray-400">
                                 {formData.decloration_file.split('/').pop()}
@@ -732,30 +745,6 @@ export default function EditApplication() {
 
             <Tab.Panel>
               <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow-sm">
-                <div className="mb-6 flex items-center justify-between ml-8">
-                  <div className="flex items-center">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-3">
-                      {t('editApplication.vipApplication')}
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, vip_application: !prev.vip_application }))}
-                      className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                        formData.vip_application ? 'bg-[#6C5DD3]' : 'bg-gray-200 dark:bg-gray-700'
-                      }`}
-                      role="switch"
-                      aria-checked={formData.vip_application}
-                    >
-                      <span
-                        aria-hidden="true"
-                        className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                          formData.vip_application ? 'translate-x-5' : 'translate-x-0'
-                        }`}
-                      />
-                    </button>
-                  </div>
-                </div>
-                
                 <ModesTab 
                   formData={formData}
                   setFormData={setFormData}

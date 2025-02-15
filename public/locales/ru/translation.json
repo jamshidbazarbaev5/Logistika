@@ -30,6 +30,8 @@
   "createApplication": {
     "title": "Создать Заявку",
     "storage": "Склад",
+    "vipApplication": "VIP Заявка",
+    "currentDeclorationFile": "Файл Декларации",
     "product": "Товар",
     "remove": "Удалить",
     "quantity": "Количество",
@@ -269,6 +271,7 @@
     "previous": "Предыдущий",
     "next": "Следующий",
     "title": "Заявки",
+    "edit": "Изменить",
     "createApplication": "Создать Заявку",
     "errorLoading": "Ошибка при загрузке заявок",
     "deleteTitle": "Удалить Заявку",
@@ -538,12 +541,13 @@
     "comingDate": "Дата Прибытия",
     "netto": "Нетто",
     "brutto": "Брутто",
+    "currentDeclorationFile": "Файл Декларации",
     "quantity": "Количество",
+    "view": "Просмотр",
     "searchProduct": "Поиск товара",
     "selectPhotos": "Выберите фото",
     "goToBasicInfo": "Перейти к Основной Информации",
     "days": "Дней",
-    "quantity": "Количество",
     "uploadPhotos": "Загрузить фото",
     "photos": "Фото",
     "selectStorage": "Выберите Склад",
@@ -576,5 +580,20 @@
     "searchModes": "Поиск режимов",
     "selectedFile": "Выбранный Файл",
     "back": "Назад"
+  },
+  "createProduct": {
+    "title": "Создать Продукт",
+    "subtitle": "Добавить новый продукт",
+    "name": "Название Продукта",
+    "namePlaceholder": "Введите название продукта",
+    "category": "Категория",
+    "selectCategory": "Выберите категорию",
+    "description": "Описание",
+    "descriptionPlaceholder": "Введите описание продукта",
+    "measurement": "Единица Измерения",
+    "selectMeasurement": "Выберите единицу измерения",
+    "submit": "Создать Продукт",
+    "successMessage": "Продукт успешно создан!",
+    "errorMessage": "Не удалось создать продукт. Пожалуйста, попробуйте снова."
   }
 }

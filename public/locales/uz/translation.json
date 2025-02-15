@@ -28,7 +28,9 @@
     "submit": "Firma Yaratish"
   },
   "createApplication": {
+    "currentDeclorationFile": "Deklaratsiya Fayli",
     "title": "Ariza Yaratish",
+    "vipApplication": "VIP Ariza",
     "storage": "Ombor",
     "product": "Mahsulot",
     "remove": "Óshiriw",
@@ -237,6 +239,7 @@
   "applicationList": {
     "previous": "Oldingi",
     "next": "Keyingi",
+    "edit": "Tahrirlash",
     "title": "Arizalar",
     "createApplication": "Ariza Yaratish",
     "errorLoading": "Arizalarni yuklashda xatolik yuz berdi",
@@ -499,6 +502,7 @@
     "title": "Arizani Tahrirlash",
     "subtitle": "Ariza ma'lumotlarini o'zgartirish",
     "firm": "Tashkilot",
+    "currentDeclorationFile": "Deklaratsiya Fayli",
     "searchFirm": "Tashkilotni qidirish",
     "comingDate": "Kelish Sanasi",
     "netto": "Netto",
