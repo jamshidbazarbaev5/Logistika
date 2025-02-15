@@ -1,31 +1,8 @@
 {
-    "routes": [
+    "rewrites": [
       {
-        "src": "/(.*).js",
-        "headers": {
-          "Content-Type": "text/javascript"
-        }
-      },
-      {
-        "src": "/(.*).mjs",
-        "headers": {
-          "Content-Type": "text/javascript"
-        }
-      },
-      {
-        "src": "/(.*).tsx",
-        "headers": {
-          "Content-Type": "text/javascript"
-        }
-      },
-      {
-        "src": "/(.*).ts",
-        "headers": {
-          "Content-Type": "text/javascript"
-        }
-      },
-      { 
-        "handle": "filesystem"
+        "source": "/(.*)",
+        "destination": "/index.html"
       }
     ]
   }
