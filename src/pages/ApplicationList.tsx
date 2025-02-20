@@ -197,13 +197,19 @@ export default function ApplicationList() {
   const fetchApplications = async () => {
     try {
       const params = new URLSearchParams();
+      
+      // Add non-empty search params
       Object.entries(searchParams).forEach(([key, value]) => {
         if (value) {
-          params.append(key, encodeURIComponent(value));
+          // Use the value directly without additional encoding
+          params.append(key, value);
         }
       });
+      
+      // Add page parameter
       params.append('page', currentPage.toString());
 
+      // Make the API call with the params
       const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse] = await Promise.all([
         api.get<PaginatedResponse<Application>>(`/application/?${params.toString()}`),
         api.get<PaginatedResponse<FirmResponse>>('/firms/'),

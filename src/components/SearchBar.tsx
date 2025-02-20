@@ -36,11 +36,11 @@ export function SearchBar<T extends Record<keyof T, string>>({
   };
 
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      onSearch(localValues);
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
+    const cleanValues = Object.fromEntries(
+      Object.entries(localValues).filter(([_, value]) => value !== '')
+    );
+    
+    onSearch(cleanValues as T);
   }, [localValues, onSearch]);
 
   return (
