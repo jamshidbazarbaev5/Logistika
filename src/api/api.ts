@@ -60,8 +60,17 @@ interface Storage {
 }
 
 interface KeepingService {
-  base_day: number;
   name: string;
+}
+
+interface KeepingServiceCreate {
+  name: string;
+}
+
+interface KeepingServiceUpdate {
+  name: string;
+  year: number;
+  base_day: number;
   base_price: string;
   extra_price: string;
 }
@@ -94,6 +103,18 @@ interface Product {
   name: string;
   measurement_id: number;
   category_id: number;
+}
+
+interface KeepingServiceNameCreate {
+  name: string;
+}
+
+interface KeepingServicePriceCreate {
+  year: number;
+  base_day: number;
+  base_price: string;
+  extra_price: string;
+  keeping_services_id: number;
 }
 
 export const apiService = {
@@ -137,7 +158,7 @@ export const apiService = {
     api.post('/payment_method/', data),
   
   // Keeping Service
-  createKeepingService: (data: KeepingService) => 
+  createKeepingService: (data: KeepingServiceCreate) => 
     api.post('/keeping_service/', data),
 
   // Working Service
@@ -201,10 +222,60 @@ export const apiService = {
     api.delete(`/keeping_service/${id}/`),
   deleteWorkingService: (id: number) =>
     api.delete(`/working_service/${id}/`),
-  updateKeepingService: (id: number, data: KeepingService) =>
+  updateKeepingService: (id: number, data: KeepingServiceUpdate) =>
     api.put(`/keeping_service/${id}/`, data),
   updateWorkingService: (id: number, data: WorkingService) =>
     api.put(`/working_service/${id}/`, data),
+
+  // Add these new methods
+  createKeepingServiceName: (data: KeepingServiceNameCreate) =>
+    api.post('/keeping_service/keeping_service_name/', data),
+
+  createKeepingServicePrice: (data: KeepingServicePriceCreate) =>
+    api.post('/keeping_service/keeping_service_price/', data),
+
+  getKeepingServiceNames: () => 
+    api.get('/keeping_service/keeping_service_name/').then(response => response.data),
+
+  getKeepingServicePrices: () => 
+    api.get('/keeping_service/keeping_service_price/').then(response => response.data),
+
+  updateKeepingServiceName: (id: number, data: { name: string }) => {
+    return api.put(`/keeping_service/keeping_service_name/${id}/`, data);
+  },
+
+  updateKeepingServicePrice: (id: number, data: {
+    base_day: number;
+    base_price: string;
+    extra_price: string;
+    year: number;
+    keeping_services_id: number;
+  }) => {
+    return api.put(`/keeping_service/keeping_service_price/${id}/`, data);
+  },
 };
 
-export type { Storage, KeepingService, WorkingService, Firm, Category, Product };
+export type { Storage, KeepingService, WorkingService, Firm, Category, Product, KeepingServiceNameCreate, KeepingServicePriceCreate };
+
+interface KeepingServiceName {
+  id: number;
+  name: string;
+}
+
+interface KeepingServicePrice {
+  id: number;
+  base_price: number;
+  extra_price: string;
+}
+
+export const keepingServiceApi = {
+  getServiceName: async (serviceId: number): Promise<KeepingServiceName> => {
+    const response = await api.get(`/keeping_service/keeping_service_name/${serviceId}/`);
+    return response.data;
+  },
+
+  getServicePrice: async (serviceId: number): Promise<KeepingServicePrice> => {
+    const response = await api.get(`/keeping_service/keeping_service_price/${serviceId}/`);
+    return response.data;
+  }
+};

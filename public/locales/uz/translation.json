@@ -239,6 +239,8 @@
   "applicationList": {
     "previous": "Oldingi",
     "next": "Keyingi",
+    "numberOfApplication": "Ariza Raqami",
+    "totalCost": "Jami Narx",
     "edit": "Tahrirlash",
     "title": "Arizalar",
     "createApplication": "Ariza Yaratish",
@@ -499,6 +501,9 @@
     "inputPlaceholder": "Mahsulot nomini kiriting"
   },
   "editApplication": {
+    "amount":"Qiymati",
+    "basePrice":"Asosiy Narx",
+    "extraPrice":"Qoshimcha Narx",
     "title": "Arizani Tahrirlash",
     "subtitle": "Ariza ma'lumotlarini o'zgartirish",
     "firm": "Tashkilot",

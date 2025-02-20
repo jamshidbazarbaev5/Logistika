@@ -54,6 +54,7 @@ interface Product {
 
 interface Application {
   id: number;
+  total_cost: number;
   decloration_file: string;
   brutto: number | null;
   netto: number | null;
@@ -75,6 +76,7 @@ interface Application {
   modes?: ApplicationMode[];
   photo_report: PhotoReport[];
   transport: Transport[];
+  number_of_application:string
   products: Product[];
 }
 
@@ -395,7 +397,7 @@ export default function ApplicationList() {
                 {t("applicationList.table.number", "#")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("applicationList.table.declarationNumber", "Declaration Number")}
+                {t("applicationList.numberOfApplication",)}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("applicationList.table.firmName", "Firm Name")}
@@ -404,7 +406,7 @@ export default function ApplicationList() {
                 {t("applicationList.table.vipStatus", "VIP Status")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("applicationList.table.brutto", "Brutto")}
+                {t("applicationList.totalCost")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("applicationList.table.dates", "Dates")}
@@ -427,7 +429,7 @@ export default function ApplicationList() {
                     {index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {application.decloration_number}
+                    {application.number_of_application}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {firms[application.firm_id] || t("applicationList.unknownFirm", "Unknown Firm")}
@@ -446,7 +448,7 @@ export default function ApplicationList() {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {application.brutto || '-'}
+                    {application.total_cost } сум
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     <div>{t("applicationList.comingDate", "Coming")}: {application.coming_date}</div>

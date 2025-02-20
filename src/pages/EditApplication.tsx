@@ -4,26 +4,32 @@ import { useTranslation } from "react-i18next";
 import { api } from "../api/api";
 import SuccessModal from "../components/SuccessModal";
 import { Tab } from "@headlessui/react";
-import { FormContext, ApplicationFormData } from "../context/FormContext";
-import ServicesTab from  '../components/ServicesTab'
+import { FormContext } from '../context/FormContext';
+import ServicesTab from '../components/ServicesTab';
 import PhotoReportTab from "../components/PhotoReportTab";
 import ProductsTab from "../components/ProductsTab";
 import ModesTab from "../components/ModesTab";
 import { useFormContext } from "../context/FormContext";
+import type { ApplicationFormData } from '../context/FormContext';
 
+interface EditApplicationFormState extends Omit<ApplicationFormData, 'decloration_file'> {
+  decloration_file?: string | File;
+  [key: string]: any;
+}
 
 export default function EditApplication() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   
-  const [formData, setFormData] = useState<ApplicationFormData>({
+  const [formData, setFormData] = useState<EditApplicationFormState>({
     firm_id: 0,
+    number_of_application: '',
     brutto: null,
     netto: null,
     coming_date: '',
@@ -39,11 +45,12 @@ export default function EditApplication() {
     payment_method: 0,
     keeping_services: [],
     working_services: [],
+    upload_keeping_services_quantity: [],
+    upload_working_services_quantity: [],
     photo_report: [],
     transport: [],
     modes: [],
-    products: [],
-    decloration_file: undefined,
+    products: []
   });
 
   const [firms, setFirms] = useState<Array<{ id: number; firm_name: string }>>([]);
@@ -76,7 +83,7 @@ export default function EditApplication() {
         ] = await Promise.all([
           api.get(`/application/${id}/`),
           api.get('/firms/'),
-          api.get('/keeping_service/'),
+          api.get('/keeping_service/keeping_service_price/'),
           api.get('/working_service/'),
           api.get('/transport/type/'),
           api.get('/storage/'),
@@ -85,6 +92,8 @@ export default function EditApplication() {
         ]); 
 
         const applicationData = applicationRes.data;
+        
+        // Transform dates
         if (applicationData.coming_date) {
           const [day, month, year] = applicationData.coming_date.split('.');
           applicationData.coming_date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
@@ -94,6 +103,19 @@ export default function EditApplication() {
           applicationData.decloration_date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
         }
 
+        // Transform keeping services
+        applicationData.upload_keeping_services_quantity = applicationData.keeping_services.map((service: any) => ({
+          service_type_id: service.service_type_id,
+          amount: service.amount
+        }));
+
+        // Transform working services
+        applicationData.upload_working_services_quantity = applicationData.working_services.map((service: any) => ({
+          service_id: service.service_id,
+          quantity: service.quantity
+        }));
+
+        // Transform modes
         if (applicationData.modes && Array.isArray(applicationData.modes)) {
           applicationData.modes = applicationData.modes.map((mode: any) => ({
             mode_id: mode.mode_id || mode.id
@@ -126,97 +148,92 @@ export default function EditApplication() {
     fetchData();
   }, [id]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     try {
-      const formDataObj = new FormData();
+      const formDataToSend = new FormData();
 
-      formDataObj.append('firm_id', formData.firm_id.toString());
-      formDataObj.append('brutto', formData.brutto?.toString() || '');
-      formDataObj.append('netto', formData.netto?.toString() || '');
-      formDataObj.append('vip_application', formData.vip_application ? 'true' : 'false');
-      formDataObj.append('total_price', formData.total_price?.toString() || '');
-      formDataObj.append('coming_date', formData.coming_date || '');
-      formDataObj.append('decloration_date', formData.decloration_date || '');
-      formDataObj.append('decloration_number', formData.decloration_number || '');
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === 'decloration_date' && value) {
+          formDataToSend.append(key, formatDateForAPI(value as string));
+        } else if (key === 'coming_date' && value) {
+          formDataToSend.append(key, formatDateForAPI(value as string));
+        } else if (value !== null && value !== undefined && key !== 'decloration_file' && key !== 'photo_report') {
+          if (Array.isArray(value)) {
+            formDataToSend.append(key, JSON.stringify(value));
+          } else {
+            formDataToSend.append(key, value.toString());
+          }
+        }
+      });
 
-      formDataObj.append('upload_keeping_services_quantity', 
-        JSON.stringify(formData.keeping_services.map(service => ({
-          keeping_services_id: service.keeping_services_id,
-          day: service.day
-        })))
-      );
-      
-      formDataObj.append('upload_working_services_quantity', 
-        JSON.stringify(formData.working_services.map(service => ({
-          service_id: service.service_id,
-          quantity: service.quantity
-        })))
-      );
-      
-      formDataObj.append('upload_transport', 
-        JSON.stringify(formData.transport.map(t => ({
-          transport_type: t.transport_type,
-          transport_number: t.transport_number
-        })))
-      );
-      
-      formDataObj.append('upload_modes', 
-        JSON.stringify(formData.modes)
-      );
-      
-      formDataObj.append('upload_products', 
-        JSON.stringify(formData.products.map(product => ({
-          product_id: product.product_id,
-          storage_id: product.storage_id,
-          quantity: product.quantity
-        })))
-      );
-
+      // Handle file uploads
       if (formData.decloration_file instanceof File) {
-        formDataObj.append('decloration_file', formData.decloration_file);
+        formDataToSend.append('decloration_file', formData.decloration_file);
       }
 
-      if (formData.photo_report && formData.photo_report.length > 0) {
-        const photoData: any[] = [];
-        
-        formData.photo_report.forEach((photo: any) => {
-          if (photo.isNew && photo.photo instanceof File) {
-            formDataObj.append(`upload_photos`, photo.photo);
-          } else if (typeof photo.photo === 'string') {
-            photoData.push({ photo: photo.photo });
+      // Handle photo report files
+      if (formData.photo_report && Array.isArray(formData.photo_report)) {
+        formData.photo_report.forEach((photo) => {
+          if (photo instanceof File) {
+            formDataToSend.append('photo_report', photo);
           }
         });
-      } else {
-        formDataObj.append('upload_photos', '[]');
       }
 
-      await api.put(`/application/${id}/`, formDataObj, {
+      // Special handling for arrays that need to be JSON stringified
+      ['upload_keeping_services_quantity', 'upload_working_services_quantity', 'upload_transport', 'upload_modes', 'upload_products'].forEach(key => {
+        if (formData[key] && Array.isArray(formData[key])) {
+          formDataToSend.append(key, JSON.stringify(formData[key]));
+        }
+      });
+
+      const response = await api.put(`/application/${id}/`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-
-      setModalMessage('Application updated successfully!');
-      setShowSuccessModal(true);
       
-      setTimeout(() => {
-        navigate('/application-list');
-      }, 2000);
-
+      if (response.status === 200) {
+        setModalMessage(t('editApplication.successMessage'));
+        setShowSuccessModal(true);
+        setTimeout(() => {
+          navigate('/application-list');
+        }, 1500);
+      }
     } catch (error: any) {
       console.error('Error updating application:', error);
+      let errorMessages = '';
       if (error.response?.data) {
-        const errorMessages = Object.entries(error.response.data)
-          .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+        errorMessages = Object.entries(error.response.data)
+          .map(([key, value]) => `${key}: ${value}`)
           .join('\n');
-        setModalMessage(`Error updating application:\n${errorMessages}`);
-      } else {
-        setModalMessage('Error updating application');
       }
+      setModalMessage(`Error updating application:\n${errorMessages}`);
       setShowSuccessModal(true);
     }
+  };
+
+  // Add this helper function
+  const formatDateForAPI = (dateString: string): string => {
+    // If the date is already in YYYY-MM-DD format, return it
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      return dateString;
+    }
+
+    // If it's in DD.MM.YYYY format, convert it
+    if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateString)) {
+      const [day, month, year] = dateString.split('.');
+      return `${year}-${month}-${day}`;
+    }
+
+    // Try to create a valid date object and format it
+    const date = new Date(dateString);
+    if (!isNaN(date.getTime())) {
+      return date.toISOString().split('T')[0];
+    }
+
+    // If all else fails, return null or the original string
+    return dateString;
   };
 
   const validateDate = (dateString: string): boolean => {
@@ -264,11 +281,14 @@ export default function EditApplication() {
     const [transportNumber, setTransportNumber] = useState('');
     const [transportTypeId, setTransportTypeId] = useState<number>(0);
 
+    // Type assertion for formData to include string indexing
+    const typedFormData = formData as EditApplicationFormState;
+
     const handleAddTransport = () => {
       if (!transportNumber || !transportTypeId) return;
 
       // Check if transport number already exists for this application
-      const isDuplicate = formData.transport.some(
+      const isDuplicate = typedFormData.transport.some(
         (t: any) => t.transport_number.toLowerCase() === transportNumber.toLowerCase()
       );
 
@@ -358,13 +378,13 @@ export default function EditApplication() {
             </div>
           </div>
 
-          {formData.transport.length > 0 && (
+          {typedFormData.transport.length > 0 && (
             <div className="mt-4 sm:mt-6">
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                 {t('editApplication.selectedTransports')}:
               </h4>
               <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2">
-                {formData.transport.map((transport:any, index:number) => (
+                {typedFormData.transport.map((transport:any, index:number) => (
                   <div 
                     key={index} 
                     className="flex justify-between items-center bg-gray-50 
@@ -413,7 +433,10 @@ export default function EditApplication() {
   }
 
   return (
-    <FormContext.Provider value={{ formData, setFormData }}>
+    <FormContext.Provider value={{ 
+      formData: formData as ApplicationFormData, 
+      setFormData: setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>
+    }}>
       <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
         <Tab.Group selectedIndex={selectedTab} onChange={handleTabChange}>
           <Tab.List className="flex space-x-1 rounded-xl bg-gray-100 dark:bg-gray-800 p-1 
@@ -631,7 +654,7 @@ export default function EditApplication() {
                     </label>
                     <input
                       type="date"
-                      value={formData.decloration_date}
+                      value={formData.decloration_date || ''}
                       onChange={(e) => handleDateChange(e, 'decloration_date')}
                       className={inputClassName}
                     />
@@ -653,17 +676,17 @@ export default function EditApplication() {
                                 {t('editApplication.currentDeclorationFile')}
                               </p>
                               <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {formData.decloration_file.split('/').pop()}
+                                {(formData.decloration_file as string).split('/').pop()}
                               </p>
                             </div>
                           </div>
                           <a
-                            href={formData.decloration_file}
+                            href={formData.decloration_file as string}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="px-3 py-1 text-sm text-[#6C5DD3] hover:bg-[#6C5DD3]/10 rounded-lg transition-colors"
                           >
-                           {t('editApplication.view')}
+                            {t('editApplication.view')}
                           </a>
                         </div>
                       </div>
@@ -722,8 +745,8 @@ export default function EditApplication() {
 
             <Tab.Panel>
               <ServicesTab 
-                formData={formData}
-                setFormData={setFormData}
+                formData={formData as ApplicationFormData}
+                setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
                 keepingServices={keepingServices}
                 workingServices={workingServices}
                 onSuccess={() => setSelectedTab(3)}
@@ -732,8 +755,8 @@ export default function EditApplication() {
 
             <Tab.Panel>
               <PhotoReportTab 
-                formData={formData}
-                setFormData={setFormData}
+                formData={formData as ApplicationFormData}
+                setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
                 onSuccess={() => setSelectedTab(4)}
                 setSelectedTab={setSelectedTab}
               />
@@ -741,8 +764,8 @@ export default function EditApplication() {
 
             <Tab.Panel>
               <ProductsTab 
-                formData={formData}
-                setFormData={setFormData}
+                formData={formData as ApplicationFormData}
+                setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
                 products={products}
                 storages={storages}
                 onSuccess={() => setSelectedTab(5)}
@@ -752,8 +775,8 @@ export default function EditApplication() {
             <Tab.Panel>
               <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow-sm">
                 <ModesTab 
-                  formData={formData}
-                  setFormData={setFormData}
+                  formData={formData as ApplicationFormData}
+                  setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
                   onSubmit={handleSubmit}
                   availableModes={availableModes}
                 />

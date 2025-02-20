@@ -133,6 +133,22 @@ const BasicInfoTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
             className={inputClassName}
           />
         </div>
+
+        <div className="space-y-1 w-full">
+          <label className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 break-words">
+            {t('editApplication.applicationNumber')}
+          </label>
+          <input
+            type="text"
+            value={formData.number_of_application || ''}
+            onChange={(e) => setFormData((prev: any) => ({ 
+              ...prev, 
+              number_of_application: e.target.value 
+            }))}
+            className={inputClassName}
+            placeholder={t('editApplication.enterApplicationNumber')}
+          />
+        </div>
       </div>
 
       <div className="mt-6 sm:mt-8 flex justify-end w-full">

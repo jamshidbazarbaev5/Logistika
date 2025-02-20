@@ -42,12 +42,11 @@ export interface Product {
 }
 
 export interface ApplicationFormData {
-  id?: number;
   firm_id: number;
+  number_of_application: string;
   brutto: number | null;
   netto: number | null;
   coming_date: string;
-  decloration_file?: string | File;
   decloration_date: string;
   decloration_number: string;
   vip_application: boolean;
@@ -58,12 +57,50 @@ export interface ApplicationFormData {
   unloading_quantity: number;
   loading_quantity: number;
   payment_method: number;
-  keeping_services: KeepingService[];
-  working_services: WorkingService[];
-  photo_report: PhotoReport[];
-  transport: Transport[];
-  modes: ApplicationMode[];
-  products: Product[];
+  keeping_services: Array<{
+    id?: number;
+    amount: number;
+    service_type_id: number;
+    application_id?: number;
+  }>;
+  working_services: Array<{
+    id?: number;
+    quantity: number;
+    service_id: number;
+    application_id?: number;
+  }>;
+  upload_keeping_services_quantity: Array<{
+    amount: number;
+    service_type_id: number;
+  }>;
+  upload_working_services_quantity: Array<{
+    service_id: number;
+    quantity: number;
+  }>;
+  photo_report: Array<{
+    id?: number;
+    photo: string | File;
+    application_id?: number;
+  }>;
+  transport: Array<{
+    id?: number;
+    transport_number: string;
+    transport_type: number;
+    application_id?: number;
+  }>;
+  modes: Array<{
+    id?: number;
+    mode_id: number;
+    application_id?: number;
+  }>;
+  products: Array<{
+    id?: number;
+    quantity: number;
+    product_id: number;
+    storage_id: number;
+    application_id?: number;
+  }>;
+  decloration_file?: File;
 }
 
 interface FormContextType {

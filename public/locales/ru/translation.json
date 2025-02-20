@@ -270,6 +270,8 @@
   "applicationList": {
     "previous": "Предыдущий",
     "next": "Следующий",
+    "numberOfApplication": "Номер Заявки",
+    "totalCost": "Общая Стоимость",
     "title": "Заявки",
     "edit": "Изменить",
     "createApplication": "Создать Заявку",
@@ -539,6 +541,9 @@
     "firm": "Организация",
     "searchFirm": "Поиск организации",
     "comingDate": "Дата Прибытия",
+    "amount":"Количество",
+    "basePrice":"Базовая Цена", 
+    "extraPrice":"Дополнительная Цена",
     "netto": "Нетто",
     "brutto": "Брутто",
     "currentDeclorationFile": "Файл Декларации",

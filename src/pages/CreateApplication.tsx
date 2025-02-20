@@ -23,8 +23,8 @@ interface ApplicationFormData {
   keeping_services?: number[];
   working_services?: number[];
   upload_keeping_services_quantity: Array<{
-    day: number;
-    keeping_services_id: number;
+    amount: number;
+    service_type_id: number;
   }>;
   upload_working_services_quantity: Array<{
     service_id: number;
@@ -43,6 +43,7 @@ interface ApplicationFormData {
     storage_id: number;
   }>;
   upload_photos?: File[];
+  number_of_application: string;
 }
 
 interface Firm {
@@ -56,10 +57,11 @@ interface PaymentMethod {
 
 interface KeepingService {
   id: number;
+  year: number;
   base_day: number;
-  name: string;
   base_price: string;
   extra_price: string;
+  keeping_services_id: number;
 }
 
 interface WorkingService {
@@ -508,7 +510,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           {formData.upload_products.map((product, index) => {
             const details = getProductDetails(product.product_id, product.storage_id);
             return (
-              <div key={index} className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+              <div key={`product-${index}`} className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
                 <div className="flex-1">
                   <span className="font-medium dark:text-gray-100">
                     {details.productName}
@@ -659,7 +661,7 @@ const TransportSection = ()  => {
             <div className="space-y-3">
               {formData.upload_transport.map((transport, index) => (
                 <div 
-                  key={index} 
+                  key={`transport-${index}`} 
                   className="flex justify-between items-center bg-gray-50 
                     dark:bg-gray-800 p-4 rounded-lg border border-gray-200 
                     dark:border-gray-700 hover:border-gray-300 
@@ -697,6 +699,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const { formData, setFormData } = useFormContext();
   const [keepingServices, setKeepingServices] = useState<KeepingService[]>([]);
   const [workingServices, setWorkingServices] = useState<WorkingService[]>([]);
+  const [keepingServicesNames, setKeepingServicesNames] = useState<Map<number, string>>(new Map());
   const [keepingServicesOpen, setKeepingServicesOpen] = useState(false);
   const [workingServicesOpen, setWorkingServicesOpen] = useState(false);
   const keepingServicesRef = useRef<HTMLDivElement>(null);
@@ -707,11 +710,23 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     const fetchServices = async () => {
       try {
         const [keepingRes, workingRes] = await Promise.all([
-          api.get('/keeping_service/'),
+          api.get('/keeping_service/keeping_service_price/'),
           api.get('/working_service/')
         ]);
         setKeepingServices(keepingRes.data.results);
         setWorkingServices(workingRes.data.results);
+
+        // Fetch names for each keeping service
+        const namePromises = keepingRes.data.results.map((service: any) =>
+          api.get(`/keeping_service/keeping_service_name/${service.keeping_services_id}/`)
+        );
+        
+        const nameResponses = await Promise.all(namePromises);
+        const namesMap = new Map();
+        keepingRes.data.results.forEach((service: any, index: number) => {
+          namesMap.set(service.keeping_services_id, nameResponses[index].data.name);
+        });
+        setKeepingServicesNames(namesMap);
       } catch (error) {
         console.error('Error fetching services:', error);
       }
@@ -738,11 +753,11 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
       ...prev,
       upload_keeping_services_quantity: [
         ...prev.upload_keeping_services_quantity.filter(
-          item => item.keeping_services_id !== serviceId
+          item => item.service_type_id !== serviceId
         ),
         {
-          keeping_services_id: serviceId,
-          day: days
+          amount: days,
+          service_type_id: serviceId
         }
       ]
     }));
@@ -772,7 +787,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     setFormData(prev => ({
       ...prev,
       upload_keeping_services_quantity: prev.upload_keeping_services_quantity.filter(
-        item => item.keeping_services_id !== serviceId
+        item => item.service_type_id !== serviceId
       )
     }));
   };
@@ -788,8 +803,8 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
 
   const getSelectedKeepingService = (serviceId: number) => {
     return formData.upload_keeping_services_quantity.find(
-      item => item.keeping_services_id === serviceId
-    )?.day || 0;
+      item => item.service_type_id === serviceId
+    )?.amount || 0;
   };
 
   const getSelectedWorkingService = (serviceId: number) => {
@@ -836,12 +851,14 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
             <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 
               border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg 
               divide-y divide-gray-100 dark:divide-gray-700">
-              {keepingServices.map(service => (
-                <div key={service.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 
+              {keepingServices?.map(service => (
+                <div key={`keeping-${service.id}`} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 
                   transition-colors duration-150">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 dark:text-gray-100">{service.name}</h4>
+                      <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                        {keepingServicesNames.get(service.keeping_services_id) || t('createApplication.loading')}
+                      </h4>
                       <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                         <span>{t('createApplication.base')}: {service.base_price}</span>
                         <span>•</span>
@@ -850,13 +867,13 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
                     </div>
                     <div className="flex items-center space-x-3">
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('createApplication.days')}:
+                        {t('createApplication.quantity')}:
                       </label>
                       <input
                         type="number"
                         min="0"
-                        value={getSelectedKeepingService(service.id)}
-                        onChange={(e) => handleKeepingServiceChange(service.id, parseInt(e.target.value) || 0)}
+                        value={getSelectedKeepingService(service.keeping_services_id)}
+                        onChange={(e) => handleKeepingServiceChange(service.keeping_services_id, parseInt(e.target.value) || 0)}
                         className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 
                           rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 
                           dark:text-gray-100 focus:ring-2 focus:ring-[#6C5DD3] 
@@ -905,7 +922,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
               border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg 
               divide-y divide-gray-100 dark:divide-gray-700">
               {workingServices.map(service => (
-                <div key={service.id} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 
+                <div key={`working-${service.id}`} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 
                   transition-colors duration-150">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
@@ -946,32 +963,33 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           </h3>
           
           {/* Selected Keeping Services */}
-          {formData.upload_keeping_services_quantity.length > 0 && (
+          {formData.upload_keeping_services_quantity && formData.upload_keeping_services_quantity.length > 0 && (
             <div className="space-y-4">
               <h4 className="font-medium text-gray-700 dark:text-white text-sm uppercase tracking-wider">
                 {t('createApplication.storageServices')}
               </h4>
               <div className="grid gap-3">
                 {formData.upload_keeping_services_quantity.map((item) => {
-                  const service = keepingServices.find(s => s.id === item.keeping_services_id);
+                  const service = keepingServices.find(s => s.keeping_services_id === item.service_type_id);
                   return (
-                    <div key={item.keeping_services_id} 
+                    <div key={`keeping-${item.service_type_id}`} 
                       className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-4 
                         rounded-xl border border-gray-100 dark:border-gray-700 
-                        hover:border-gray-200 dark:hover:border-gray-700 transition-colors duration-200"
-                    >
+                        hover:border-gray-200 dark:hover:border-gray-700 transition-colors duration-200">
                       <div className="flex flex-col">
                         <span className="font-medium text-gray-900 dark:text-white">
-                          {service?.name}
+                          {keepingServicesNames.get(item.service_type_id) || t('createApplication.loading')}
                         </span>
                         <div className="mt-1 flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-300">
-                          <span>{item.day} {t('createApplication.days')}</span>
+                          <span>{item.amount} {t('createApplication.quantity')}</span>
                           <span>•</span>
                           <span>{t('createApplication.base')}: {service?.base_price}</span>
+                          <span>•</span>
+                          <span>{t('createApplication.extra')}: {service?.extra_price}</span>
                         </div>
                       </div>
                       <button
-                        onClick={() => handleRemoveKeepingService(item.keeping_services_id)}
+                        onClick={() => handleRemoveKeepingService(item.service_type_id)}
                         className="p-2 text-gray-400 hover:text-red-500 dark:text-gray-300 
                           dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 
                           rounded-lg transition-colors duration-200"
@@ -988,7 +1006,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           )}
 
           {/* Selected Working Services */}
-          {formData.upload_working_services_quantity.length > 0 && (
+          {formData.upload_working_services_quantity && formData.upload_working_services_quantity.length > 0 && (
             <div className="space-y-4">
                 <h4 className="font-medium text-gray-700 dark:text-white text-sm uppercase tracking-wider">
                 {t('createApplication.workingServices')}
@@ -997,7 +1015,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
                 {formData.upload_working_services_quantity.map((item) => {
                   const service = workingServices.find(s => s.id === item.service_id);
                   return (
-                    <div key={item.service_id} 
+                    <div key={`working-${item.service_id}`} 
                       className="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-4 
                         rounded-xl border border-gray-100 dark:border-gray-700 
                         hover:border-gray-200 dark:hover:border-gray-700 transition-colors duration-200"
@@ -1245,7 +1263,8 @@ export default function CreateApplication() {
     upload_transport: [],
     upload_modes: [],
     upload_products: [],
-    upload_photos: []
+    upload_photos: [],
+    number_of_application: ''
   });
 
   useEffect(() => {
@@ -1259,7 +1278,7 @@ export default function CreateApplication() {
           transportTypesResponse
         ] = await Promise.all([
           api.get('/payment_method/'),
-          api.get('/keeping_service/'),
+          api.get('/keeping_service/keeping_service_price/'),
           api.get('/working_service/'),
           api.get('/storage/'),
           api.get('/transport/type/')
@@ -1315,15 +1334,15 @@ export default function CreateApplication() {
     try {
       const formDataObj = new FormData();
 
+      // Basic fields
       formDataObj.append('firm_id', formData.firm_id.toString());
       formDataObj.append('brutto', formData.brutto?.toString() || '');
       formDataObj.append('netto', formData.netto?.toString() || '');
       formDataObj.append('vip_application', formData.vip_application ? 'true' : 'false');
       formDataObj.append('total_price', formData.total_price?.toString() || '');
-      formDataObj.append('coming_date', formData.coming_date || '');
-      formDataObj.append('decloration_date', formData.decloration_date || '');
-      formDataObj.append('decloration_number', formData.decloration_number || '');
+      formDataObj.append('number_of_application', formData.number_of_application || '');
 
+      // Arrays need to be stringified
       formDataObj.append('upload_keeping_services_quantity', 
         JSON.stringify(formData.upload_keeping_services_quantity));
       
@@ -1339,6 +1358,7 @@ export default function CreateApplication() {
       formDataObj.append('upload_products', 
         JSON.stringify(formData.upload_products));
 
+      // File uploads
       if (formData.decloration_file) {
         formDataObj.append('decloration_file', formData.decloration_file);
       }
@@ -1349,22 +1369,19 @@ export default function CreateApplication() {
         });
       }
 
-      const endpoint = '/application/';
-      const method = 'post';
-
-      const response = await api[method](endpoint, formDataObj, {
+      const response = await api.post('/application/', formDataObj, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
 
-      console.log(`Application created successfully:`, response.data);
+      console.log('Application created successfully:', response.data);
       setApplicationId(response.data.id);
       setShowSuccessModal(true);
       navigate('/application-list');
 
     } catch (error: any) {
-      console.error(`Error submitting application:`, error);
+      console.error('Error submitting application:', error);
       if (error.response) {
         console.error('Server error details:', {
           status: error.response.status,
@@ -1586,6 +1603,20 @@ export default function CreateApplication() {
             <Tab.Panel>
               <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="number_of_application" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                      {t('createApplication.applicationNumber', 'Application Number')}
+                    </label>
+                    <input
+                      type="text"
+                      name="number_of_application"
+                      id="number_of_application"
+                      value={formData.number_of_application || ''}
+                      onChange={handleChange}
+                      className={inputClassName}
+                    />
+                  </div>
+
                   <div className="sm:col-span-2 mb-4">
                     <div className="flex items-center">
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-3">
