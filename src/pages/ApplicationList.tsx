@@ -161,7 +161,7 @@ export default function ApplicationList() {
 
   const searchFields: SearchField[] = [
     {
-      name: t('applicationList.table.firmName'),
+      name: 'firm_name',
       label: t('applicationList.table.firmName'),
       placeholder: t('applicationList.table.firmName'),
       className: 'col-span-12 sm:col-span-6 lg:col-span-4',
@@ -198,7 +198,9 @@ export default function ApplicationList() {
     try {
       const params = new URLSearchParams();
       Object.entries(searchParams).forEach(([key, value]) => {
-        if (value) params.append(key, value);
+        if (value) {
+          params.append(key, encodeURIComponent(value));
+        }
       });
       params.append('page', currentPage.toString());
 

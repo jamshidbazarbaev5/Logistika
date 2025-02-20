@@ -7,14 +7,7 @@ import SuccessModal from "../components/SuccessModal";
 import { Pencil, Trash2 } from 'lucide-react';
 import { Dialog } from "@headlessui/react";
 
-interface KeepingService {
-  id: number;
-  base_day: number;
-  name: string;
-  base_price: string;
-  extra_price: string;
-  year: number;
-}
+
 
 interface KeepingServiceFormData {
   name: string;
