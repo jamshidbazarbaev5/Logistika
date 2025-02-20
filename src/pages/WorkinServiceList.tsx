@@ -250,7 +250,6 @@ export default function WorkingServiceList() {
                       required
                     >
                       <option value="">{t("common.select")}</option>
-                      <option value="day">{t("workingService.unitsSelect.day")}</option>
                       <option value="hour">{t("workingService.unitsSelect.hour")}</option>
                       <option value="piece">{t("workingService.unitsSelect.piece")}</option>
                     </select>

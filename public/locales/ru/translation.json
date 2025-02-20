@@ -473,9 +473,11 @@
     "createUser": "Список Пользователей",
     "services": "Услуги",
     "workingServices": "Рабочие Услуги",
-    "keepingServices": "Услуги Хранения"
+    "keepingServices": "Услуги Хранения",
+    "year": "Год"
   },
   "keepingService": {
+    "year": "Год",
     "title": "Услуги Хранения",
     "create": "Создать Услугу Хранения",
     "edit": "Редактировать Услугу Хранения",

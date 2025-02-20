@@ -112,7 +112,6 @@ export default function CreateWorkingService() {
                 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 required
               >
-                <option value="day">{t("createWorkingService.serviceInfo.unitsSelect.day")}</option>
                 <option value="hour">{t("createWorkingService.serviceInfo.unitsSelect.hour")}</option>
                 <option value="piece">{t("createWorkingService.serviceInfo.unitsSelect.piece")}</option>
               </select>

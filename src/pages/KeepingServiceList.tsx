@@ -21,6 +21,7 @@ interface KeepingServiceFormData {
   base_day: number;
   base_price: string;
   extra_price: string;
+  year: number;
 }
 
 interface KeepingServiceName {
@@ -37,8 +38,30 @@ interface KeepingServicePrice {
   keeping_services_id: number;
 }
 
-interface KeepingServiceWithPriceId extends KeepingService {
-  priceId?: number; // Add this to track the price record ID
+interface KeepingServiceWithPriceId {
+  id: number;
+  name: string;
+  base_day: number;
+  base_price: string;
+  extra_price: string;
+  year: number;
+  priceId: number;
+}
+
+// Update the API response interface
+interface PaginatedResponse<T> {
+  links: {
+    first: string | null;
+    last: string | null;
+    next: string | null;
+    previous: string | null;
+  };
+  total_pages: number;
+  current_page: number;
+  page_range: number[];
+  page_size: number;
+  results: T[];
+  count: number;
 }
 
 export default function KeepingServiceList() {
@@ -57,48 +80,82 @@ export default function KeepingServiceList() {
     base_day: 0,
     base_price: '',
     extra_price: '',
+    year: new Date().getFullYear(),
   });
   const [showNameModal, setShowNameModal] = useState(false);
   const [newServiceName, setNewServiceName] = useState("");
+  const [selectedYear, setSelectedYear] = useState(2025); // Default to 2025
+  const availableYears = [2024, 2025]; // Fixed years
 
   const fetchServices = async () => {
     try {
-      // Fetch both service names and prices
       const [namesResponse, pricesResponse] = await Promise.all([
         apiService.getKeepingServiceNames(),
-        apiService.getKeepingServicePrices()
+        apiService.getKeepingServicePrices(selectedYear)
       ]);
 
-      const names = namesResponse?.results ;
-      const prices = pricesResponse?.results || [];
-      console.log(names, prices);
+      console.log('Raw namesResponse:', namesResponse);
+      console.log('Raw pricesResponse:', pricesResponse);
 
-      // Combine the data
-      const combinedServices = names.map((name: KeepingServiceName) => {
-        const price = prices.find((p: KeepingServicePrice) => p.keeping_services_id === name.id);
-        return {
-          id: name.id,
-          name: name.name,
-          base_day: price?.base_day || 0,
-          base_price: price?.base_price || '0',
-          extra_price: price?.extra_price || '0',
-          year: price?.year || new Date().getFullYear(),
-          priceId: price?.id // Store the price record ID
-        };
-      });
+      const names = (namesResponse?.data as PaginatedResponse<KeepingServiceName>)?.results || [];
+      const prices = (pricesResponse?.data as PaginatedResponse<KeepingServicePrice>)?.results || [];
 
-      setServices(combinedServices);
+      // Filter prices for the selected year only
+      const yearPrices = prices.filter(price => price.year === selectedYear);
+
+      console.log('Names:', names);
+      console.log('Filtered Prices for year', selectedYear, ':', yearPrices);
+
+      if (names.length === 0 && yearPrices.length > 0) {
+        // If we have prices but no names, create services from the prices
+        const servicesFromPrices: KeepingServiceWithPriceId[] = yearPrices.map((price: KeepingServicePrice) => ({
+          id: price.keeping_services_id,
+          name: `Service ${price.keeping_services_id}`,
+          base_day: price.base_day,
+          base_price: price.base_price,
+          extra_price: price.extra_price,
+          year: price.year,
+          priceId: price.id
+        }));
+
+        setServices(servicesFromPrices);
+      } else {
+        // Original logic for combining names and prices
+        const combinedServices: KeepingServiceWithPriceId[] = names
+          .map((name: KeepingServiceName) => {
+            const price = yearPrices.find((p: KeepingServicePrice) => p.keeping_services_id === name.id);
+            if (!price) return null;
+            
+            return {
+              id: name.id,
+              name: name.name,
+              base_day: price.base_day,
+              base_price: price.base_price,
+              extra_price: price.extra_price,
+              year: price.year,
+              priceId: price.id
+            };
+          })
+          .filter((service): service is KeepingServiceWithPriceId => service !== null);
+
+        setServices(combinedServices);
+      }
       setLoading(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error loading keeping services:", error);
+      console.error("Error details:", {
+        namesResponse: error?.response?.data,
+        pricesResponse: error?.response?.data
+      });
       setServices([]);
       setLoading(false);
     }
   };
 
   useEffect(() => {
+    setLoading(true); 
     fetchServices();
-  }, []);
+  }, [selectedYear]);
 
   const handleDelete = (service: KeepingServiceWithPriceId) => {
     setServiceToDelete(service);
@@ -109,12 +166,23 @@ export default function KeepingServiceList() {
     if (!serviceToDelete) return;
 
     try {
-      await apiService.deleteKeepingService(serviceToDelete.id);
+      // Delete the price record first using the priceId
+      if (serviceToDelete.priceId) {
+        await api.delete(`/keeping_service/keeping_service_price/${serviceToDelete.priceId}/`);
+      }
+
+      // Then delete the service name using the service id
+      await api.delete(`/keeping_service/keeping_service_name/${serviceToDelete.id}/`);
+
+      setServices(prevServices => 
+        prevServices.filter(service => service.id !== serviceToDelete.id)
+      );
+
       setModalMessage(t("keepingService.deleteSuccess"));
       setShowSuccessModal(true);
-      fetchServices();
     } catch (error) {
       console.error("Error deleting service:", error);
+      alert(t("keepingService.deleteError", "Error deleting service"));
     }
     setShowDeleteModal(false);
   };
@@ -125,6 +193,7 @@ export default function KeepingServiceList() {
       base_day: service.base_day,
       base_price: service.base_price,
       extra_price: service.extra_price,
+      year: service.year || new Date().getFullYear(),
     });
     setServiceToDelete(service);
     setIsEditing(true);
@@ -141,41 +210,43 @@ export default function KeepingServiceList() {
           { name: formData.name }
         );
 
-        // Update or create price details
+        // Update price details using the priceId instead of service id
         const priceData = {
-          year: new Date().getFullYear(),
+          year: formData.year,
           base_day: formData.base_day,
           base_price: formData.base_price,
           extra_price: formData.extra_price,
-          keeping_services_id: serviceToDelete.id  // Make sure this is included
+          keeping_services_id: serviceToDelete.id
         };
 
+        // Use the correct priceId for updating price details
         if (serviceToDelete.priceId) {
-          // Update existing price record
           await api.put(
             `/keeping_service/keeping_service_price/${serviceToDelete.priceId}/`,
             priceData
           );
-        } else {
-          // Create new price record
-          await api.post(
-            '/keeping_service/keeping_service_price/',
-            priceData
-          );
         }
-        
+
         setModalMessage(t("keepingService.updateSuccess"));
+        
+        // If the year was changed, update selectedYear to show the new list
+        if (formData.year !== selectedYear) {
+          setSelectedYear(formData.year);
+        } else {
+          // If year hasn't changed, just refresh the current list
+          await fetchServices();
+        }
       } else {
         // Handle create new service case
         await apiService.createKeepingService(formData);
         setModalMessage(t("keepingService.createSuccess"));
+        await fetchServices();
       }
+      
       setIsFormModalOpen(false);
       setShowSuccessModal(true);
-      fetchServices();
-    } catch (error: any ) {
+    } catch (error: any) {
       console.error("Error saving service:", error);
-      // Add more detailed error logging
       if (error.response) {
         console.error("Error response data:", error.response.data);
       }
@@ -226,6 +297,29 @@ export default function KeepingServiceList() {
         </button>
       </div>
 
+      {/* Year Tabs */}
+      <div className="mb-6">
+        <div className="border-b border-gray-200 dark:border-gray-700">
+          <nav className="-mb-px flex space-x-4" aria-label="Tabs">
+            {availableYears.map((year) => (
+              <button
+                key={year}
+                onClick={() => setSelectedYear(year)}
+                className={`
+                  whitespace-nowrap px-4 py-2 border-b-2 font-medium text-sm
+                  ${selectedYear === year
+                    ? 'border-[#6C5DD3] text-[#6C5DD3]'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }
+                `}
+              >
+                {year}
+              </button>
+            ))}
+          </nav>
+        </div>
+      </div>
+
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead className="bg-gray-50 dark:bg-gray-800">
@@ -243,43 +337,57 @@ export default function KeepingServiceList() {
                 {t("keepingService.extraPrice")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t("keepingService.year")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("common.actions")}
               </th>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            {services?.map((service) => (
-              <tr key={`service-${service.id}`}>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {service.name}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {service.base_day}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {service.base_price}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {service.extra_price}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEdit(service)}
-                      className="text-blue-600 hover:text-blue-900 dark:hover:text-blue-400"
-                    >
-                      <Pencil size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(service)}
-                      className="text-red-600 hover:text-red-800 dark:hover:text-red-400"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
+            {services.length > 0 ? (
+              services.map((service) => (
+                <tr key={`service-${service.id}`}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {service.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {service.base_day}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {service.base_price}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {service.extra_price}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {service.year}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleEdit(service)}
+                        className="text-blue-600 hover:text-blue-900 dark:hover:text-blue-400"
+                      >
+                        <Pencil size={20} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(service)}
+                        className="text-red-600 hover:text-red-800 dark:hover:text-red-400"
+                      >
+                        <Trash2 size={20} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                  {t("keepingService.noServices")}
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
@@ -342,6 +450,19 @@ export default function KeepingServiceList() {
                       type="text"
                       value={formData.extra_price}
                       onChange={(e) => setFormData({ ...formData, extra_price: e.target.value })}
+                      className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      {t("keepingService.year")}
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.year}
+                      onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                       required
                     />

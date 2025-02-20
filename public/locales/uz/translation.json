@@ -477,6 +477,7 @@
     "edit": "Saqlash Xizmatini Tahrirlash",
     "name": "Xizmat Nomi",
     "baseDay": "Asosiy Kun",
+    "year": "Yil",
     "basePrice": "Asosiy Narx",
     "extraPrice": "Qo'shimcha Narx",
     "deleteTitle": "Saqlash Xizmatini O'chirish",

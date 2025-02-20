@@ -227,18 +227,19 @@ export const apiService = {
   updateWorkingService: (id: number, data: WorkingService) =>
     api.put(`/working_service/${id}/`, data),
 
-  // Add these new methods
   createKeepingServiceName: (data: KeepingServiceNameCreate) =>
     api.post('/keeping_service/keeping_service_name/', data),
 
-  createKeepingServicePrice: (data: KeepingServicePriceCreate) =>
+    createKeepingServicePrice: (data: KeepingServicePriceCreate) =>
     api.post('/keeping_service/keeping_service_price/', data),
 
-  getKeepingServiceNames: () => 
-    api.get('/keeping_service/keeping_service_name/').then(response => response.data),
-
-  getKeepingServicePrices: () => 
-    api.get('/keeping_service/keeping_service_price/').then(response => response.data),
+  getKeepingServiceNames: () => {
+    return api.get('/keeping_service/keeping_service_name/');
+  },
+  
+  getKeepingServicePrices: (year: number) => {
+    return api.get(`/keeping_service/keeping_service_price/?year=${year}`);
+  },
 
   updateKeepingServiceName: (id: number, data: { name: string }) => {
     return api.put(`/keeping_service/keeping_service_name/${id}/`, data);

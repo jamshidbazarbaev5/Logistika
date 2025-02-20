@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { apiService } from "../api/api";
+import { api, apiService } from "../api/api";
 import SuccessModal from "../components/SuccessModal";
 import FormLayout from "../components/FormLayout";
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-interface PriceFormData {
+interface KeepingServiceFormData {
   year: number;
   base_day: number;
   base_price: string;
@@ -15,124 +15,178 @@ interface PriceFormData {
 
 export default function CreateKeepingService() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  
   const serviceId = Number(searchParams.get('id'));
   const serviceName = searchParams.get('name');
-
-  const [formData, setFormData] = useState<PriceFormData>({
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [formData, setFormData] = useState<KeepingServiceFormData>({
     year: new Date().getFullYear(),
     base_day: 0,
     base_price: "",
     extra_price: "",
-    keeping_services_id: serviceId
+    keeping_services_id: serviceId,
   });
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!serviceId || !serviceName) {
-      navigate('/keeping-services');
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value, type } = e.target;
+    
+    if (type === 'number') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value === '' ? 0 : Number(value)
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
     }
-  }, [serviceId, serviceName, navigate]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiService.createKeepingServicePrice({
-        ...formData,
-        year: Number(formData.year), // Ensure year is a number
+      await api.post('/keeping_service/keeping_service_price/', {
+        year: formData.year,
+        base_day: formData.base_day,
+        base_price: formData.base_price,
+        extra_price: formData.extra_price,
         keeping_services_id: serviceId
       });
+
       setShowSuccessModal(true);
-      setTimeout(() => {
-        navigate('/keeping-services');
-      }, 2000);
-    } catch (error) {
-      console.error('Error creating service price:', error);
-      alert(t('createKeepingService.errorMessage', 'Failed to create service. Please try again.'));
+      
+      // Reset form
+      setFormData({
+        year: new Date().getFullYear(),
+        base_day: 0,
+        base_price: "",
+        extra_price: "",
+        keeping_services_id: serviceId,
+      });
+      navigate('/keeping-services');
+    
+    } catch (error: any) {
+      console.error('Error creating keeping service:', error);
+      let errorMessage = t('createKeepingService.errorMessage', 'Failed to create service. Please try again.');
+      
+      if (error.response?.data) {
+        const serverError = error.response.data;
+        errorMessage = typeof serverError === 'object' 
+          ? Object.entries(serverError).map(([key, value]) => `${key}: ${value}`).join('\n')
+          : serverError.toString();
+      }
+      
+      alert(errorMessage);
     }
   };
 
   return (
     <FormLayout
-      title={t('createKeepingService.title', 'Create Keeping Service')}
-      subtitle={decodeURIComponent(serviceName || '')}
+      title={t('createKeepingService.title', 'Create Keeping Service Price')}
+      subtitle={serviceName ? t('createKeepingService.subtitleWithName', 'Add pricing details for {{name}}', { name: serviceName }) 
+        : t('createKeepingService.subtitle', 'Add pricing details for the service')}
     >
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('keepingService.year')}
-            </label>
-            <input
-              type="number"
-              value={formData.year}
-              onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              required
-              min={2024}
-            />
-          </div>
+        <div className="dark:bg-gray-800 p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="col-span-1">
+              <label 
+                htmlFor="year" 
+                className="block text-sm font-medium text-gray-600 dark:text-white mb-1"
+              >
+                {t('createKeepingService.year', 'Year')}
+              </label>
+              <input
+                type="number"
+                name="year"
+                id="year"
+                value={formData.year}
+                onChange={handleChange}
+                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
+                  px-3 py-2 text-sm md:text-base
+                  focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('keepingService.baseDay')}
-            </label>
-            <input
-              type="number"
-              value={formData.base_day}
-              onChange={(e) => setFormData({ ...formData, base_day: Number(e.target.value) })}
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              required
-              min={0}
-            />
-          </div>
+            <div className="col-span-1">
+              <label 
+                htmlFor="base_day" 
+                className="block text-sm font-medium text-gray-600 dark:text-white mb-1"
+              >
+                {t('createKeepingService.baseDays', 'Base Days')}
+              </label>
+              <input
+                type="number"
+                name="base_day"
+                id="base_day"
+                value={formData.base_day}
+                onChange={handleChange}
+                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
+                  px-3 py-2 text-sm md:text-base
+                  focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('keepingService.basePrice')}
-            </label>
-            <input
-              type="text"
-              value={formData.base_price}
-              onChange={(e) => setFormData({ ...formData, base_price: e.target.value })}
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              required
-              pattern="^\d+(\.\d{0,2})?$"
-              placeholder="0.00"
-            />
-          </div>
+            <div className="col-span-1">
+              <label 
+                htmlFor="base_price" 
+                className="block text-sm font-medium text-gray-600 dark:text-white mb-1"
+              >
+                {t('createKeepingService.basePrice', 'Base Price')}
+              </label>
+              <input
+                type="text"
+                name="base_price"
+                id="base_price"
+                value={formData.base_price}
+                onChange={handleChange}
+                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
+                  px-3 py-2 text-sm md:text-base
+                  focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                required
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t('keepingService.extraPrice')}
-            </label>
-            <input
-              type="text"
-              value={formData.extra_price}
-              onChange={(e) => setFormData({ ...formData, extra_price: e.target.value })}
-              className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              required
-              pattern="^\d+(\.\d{0,2})?$"
-              placeholder="0.00"
-            />
+            <div className="col-span-1">
+              <label 
+                htmlFor="extra_price" 
+                className="block text-sm font-medium text-gray-600 dark:text-white mb-1"
+              >
+                {t('createKeepingService.extraPrice', 'Extra Price')}
+              </label>
+              <input
+                type="text"
+                name="extra_price"
+                id="extra_price"
+                value={formData.extra_price}
+                onChange={handleChange}
+                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
+                  px-3 py-2 text-sm md:text-base
+                  focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                required
+              />
+            </div>
           </div>
         </div>
 
-        <div className="flex justify-end gap-3 mt-6">
-          <button
-            type="button"
-            onClick={() => navigate('/keeping-services')}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-          >
-            {t('common.cancel')}
-          </button>
+        <div className="flex justify-end mt-6">
           <button
             type="submit"
-            className="px-4 py-2 text-sm font-medium text-white bg-[#6C5DD3] rounded-md hover:bg-[#5c4eb3]"
+            className="w-full sm:w-auto px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base
+              bg-[#6C5DD3] text-white rounded-lg hover:bg-[#5c4eb3]
+              focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2"
           >
-            {t('common.create')}
+            {t('createKeepingService.submit', 'Create Service')}
           </button>
         </div>
       </form>
