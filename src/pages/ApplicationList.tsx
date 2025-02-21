@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect, Fragment, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Menu, Transition } from "@headlessui/react";
@@ -9,84 +9,52 @@ import SuccessModal from "../components/SuccessModal";
 import { SearchBar, SearchField } from "../components/SearchBar";
 import { Crown, User } from "lucide-react";
 
-interface ApplicationMode {
-  id: number;
-  mode_id: number;
-  application_id: number;
-  mode_name: string;
-  name_mode: string;
-}
 
-interface KeepingService {
-  id?: number;
-  day: number;
-  keeping_services_id: number;
-  application_id?: number;
-}
 
-interface WorkingService {
-  id?: number;
-  quantity: number;
-  service_id: number;
-  application_id?: number;
-}
 
-interface PhotoReport {
-  id?: number;
-  photo: string | File;
-  application_id?: number;
-}
 
-interface Transport {
-  id?: number;
-  transport_number: string;
-  transport_type: number;
-  application_id?: number;
-}
 
-interface Product {
-  id?: number;
-  quantity: number;
-  product_id: number;
-  storage_id: number;
-  application_id?: number;
-}
 
 interface Application {
   id: number;
-  total_cost: number;
-  decloration_file: string;
-  brutto: number | null;
-  netto: number | null;
-  coming_date: string;
-  decloration_date: string;
-  decloration_number: string;
-  vip_application: boolean | null;
-  total_price: number | null;
-  discount_price: number | null;
-  keeping_days: number;
-  workers_hours: number;
-  unloading_quantity: number;
-  loading_quantity: number;
   firm_id: number;
-  firm_name?: string;
-  payment_method: number;
-  keeping_services: KeepingService[];
-  working_services: WorkingService[];
-  modes?: ApplicationMode[];
-  photo_report: PhotoReport[];
-  transport: Transport[];
-  number_of_application:string
-  products: Product[];
+  number_of_application: string;
+  brutto: number;
+  netto: number;
+  coming_date: string;
+  decloration_date: string | null;
+  decloration_number: string | null;
+  vip_application: boolean;
+  total_price: string;
+  total_cost_keeping_service: number;
+  total_cost_working_service: number;
+  total_cost: number;
+  keeping_services: Array<{
+    id: number;
+    amount: number;
+    service_type_id: number;
+    application_id: number;
+  }>;
+  working_services: Array<{
+    id: number;
+    quantity: number;
+    price: string;
+    service_id: number;
+    application_id: number;
+  }>;
+  transport: Array<{
+    id: number;
+    transport_number: string;
+    transport_type: number;
+    application_id: number;
+  }>;
+  modes: Array<{
+    mode_id: number;
+    date_created: string;
+  }>;
 }
 
-interface SearchParams extends Record<string, string> {
-  firm_name: string;
-  decloration_number: string;
-  firm_INN: string;
-  decloration_date_gte: string;
-  decloration_date_lte: string;
-}
+
 
 // Add interfaces for API responses
 interface PaginatedResponse<T> {
@@ -116,9 +84,6 @@ interface Mode {
 }
 
 // Update the interface for the modes API response
-interface ModesResponse {
-  results: Mode[];
-}
 
 export default function ApplicationList() {
   const { t } = useTranslation();
@@ -131,13 +96,12 @@ export default function ApplicationList() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [firms, setFirms] = useState<Record<number, string>>({});
-  const [modes, setModes] = useState<Record<number, ApplicationMode[]>>({});
-  const [searchParams, setSearchParams] = useState<SearchParams>({
+  const [searchParams, setSearchParams] = useState({
     firm_name: '',
     decloration_number: '',
     firm_INN: '',
     decloration_date_gte: '',
-    decloration_date_lte: '',
+    decloration_date_lte: ''
   });
 
   // Add pagination state
@@ -194,73 +158,68 @@ export default function ApplicationList() {
     },
   ];
 
+  // Modified handleSearch callback
+  const handleSearch = useCallback((values: typeof searchParams) => {
+    console.log('Search initiated with values:', values);
+    setCurrentPage(1);
+    setSearchParams(values);
+  }, []);
+
   const fetchApplications = async () => {
     try {
       const params = new URLSearchParams();
       
-      // Add non-empty search params
       Object.entries(searchParams).forEach(([key, value]) => {
-        if (value) {
-          // Use the value directly without additional encoding
-          params.append(key, value);
+        if (value && value.trim() !== '') {
+          if (key.includes('date') && value) {
+            const formattedDate = new Date(value).toISOString().split('T')[0];
+            params.append(key, formattedDate);
+          } else {
+            params.append(key, value.trim());
+          }
         }
       });
-      
-      // Add page parameter
-      params.append('page', currentPage.toString());
 
-      // Make the API call with the params
-      const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse] = await Promise.all([
+      // Fetch applications and firms data in parallel
+      const [applicationsResponse, firmsResponse] = await Promise.all([
         api.get<PaginatedResponse<Application>>(`/application/?${params.toString()}`),
-        api.get<PaginatedResponse<FirmResponse>>('/firms/'),
-        api.get<PaginatedResponse<ApplicationMode>>('/modes/application_modes/'),
-        api.get<ModesResponse>('/modes/modes/')
+        api.get<PaginatedResponse<FirmResponse>>('/firms/') // Make sure to fetch all firms
       ]);
 
-      // Add type checking and error handling for firms data
-      const firmsData = Array.isArray(firmsResponse.data?.results) ? firmsResponse.data.results : [];
-      const firmMap = firmsData.reduce((acc: Record<number, string>, firm: FirmResponse) => {
-        if (firm && typeof firm.id === 'number' && typeof firm.firm_name === 'string') {
-          acc[firm.id] = firm.firm_name;
-        }
+      // Process firms data into a lookup map
+      const firmsData = firmsResponse.data.results || [];
+      const firmsMap = firmsData.reduce((acc: Record<number, string>, firm) => {
+        acc[firm.id] = firm.firm_name;
         return acc;
       }, {});
 
-      // Add type checking and error handling for modes data
-      const modesData = Array.isArray(modesResponse.data?.results) ? modesResponse.data.results : [];
-      const modesMap = modesData.reduce((acc: Record<number, ApplicationMode[]>, mode: ApplicationMode) => {
-        if (mode && mode.application_id) {
-          if (!acc[mode.application_id]) {
-            acc[mode.application_id] = [];
-          }
-          if (!acc[mode.application_id].some(m => m.mode_id === mode.mode_id)) {
-            acc[mode.application_id].push(mode);
-          }
-        }
-        return acc;
-      }, {});
+      // Update firms state
+      setFirms(firmsMap);
 
-      setFirms(firmMap);
-      setModes(modesMap);
-      setAvailableModes(Array.isArray(availableModesResponse.data.results) 
-        ? availableModesResponse.data.results 
-        : []);
-      setApplications(Array.isArray(applicationsResponse.data?.results) 
-        ? applicationsResponse.data.results 
-        : []);
+      // Process applications data
+      if ('results' in applicationsResponse.data) {
+        setApplications(applicationsResponse.data.results);
+        setTotalPages(applicationsResponse.data.total_pages);
+      } else {
+        setApplications(applicationsResponse.data as unknown as Application[]);
+        setTotalPages(Math.ceil((applicationsResponse.data as unknown as Application[]).length / 10));
+      }
+      
       setLoading(false);
+      setError(null);
 
-      setTotalPages(applicationsResponse.data.total_pages);
     } catch (err) {
-      console.error('Error fetching data:', err);
+      console.error('Error in fetchApplications:', err);
       setError(t("applicationList.errorLoading", "Error loading applications"));
       setLoading(false);
     }
   };
 
+  // Add dependency array to prevent infinite loops
   useEffect(() => {
+    console.log('useEffect triggered with:', { searchParams, currentPage });
     fetchApplications();
-  }, [searchParams, currentPage]);
+  }, [searchParams, currentPage]); // Add other dependencies if needed
 
   useEffect(() => {
     const fetchFormData = async () => {
@@ -287,6 +246,7 @@ export default function ApplicationList() {
         setStorages(storagesRes.data.results);
         setProducts(productsRes.data.results);
         setAvailableModes(modesRes.data.results);
+        console.log(keepingRes.data.results);
       } catch (error) {
         console.error('Error fetching form data:', error);
       }
@@ -297,7 +257,9 @@ export default function ApplicationList() {
     }
   }, [isFormModalOpen]);
 
+  // Render loading state
   if (loading) {
+    console.log('Rendering loading state');
     return (
       <div className="flex justify-center items-center min-h-[400px]">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6C5DD3]"></div>
@@ -305,10 +267,13 @@ export default function ApplicationList() {
     );
   }
 
+  // Render error state
   if (error) {
+    console.log('Rendering error state:', error);
     return <div className="text-red-500 text-center p-4">{error}</div>;
   }
 
+  console.log('About to render applications:', applications);
 
   const confirmDelete = async () => {
     if (!applicationToDelete) return;
@@ -363,13 +328,9 @@ export default function ApplicationList() {
     );
   };
 
-
-
   const handleEditClick = (application: Application) => {
     navigate(`/edit-application/${application.id}`);
   };
-
-
 
   return (
     <div className="p-2 sm:p-4 md:p-6">
@@ -391,136 +352,148 @@ export default function ApplicationList() {
         <SearchBar
           fields={searchFields}
           initialValues={searchParams}
-          onSearch={setSearchParams}
+          onSearch={handleSearch}
           className="grid grid-cols-12 gap-3"
           t={t}
         />
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-800">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("applicationList.table.number", "#")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("applicationList.numberOfApplication",)}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("applicationList.table.firmName", "Firm Name")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("applicationList.table.vipStatus", "VIP Status")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("applicationList.totalCost")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("applicationList.table.dates", "Dates")}
-              </th>
-            
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("applicationList.table.modes", "Modes")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("applicationList.table.actions", "Actions")}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            {applications.map((application, index) => {
-              console.log(`Modes for application ${application.id}:`, modes[application.id]);
-              return (
-                <tr key={application.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {index + 1}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {application.number_of_application}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {firms[application.firm_id] || t("applicationList.unknownFirm", "Unknown Firm")}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {application.vip_application ? (
-                      <div className="flex items-center text-yellow-600 dark:text-yellow-500">
-                        <Crown className="w-5 h-5 mr-1" />
-                        <span>{t("applicationList.vip", "VIP")}</span>
+      {loading ? (
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6C5DD3]"></div>
+        </div>
+      ) : error ? (
+        <div className="text-red-500 text-center p-4">{error}</div>
+      ) : !applications?.length ? (
+        <div className="text-center py-4 text-gray-500">
+          {t("applicationList.noApplications", "No applications found")}
+        </div>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("applicationList.table.number", "#")}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("applicationList.numberOfApplication",)}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("applicationList.table.firmName", "Firm Name")}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("applicationList.table.vipStatus", "VIP Status")}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("applicationList.totalCost")}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("applicationList.table.dates", "Dates")}
+                </th>
+              
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("applicationList.table.modes", "Modes")}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("applicationList.table.actions", "Actions")}
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+              {applications.map((application, index) => {
+                console.log('Rendering application:', application);
+                return (
+                  <tr key={application.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      {index + 1}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      {application.number_of_application}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      {firms[application.firm_id] || t("applicationList.unknownFirm", "Unknown Firm")}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      {application.vip_application ? (
+                        <div className="flex items-center text-yellow-600 dark:text-yellow-500">
+                          <Crown className="w-5 h-5 mr-1" />
+                          <span>{t("applicationList.vip", "VIP")}</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center text-gray-500 dark:text-gray-400">
+                          <User className="w-5 h-5 mr-1" />
+                          <span>{t("applicationList.regular", "Regular")}</span>
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      {application.total_price } сум
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      <div>{t("applicationList.comingDate", "Coming")}: {application.coming_date}</div>
+                      <div className="text-gray-500 dark:text-gray-400">
+                        {t("applicationList.declarationDate", "Declaration")}: {application.decloration_date}
                       </div>
-                    ) : (
-                      <div className="flex items-center text-gray-500 dark:text-gray-400">
-                        <User className="w-5 h-5 mr-1" />
-                        <span>{t("applicationList.regular", "Regular")}</span>
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {application.total_cost } сум
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    <div>{t("applicationList.comingDate", "Coming")}: {application.coming_date}</div>
-                    <div className="text-gray-500 dark:text-gray-400">
-                      {t("applicationList.declarationDate", "Declaration")}: {application.decloration_date}
-                    </div>
-                  </td>
-                 
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {application.modes?.map((mode) => {
-                      const modeInfo = Array.isArray(availableModes) 
-                        ? availableModes.find(m => m.id === mode.mode_id)
-                        : undefined;
-                      return (
-                        <span
-                          key={mode.mode_id}
-                          className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-2 mb-1"
+                    </td>
+                   
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      {application.modes?.map((mode) => {
+                        const modeInfo = Array.isArray(availableModes) 
+                          ? availableModes.find(m => m.id === mode.mode_id)
+                          : undefined;
+                        return (
+                          <span
+                            key={mode.mode_id}
+                            className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-2 mb-1"
+                          >
+                            {modeInfo ? `  (${modeInfo.code_mode})` : `Mode ${mode.mode_id}`}
+                          </span>
+                        );
+                      })}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                      <Menu as="div" className="relative inline-block text-left">
+                        <Menu.Button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
+                          <EllipsisVerticalIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                        </Menu.Button>
+                        <Transition
+                          as={Fragment}
+                          enter="transition ease-out duration-100"
+                          enterFrom="transform opacity-0 scale-95"
+                          enterTo="transform opacity-100 scale-100"
+                          leave="transition ease-in duration-75"
+                          leaveFrom="transform opacity-100 scale-100"
+                          leaveTo="transform opacity-0 scale-95"
                         >
-                          {modeInfo ? `  (${modeInfo.code_mode})` : `Mode ${mode.mode_id}`}
-                        </span>
-                      );
-                    })}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    <Menu as="div" className="relative inline-block text-left">
-                      <Menu.Button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
-                        <EllipsisVerticalIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                      </Menu.Button>
-                      <Transition
-                        as={Fragment}
-                        enter="transition ease-out duration-100"
-                        enterFrom="transform opacity-0 scale-95"
-                        enterTo="transform opacity-100 scale-100"
-                        leave="transition ease-in duration-75"
-                        leaveFrom="transform opacity-100 scale-100"
-                        leaveTo="transform opacity-0 scale-95"
-                      >
-                        <Menu.Items className="absolute right-0 z-50 mt-2 w-36 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                          <div className="py-1">
-                            <Menu.Item>
-                              {({ active }) => (
-                                <button
-                                  onClick={() => handleEditClick(application)}
-                                  className={`${
-                                    active ? "bg-gray-100 dark:bg-gray-700" : ""
-                                  } flex w-full items-center px-4 py-2 text-sm text-blue-600 dark:text-blue-400`}
-                                >
-                                  {t("applicationList.edit")}
-                                </button>
-                              )}
-                            </Menu.Item>
-                          </div>
-                        </Menu.Items>
-                      </Transition>
-                    </Menu>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                          <Menu.Items className="absolute right-0 z-50 mt-2 w-36 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                            <div className="py-1">
+                              <Menu.Item>
+                                {({ active }) => (
+                                  <button
+                                    onClick={() => handleEditClick(application)}
+                                    className={`${
+                                      active ? "bg-gray-100 dark:bg-gray-700" : ""
+                                    } flex w-full items-center px-4 py-2 text-sm text-blue-600 dark:text-blue-400`}
+                                  >
+                                    {t("applicationList.edit")}
+                                  </button>
+                                )}
+                              </Menu.Item>
+                            </div>
+                          </Menu.Items>
+                        </Transition>
+                      </Menu>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
-      <PaginationControls />
+      {!loading && !error && applications?.length > 0 && <PaginationControls />}
 
       <ConfirmModal
         isOpen={showDeleteModal}

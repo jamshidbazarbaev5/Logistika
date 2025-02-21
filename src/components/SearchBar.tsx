@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { MagnifyingGlassIcon, CalendarIcon } from '@heroicons/react/24/outline';
 
 export interface SearchField {
@@ -24,24 +24,52 @@ export function SearchBar<T extends Record<keyof T, string>>({
   initialValues, 
   onSearch, 
   className = "",
+  t
 }: SearchBarProps<T>) {
   const [localValues, setLocalValues] = useState<T>(initialValues);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setLocalValues(prev => ({
-      ...prev,
-      [name]: value
-    }) as T);
-  };
+  useEffect(() => {
+    console.log('SearchBar initialValues changed:', initialValues);
+    setLocalValues(initialValues);
+  }, [initialValues]);
 
   useEffect(() => {
-    const cleanValues = Object.fromEntries(
-      Object.entries(localValues).filter(([_, value]) => value !== '')
-    );
-    
-    onSearch(cleanValues as T);
+    console.log('SearchBar localValues changed:', localValues);
+    const timeoutId = setTimeout(() => {
+      console.log('Debounce timer triggered, calling onSearch with:', localValues);
+      onSearch(localValues);
+    }, 500);
+
+    return () => {
+      console.log('Cleaning up previous debounce timer');
+      clearTimeout(timeoutId);
+    };
   }, [localValues, onSearch]);
+
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    console.log('Input changed:', { name, value });
+    setLocalValues(prev => {
+      const newValues = {
+        ...prev,
+        [name]: value
+      } as T;
+      console.log('New localValues:', newValues);
+      return newValues;
+    });
+  }, []);
+
+  const handleClearInput = useCallback((fieldName: string) => {
+    console.log('Clearing input:', fieldName);
+    setLocalValues(prev => {
+      const newValues = {
+        ...prev,
+        [fieldName]: ''
+      } as T;
+      console.log('New localValues after clear:', newValues);
+      return newValues;
+    });
+  }, []);
 
   return (
     <div className={`grid ${className}`}>
@@ -83,12 +111,7 @@ export function SearchBar<T extends Record<keyof T, string>>({
             {localValues[field.name as keyof T] && (
               <button
                 type="button"
-                onClick={() => {
-                  setLocalValues(prev => ({
-                    ...prev,
-                    [field.name]: ''
-                  }) as T);
-                }}
+                onClick={() => handleClearInput(field.name)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full p-0.5
                   text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2
                   focus:ring-[#6C5DD3] focus:ring-offset-2"
@@ -100,7 +123,6 @@ export function SearchBar<T extends Record<keyof T, string>>({
               </button>
             )}
           </div>
-         
         </div>
       ))}
     </div>
