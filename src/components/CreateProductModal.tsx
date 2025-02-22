@@ -1,7 +1,7 @@
 import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { useTranslation } from 'react-i18next';
-import { api } from '../api/api';
+import { api, Product } from '../api/api';
 
 interface CreateProductModalProps {
   isOpen: boolean;
