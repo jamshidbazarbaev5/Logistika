@@ -152,6 +152,13 @@ export default function EditApplication() {
     try {
       const formDataToSend = new FormData();
 
+      // Transform products array to upload_products format
+      const upload_products = formData.products.map(product => ({
+        quantity: product.quantity,
+        product_id: product.product_id,
+        storage_id: product.storage_id
+      }));
+
       Object.entries(formData).forEach(([key, value]) => {
         if (key === 'decloration_date' && value) {
           formDataToSend.append(key, formatDateForAPI(value as string));
@@ -159,7 +166,12 @@ export default function EditApplication() {
           formDataToSend.append(key, formatDateForAPI(value as string));
         } else if (value !== null && value !== undefined && key !== 'decloration_file' && key !== 'photo_report') {
           if (Array.isArray(value)) {
-            formDataToSend.append(key, JSON.stringify(value));
+            if (key === 'products') {
+              // Use the upload_products format instead
+              formDataToSend.append('upload_products', JSON.stringify(upload_products));
+            } else {
+              formDataToSend.append(key, JSON.stringify(value));
+            }
           } else {
             formDataToSend.append(key, value.toString());
           }
@@ -179,13 +191,6 @@ export default function EditApplication() {
           }
         });
       }
-
-      // Special handling for arrays that need to be JSON stringified
-      ['upload_keeping_services_quantity', 'upload_working_services_quantity', 'upload_transport', 'upload_modes', 'upload_products'].forEach(key => {
-        if (formData[key] && Array.isArray(formData[key])) {
-          formDataToSend.append(key, JSON.stringify(formData[key]));
-        }
-      });
 
       const response = await api.put(`/application/${id}/`, formDataToSend, {
         headers: {

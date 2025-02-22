@@ -45,6 +45,8 @@
     "days": "Kun",
     "hours": "Soat",
     "pieces": "Shtuk",
+    "noProductsFound": "Mahsulot topilmadi",
+    "createNewProduct": "Mahsulot Yaratish",
     "storageSearchPlaceholder": "Ombor nomini kiriting",
     "productSearchPlaceholder": "Mahsulot nomini kiriting",
     "subtitle": "Yangi ariza yaratish uchun formani to'ldiring",

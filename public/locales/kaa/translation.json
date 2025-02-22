@@ -30,8 +30,10 @@
   "createApplication": {
     "title": "Ótinish Jaratıw",
     "storage": "Ombor",
+    "noProductsFound": "Ónim tawilmadi",
+    "createNewProduct": "Ónim Jaratıw",
     "remove": "Óshiriw",
-    "product": "Mahsulot",
+    "product": "Ónim",
     "quantity": "Mug'dar",
     "laborServices": "Jumıs Xızmetleri",
     "storageServices": "Qoyma Xızmetleri",

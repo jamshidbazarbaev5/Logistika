@@ -1,13 +1,20 @@
 import { Fragment, useState, useEffect } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { useTranslation } from 'react-i18next';
-import { api, Product } from '../api/api';
+import { api } from '../api/api';
 
 interface CreateProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (product: Product) => void;
+  onSuccess: (product: CreateProductResponse) => void;
   initialProductName: string;
+}
+
+interface CreateProductResponse {
+  id: number;
+  name: string;
+  measurement_id: number;
+  category_id: number;
 }
 
 interface Category {

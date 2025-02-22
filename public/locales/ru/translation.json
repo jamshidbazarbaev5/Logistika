@@ -33,6 +33,8 @@
     "vipApplication": "VIP Заявка",
     "currentDeclorationFile": "Файл Декларации",
     "product": "Товар",
+    "noProductsFound": "Товар не найден",
+    "createNewProduct": "Создать Новый Товар",
     "remove": "Удалить",
     "quantity": "Количество",
     "addProduct": "Добавить Товар",

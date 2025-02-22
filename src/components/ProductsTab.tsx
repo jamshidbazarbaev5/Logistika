@@ -2,7 +2,14 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api/api';
 import { ApplicationFormData } from '../context/FormContext';
+import CreateProductModal from './CreateProductModal';
 
+interface CreateProductResponse {
+  id: number;
+  name: string;
+  measurement_id: number;
+  category_id: number;
+}
 
 interface Product {
   id?: number;
@@ -42,9 +49,11 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   const [showProductDropdown, setShowProductDropdown] = useState(false);
   const [filteredProducts, setFilteredProducts] = useState<ProductDisplay[]>(initialProducts);
   const productDropdownRef = useRef<HTMLDivElement>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [products, setProducts] = useState<ProductDisplay[]>(initialProducts);
 
   const getProductName = (productId: number) => {
-    const product = initialProducts.find(p => p.id === productId);
+    const product = products.find(p => p.id === productId);
     return product ? product.name : 'Unknown Product';
   };
 
@@ -61,8 +70,16 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
         return;
       }
       const response = await api.get(`/items/product/?product_name=${searchTerm}`);
-      setFilteredProducts(response.data.results || []);
+      const results = response.data.results || [];
+      setFilteredProducts(results);
       setShowProductDropdown(true);
+      
+      // Update local products state with any new products found
+      results.forEach((newProduct: ProductDisplay) => {
+        if (!products.some(p => p.id === newProduct.id)) {
+          setProducts(prev => [...prev, newProduct]);
+        }
+      });
     } catch (error) {
       console.error('Error searching products:', error);
       setFilteredProducts([]);
@@ -111,6 +128,14 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
     });
   };
 
+  const handleCreateProductSuccess = (newProduct: CreateProductResponse) => {
+    // Update the products state with the newly created product
+    setProducts(prev => [...prev, newProduct]);
+    setFilteredProducts(prev => [...prev, newProduct]);
+    // Select the newly created product
+    handleProductSelect(newProduct);
+  };
+
   return (
     <div className="bg-white dark:bg-gray-900 p-3 sm:p-6 rounded-lg shadow-sm">
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
@@ -128,19 +153,29 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
                 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               placeholder={t('editApplication.searchProduct')}
             />
-            {showProductDropdown && filteredProducts.length > 0 && (
+            {showProductDropdown && (
               <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
                 border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-                {filteredProducts.map((product) => (
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.map((product) => (
+                    <div
+                      key={product.id}
+                      onClick={() => handleProductSelect(product)}
+                      className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer
+                        text-gray-900 dark:text-gray-100"
+                    >
+                      {product.name}
+                    </div>
+                  ))
+                ) : (
                   <div
-                    key={product.id}
-                    onClick={() => handleProductSelect(product)}
+                    onClick={() => setShowCreateModal(true)}
                     className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer
                       text-gray-900 dark:text-gray-100"
                   >
-                    {product.name}
+                    {t('createProduct.createNew', 'Create new product')}
                   </div>
-                ))}
+                )}
               </div>
             )}
           </div>
@@ -224,6 +259,13 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
           ))}
         </div>
       </div>
+
+      <CreateProductModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={handleCreateProductSuccess}
+        initialProductName={productSearch}
+      />
 
       <div className="mt-6 flex justify-end">
         <button
