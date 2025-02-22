@@ -181,127 +181,127 @@ export default function FirmList() {
         t={t}
       />
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead className="bg-gray-50 dark:bg-gray-800">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("firmList.table.number", "#")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("firmList.table.inn", "INN")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("firmList.table.firmName", "Firm Name")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("firmList.table.phoneNumber", "Phone Number")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("firmList.table.director", "Director")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("firmList.table.trustee", "Trustee")}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("firmList.table.actions", "Actions")}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            {firms?.map((firm, index) => (
-              <tr
-                key={firm.id}
-                className="hover:bg-gray-50 dark:hover:bg-gray-800"
-              >
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {index + 1}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {firm.INN}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {firm.firm_name}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  {firm.phoneNumber_firm}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  <div>{firm.full_name_director}</div>
-                  <div className="text-gray-500 dark:text-gray-400">
-                    {firm.phoneNumber_director}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  <div>{firm.firm_trustee}</div>
-                  <div className="text-gray-500 dark:text-gray-400">
-                    {firm.phoneNumber_trustee}
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                  <Menu as="div" className="relative inline-block text-left">
-                    <Menu.Button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
-                      <EllipsisVerticalIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
-                    </Menu.Button>
-                    <Transition
-                      as={Fragment}
-                      enter="transition ease-out duration-100"
-                      enterFrom="transform opacity-0 scale-95"
-                      enterTo="transform opacity-100 scale-100"
-                      leave="transition ease-in duration-75"
-                      leaveFrom="transform opacity-100 scale-100"
-                      leaveTo="transform opacity-0 scale-95"
-                    >
-                      <Menu.Items
-                        className={`absolute z-50 mt-2 w-36 rounded-md bg-white dark:bg-gray-800 
-                        shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none
-                        ${
-                          firms.indexOf(firm) >= firms.length - 3
-                            ? "bottom-[-15px] mb-2"
-                            : "top-full"
-                        } 
-                        ${
-                          firms.indexOf(firm) >= firms.length - 3
-                            ? "origin-bottom-right"
-                            : "origin-top-right"
-                        }
-                        right-20`}
-                      >
-                        <div className="py-1">
-                          <Menu.Item>
-                            {({ active }) => (
-                              <button
-                                onClick={() => handleEdit(firm)}
-                                className={`${
-                                  active ? "bg-gray-100 dark:bg-gray-700" : ""
-                                } flex w-full items-center px-4 py-2 text-sm text-blue-600 dark:text-blue-400`}
-                              >
-                                {t("firmList.edit", "Edit")}
-                              </button>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <button
-                                onClick={() => handleDelete(firm)}
-                                className={`${
-                                  active ? "bg-gray-100 dark:bg-gray-700" : ""
-                                } flex w-full items-center px-4 py-2 text-sm text-red-600 dark:text-red-400`}
-                              >
-                                {t("firmList.delete", "Delete")}
-                              </button>
-                            )}
-                          </Menu.Item>
-                        </div>
-                      </Menu.Items>
-                    </Transition>
-                  </Menu>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-800">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("firmList.table.number", "#")}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("firmList.table.inn", "INN")}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("firmList.table.firmName", "Firm Name")}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("firmList.table.phoneNumber", "Phone Number")}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("firmList.table.director", "Director")}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("firmList.table.trustee", "Trustee")}
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  {t("firmList.table.actions", "Actions")}
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+              {firms?.map((firm, index) => (
+                <tr
+                  key={firm.id}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-800"
+                >
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {index + 1}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {firm.INN}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {firm.firm_name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {firm.phoneNumber_firm}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    <div>{firm.full_name_director}</div>
+                    <div className="text-gray-500 dark:text-gray-400">
+                      {firm.phoneNumber_director}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    <div>{firm.firm_trustee}</div>
+                    <div className="text-gray-500 dark:text-gray-400">
+                      {firm.phoneNumber_trustee}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    <Menu as="div" className="relative inline-block text-left">
+                      <Menu.Button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
+                        <EllipsisVerticalIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                      </Menu.Button>
+                      <Transition
+                        as={Fragment}
+                        enter="transition ease-out duration-100"
+                        enterFrom="transform opacity-0 scale-95"
+                        enterTo="transform opacity-100 scale-100"
+                        leave="transition ease-in duration-75"
+                        leaveFrom="transform opacity-100 scale-100"
+                        leaveTo="transform opacity-0 scale-95"
+                      >
+                        <Menu.Items
+                          className={`absolute z-50 mt-2 w-36 rounded-md bg-white dark:bg-gray-800 
+                          shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none
+                          ${
+                            firms.indexOf(firm) >= firms.length - 3
+                              ? "bottom-[-15px] mb-2"
+                              : "top-full"
+                          } 
+                          ${
+                            firms.indexOf(firm) >= firms.length - 3
+                              ? "origin-bottom-right"
+                              : "origin-top-right"
+                          }
+                          right-20`}
+                        >
+                          <div className="py-1">
+                            <Menu.Item>
+                              {({ active }) => (
+                                <button
+                                  onClick={() => handleEdit(firm)}
+                                  className={`${
+                                    active ? "bg-gray-100 dark:bg-gray-700" : ""
+                                  } flex w-full items-center px-4 py-2 text-sm text-blue-600 dark:text-blue-400`}
+                                >
+                                  {t("firmList.edit", "Edit")}
+                                </button>
+                              )}
+                            </Menu.Item>
+                            <Menu.Item>
+                              {({ active }) => (
+                                <button
+                                  onClick={() => handleDelete(firm)}
+                                  className={`${
+                                    active ? "bg-gray-100 dark:bg-gray-700" : ""
+                                  } flex w-full items-center px-4 py-2 text-sm text-red-600 dark:text-red-400`}
+                                >
+                                  {t("firmList.delete", "Delete")}
+                                </button>
+                              )}
+                            </Menu.Item>
+                          </div>
+                        </Menu.Items>
+                      </Transition>
+                    </Menu>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
       <ConfirmModal
         isOpen={showDeleteModal}

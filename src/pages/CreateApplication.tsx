@@ -7,6 +7,7 @@ import { Tab } from '@headlessui/react';
 import { classNames } from '../../utils/classNames'
 import { useNavigate } from "react-router-dom";
 import { createContext, useContext } from 'react';
+import CreateProductModal from "../components/CreateProductModal";
 
 interface ApplicationFormData {
   firm_id: number;
@@ -277,6 +278,8 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const productDropdownRef = useRef<HTMLDivElement>(null);
   const storageDropdownRef = useRef<HTMLDivElement>(null);
   const {t} = useTranslation();
+  const [showCreateProductModal, setShowCreateProductModal] = useState(false);
+
   const fetchProductDetails = async (productId: number) => {
     try {
       const response = await api.get(`/items/product/${productId}/`);
@@ -391,6 +394,11 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     return () => clearTimeout(timeoutId);
   }, [productSearch]);
 
+  const handleProductCreated = (newProduct: Product) => {
+    setProducts(prevProducts => [...prevProducts, newProduct]);
+    handleProductSelect(newProduct);
+  };
+
   return (
     <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -417,19 +425,35 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
             placeholder={t("createApplication.productSearchPlaceholder")}
           />
           
-          {showProductDropdown && products.length > 0 && (
+          {showProductDropdown && (
             <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
               border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  onClick={() => handleProductSelect(product)}
-                  className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
-                    cursor-pointer text-sm text-gray-900 dark:text-gray-100"
-                >
-                  {product.name}
+              {products.length > 0 ? (
+                products.map((product) => (
+                  <div
+                    key={product.id}
+                    onClick={() => handleProductSelect(product)}
+                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
+                      cursor-pointer text-sm text-gray-900 dark:text-gray-100"
+                  >
+                    {product.name}
+                  </div>
+                ))
+              ) : (
+                <div className="p-4">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    {t('createApplication.noProductsFound')}
+                  </p>
+                  <button
+                    onClick={() => setShowCreateProductModal(true)}
+                    className="w-full text-center bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
+                      hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
+                      dark:focus:ring-offset-gray-800"
+                  >
+                    {t('createApplication.createNewProduct')}
+                  </button>
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>
@@ -545,6 +569,13 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           {t('createApplication.next')}
         </button>
       </div>
+
+      <CreateProductModal
+        isOpen={showCreateProductModal}
+        onClose={() => setShowCreateProductModal(false)}
+        onSuccess={handleProductCreated}
+        initialProductName={productSearch}
+      />
     </div>
   );
 };
@@ -980,7 +1011,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
                         <span className="font-medium text-gray-900 dark:text-white">
                           {keepingServicesNames.get(item.service_type_id) || t('createApplication.loading')}
                         </span>
-                        <div className="mt-1 flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-300">
+                        <div className="mt-1 flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-400">
                           <span>{item.amount} {t('createApplication.quantity')}</span>
                           <span>•</span>
                           <span>{t('createApplication.base')}: {service?.base_price}</span>
