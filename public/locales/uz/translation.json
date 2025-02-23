@@ -456,7 +456,9 @@
     "createUser": "Foydalanuvchilar ro'yxati",
     "services": "Xizmatlar",
     "workingServices": "Ish Xizmatlari",
-    "keepingServices": "Saqlash Xizmatlari"
+    "keepingServices": "Saqlash Xizmatlari",
+    "year": "Yil"
+
   },
   "workingService": {
     "title": "Ish Xizmatlari",
@@ -478,6 +480,7 @@
     "create": "Saqlash Xizmatini Yaratish",
     "edit": "Saqlash Xizmatini Tahrirlash",
     "name": "Xizmat Nomi",
+    "noServices": "Saqlash xizmatlari topilmadi",
     "baseDay": "Asosiy Kun",
     "year": "Yil",
     "basePrice": "Asosiy Narx",

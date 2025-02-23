@@ -5,7 +5,6 @@ import { api, apiService } from "../api/api";
 import ConfirmModal from "../components/ConfirmModal";
 import SuccessModal from "../components/SuccessModal";
 import { Pencil, Trash2 } from 'lucide-react';
-import { Dialog } from "@headlessui/react";
 
 
 
@@ -41,7 +40,6 @@ interface KeepingServiceWithPriceId {
   priceId: number;
 }
 
-// Update the API response interface
 interface PaginatedResponse<T> {
   links: {
     first: string | null;
@@ -75,10 +73,8 @@ export default function KeepingServiceList() {
     extra_price: '',
     year: new Date().getFullYear(),
   });
-  const [showNameModal, setShowNameModal] = useState(false);
-  const [newServiceName, setNewServiceName] = useState("");
-  const [selectedYear, setSelectedYear] = useState(2025); // Default to 2025
-  const availableYears = [2024, 2025]; // Fixed years
+  const [selectedYear, setSelectedYear] = useState(2025);
+  const availableYears = [2024, 2025,2026,2027,2028,2029,2030];
 
   const fetchServices = async () => {
     try {
@@ -93,14 +89,12 @@ export default function KeepingServiceList() {
       const names = (namesResponse?.data as PaginatedResponse<KeepingServiceName>)?.results || [];
       const prices = (pricesResponse?.data as PaginatedResponse<KeepingServicePrice>)?.results || [];
 
-      // Filter prices for the selected year only
       const yearPrices = prices.filter(price => price.year === selectedYear);
 
       console.log('Names:', names);
       console.log('Filtered Prices for year', selectedYear, ':', yearPrices);
 
       if (names.length === 0 && yearPrices.length > 0) {
-        // If we have prices but no names, create services from the prices
         const servicesFromPrices: KeepingServiceWithPriceId[] = yearPrices.map((price: KeepingServicePrice) => ({
           id: price.keeping_services_id,
           name: `Service ${price.keeping_services_id}`,
@@ -113,7 +107,6 @@ export default function KeepingServiceList() {
 
         setServices(servicesFromPrices);
       } else {
-        // Original logic for combining names and prices
         const combinedServices: KeepingServiceWithPriceId[] = names
           .map((name: KeepingServiceName) => {
             const price = yearPrices.find((p: KeepingServicePrice) => p.keeping_services_id === name.id);
@@ -159,12 +152,10 @@ export default function KeepingServiceList() {
     if (!serviceToDelete) return;
 
     try {
-      // Delete the price record first using the priceId
       if (serviceToDelete.priceId) {
         await api.delete(`/keeping_service/keeping_service_price/${serviceToDelete.priceId}/`);
       }
 
-      // Then delete the service name using the service id
       await api.delete(`/keeping_service/keeping_service_name/${serviceToDelete.id}/`);
 
       setServices(prevServices => 
@@ -197,13 +188,11 @@ export default function KeepingServiceList() {
     e.preventDefault();
     try {
       if (isEditing && serviceToDelete) {
-        // Update service name
         await api.put(
           `/keeping_service/keeping_service_name/${serviceToDelete.id}/`, 
           { name: formData.name }
         );
 
-        // Update price details using the priceId instead of service id
         const priceData = {
           year: formData.year,
           base_day: formData.base_day,
@@ -212,7 +201,6 @@ export default function KeepingServiceList() {
           keeping_services_id: serviceToDelete.id
         };
 
-        // Use the correct priceId for updating price details
         if (serviceToDelete.priceId) {
           await api.put(
             `/keeping_service/keeping_service_price/${serviceToDelete.priceId}/`,
@@ -222,11 +210,9 @@ export default function KeepingServiceList() {
 
         setModalMessage(t("keepingService.updateSuccess"));
         
-        // If the year was changed, update selectedYear to show the new list
         if (formData.year !== selectedYear) {
           setSelectedYear(formData.year);
         } else {
-          // If year hasn't changed, just refresh the current list
           await fetchServices();
         }
       } else {
@@ -248,24 +234,7 @@ export default function KeepingServiceList() {
   };
 
   const handleCreateService = () => {
-    setShowNameModal(true);
-  };
-
-  const handleNameSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await apiService.createKeepingServiceName({
-        name: newServiceName
-      });
-      
-      if (response.data.id) {
-        setShowNameModal(false);
-        navigate(`/keeping-services/create-price?id=${response.data.id}&name=${encodeURIComponent(newServiceName)}`);
-      }
-    } catch (error) {
-      console.error('Error creating service name:', error);
-      alert(t('keepingService.createError', 'Error creating service'));
-    }
+    navigate('/keeping-services/create-price');
   };
 
   if (loading) {
@@ -496,58 +465,6 @@ export default function KeepingServiceList() {
         onClose={() => setShowSuccessModal(false)}
         message={modalMessage}
       />
-
-      {/* Replace the existing service name selection modal with this input modal */}
-      <Dialog
-        open={showNameModal}
-        onClose={() => setShowNameModal(false)}
-        className="relative z-50"
-      >
-        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-        
-        <div className="fixed inset-0 flex items-center justify-center p-4">
-          <Dialog.Panel className="mx-auto w-full max-w-md rounded-lg bg-white dark:bg-gray-800 p-6">
-            <Dialog.Title className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              {t('keepingService.enterName', 'Enter Service Name')}
-            </Dialog.Title>
-
-            <form onSubmit={handleNameSubmit}>
-              <div className="mt-4">
-                <input
-                  type="text"
-                  value={newServiceName}
-                  onChange={(e) => setNewServiceName(e.target.value)}
-                  className="block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                    bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
-                    px-3 py-2 text-sm md:text-base
-                    focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
-                  placeholder={t('keepingService.namePlaceholder', 'Enter service name')}
-                  required
-                />
-              </div>
-
-              <div className="mt-6 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowNameModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 
-                    rounded-md hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 
-                    dark:hover:bg-gray-600"
-                >
-                  {t('common.cancel', 'Cancel')}
-                </button>
-                <button
-                  type="submit"
-                  className="px-4 py-2 text-sm font-medium text-white bg-[#6C5DD3] 
-                    rounded-md hover:bg-[#5c4eb3]"
-                >
-                  {t('common.continue', 'Continue')}
-                </button>
-              </div>
-            </form>
-          </Dialog.Panel>
-        </div>
-      </Dialog>
     </div>
   );
 }
