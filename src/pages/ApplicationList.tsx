@@ -2,13 +2,14 @@ import { useState, useEffect, Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Menu, Transition } from "@headlessui/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import { EllipsisVerticalIcon,  } from "@heroicons/react/24/outline";
 import { api } from "../api/api";
 import ConfirmModal from "../components/ConfirmModal";
 import SuccessModal from "../components/SuccessModal";
 import { SearchBar, SearchField } from "../components/SearchBar";
 import { Crown, User } from "lucide-react";
 
+import { Calculator } from "lucide-react"; 
 interface ApplicationMode {
   id: number;
   mode_id: number;
@@ -494,7 +495,7 @@ export default function ApplicationList() {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                       >
-                        <Menu.Items className="absolute right-0 z-50 mt-2 w-36 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <Menu.Items className="absolute right-0 z-50  w-36 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none mt-[-70px]">
                           <div className="py-1">
                             <Menu.Item>
                               {({ active }) => (
@@ -505,6 +506,19 @@ export default function ApplicationList() {
                                   } flex w-full items-center px-4 py-2 text-sm text-blue-600 dark:text-blue-400`}
                                 >
                                   {t("applicationList.edit")}
+                                </button>
+                              )}
+                            </Menu.Item>
+                            <Menu.Item>
+                              {({ active }) => (
+                                <button
+                                  onClick={() => navigate(`/calculate-services/${application.id}`)}
+                                  className={`${
+                                    active ? "bg-gray-100 dark:bg-gray-700" : ""
+                                  } flex w-full items-center px-4 py-2 text-sm text-green-600 dark:text-green-400`}
+                                >
+                                  <Calculator className="w-4 h-4 mr-2" />
+                                  {t("applicationList.calculate")}
                                 </button>
                               )}
                             </Menu.Item>

@@ -32,5 +32,26 @@
     "message": "Are you sure you want to proceed?",
     "confirmText": "Confirm",
     "cancelText": "Cancel"
+  },
+  "calculateServices": {
+    "title": "Calculate Services",
+    "applicationServices": "Application Services",
+    "maxAmount": "Max amount",
+    "results": "Calculation Results",
+    "requestedAmount": "Requested Amount",
+    "totalAmount": "Total Amount",
+    "price": "Price",
+    "totalPrice": "Total Price",
+    "proceedToTransaction": "Proceed to Transaction"
+  },
+  "transaction": {
+    "title": "Create Transaction",
+    "fullName": "Full Name",
+    "phoneNumber": "Phone Number",
+    "carNumber": "Car Number",
+    "services": "Services",
+    "totalPrice": "Total Price",
+    "payments": "Payments",
+    "addPayment": "Add Payment"
   }
 }

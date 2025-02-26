@@ -240,6 +240,7 @@
   },
   "applicationList": {
     "previous": "Oldingi",
+    "calculate": "Hisoblash",
     "next": "Keyingi",
     "numberOfApplication": "Ariza Raqami",
     "totalCost": "Jami Narx",
@@ -460,6 +461,27 @@
     "year": "Yil"
 
   },
+  "calculateServices": {
+    "title": "Hisoblash Xizmatlari",
+    "applicationServices": "Arizani Xizmatlari",
+    "maxAmount": "Maksimal miqdori",
+    "results": "Hisoblash Natijalari",
+    "requestedAmount": "Sorangan Miqdori",
+    "totalAmount": "Umumiy Miqdori",
+    "price": "Narxi",
+    "totalPrice": "Umumiy Summasi",
+    "proceedToTransaction": "Tólemge Ótiw"
+  },
+"transaction":{
+  "title": "Hisobot Yaratish",
+  "fullName": "To'liq Ismi",
+  "phoneNumber": "Telefon Raqami",
+  "carNumber": "Mashina Raqami",
+  "services": "Xizmatlar",
+  "totalPrice": "Umumiy Summasi",
+  "payments": "To'lovlar",
+  "addPayment": "To'lov Qo'shish"
+},
   "workingService": {
     "title": "Ish Xizmatlari",
     "create": "Ish Xizmatini Yaratish",
@@ -482,6 +504,7 @@
     "name": "Xizmat Nomi",
     "noServices": "Saqlash xizmatlari topilmadi",
     "baseDay": "Asosiy Kun",
+
     "year": "Yil",
     "basePrice": "Asosiy Narx",
     "extraPrice": "Qo'shimcha Narx",

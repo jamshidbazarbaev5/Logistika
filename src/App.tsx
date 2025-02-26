@@ -38,56 +38,65 @@ import WorkingServiceList from './pages/WorkinServiceList'
 import CreateWorkingService from './pages/CreateWorkingService'
 import EditApplication from "./pages/EditApplication";
 import CreateKeepingServicePrice from './pages/CreateKeepingService'
+import CalculateServices from "./pages/CalculateServices";
+import TransactionPage from "./pages/TransactionPage";
+import { Provider } from "react-redux";
+import store from "./storage/storage";
 const queryClient = new QueryClient();
 
 function App() {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-200">
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route
-              element={
-                <PrivateRoute>
-                  <Layout />
-                </PrivateRoute>
-              }
-            >
-              <Route path="/" element={<Navigate to="/application-list" replace />} />
-              <Route path="/application-list" element={<ApplicationList />} />
-              <Route path="/categories/create" element={<CreateItemCategory />} />
-              <Route path="/category" element={<CategoryList />} />
-              <Route path="/create-application" element={<CreateApplication />} />
-              <Route path="/edit-application/:id" element={<EditApplication />} />
-              <Route path="/firm-list" element={<FirmList />} />
-              <Route path="/firms" element={<CreateFirm />} />
-              <Route path="/keeping-services" element={<KeepingServiceList />} />
-              <Route path="/keeping-services/create" element={<CreateKeepingService />} />
-              <Route path="/keeping-services/create-price" element={<CreateKeepingServicePrice />} />
-              <Route path="/measurements" element={<MeasurementList />} />
-              <Route path="/measurements/create" element={<CreateMeasurement />} />
-              <Route path="/modes" element={<ModeList />} />
-              <Route path="/modes/create" element={<ModeCreate />} />
-              <Route path="/payment-list" element={<PaymentList />} />
-              <Route path="/payment-methods/create" element={<CreatePaymentMethod />} />
-              <Route path="/photo-report" element={<PhotoUpload />} />
-              <Route path="/products-list" element={<ProductsList />} />
-              <Route path="/products/create" element={<CreateProduct />} />
-              <Route path="/product-quantity" element={<CreateProductQuantity />} />
-              <Route path="/storage-list" element={<StorageList />} />
-              <Route path="/storages/create" element={<CreateStorage />} />
-              <Route path="/transport/create" element={<TransportForm />} />
-              <Route path="/transport-list" element={<TransportList />} />
-              <Route path="/transport/number/create" element={<CreateTransportNumber />} />
-              <Route path="/update-user" element={<UpdateUser />} />
-              <Route path="/user-list" element={<UserList />} />
-              <Route path="/working-services" element={<WorkingServiceList />} />
-              <Route path="/working-services/create" element={<CreateWorkingService />} />
-            </Route>
-          </Routes>
-        </Router>
-      </QueryClientProvider>
+      <Provider store={store}>
+        <QueryClientProvider client={queryClient}>
+          <Router>
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route
+                element={
+                  <PrivateRoute>
+                    <Layout />
+                  </PrivateRoute>
+                }
+              >
+                <Route path="/" element={<Navigate to="/application-list" replace />} />
+                <Route path="/application-list" element={<ApplicationList />} />
+                <Route path="/categories/create" element={<CreateItemCategory />} />
+                <Route path="/category" element={<CategoryList />} />
+                <Route path="/create-application" element={<CreateApplication />} />
+                <Route path="/edit-application/:id" element={<EditApplication />} />
+                <Route path="/firm-list" element={<FirmList />} />
+                <Route path="/firms" element={<CreateFirm />} />
+                <Route path="/keeping-services" element={<KeepingServiceList />} />
+                <Route path="/keeping-services/create" element={<CreateKeepingService />} />
+                <Route path="/keeping-services/create-price" element={<CreateKeepingServicePrice />} />
+                <Route path="/measurements" element={<MeasurementList />} />
+                <Route path="/measurements/create" element={<CreateMeasurement />} />
+                <Route path="/modes" element={<ModeList />} />
+                <Route path="/modes/create" element={<ModeCreate />} />
+                <Route path="/payment-list" element={<PaymentList />} />
+                <Route path="/payment-methods/create" element={<CreatePaymentMethod />} />
+                <Route path="/photo-report" element={<PhotoUpload />} />
+                <Route path="/products-list" element={<ProductsList />} />
+                <Route path="/products/create" element={<CreateProduct />} />
+                <Route path="/product-quantity" element={<CreateProductQuantity />} />
+                <Route path="/storage-list" element={<StorageList />} />
+                <Route path="/storages/create" element={<CreateStorage />} />
+                <Route path="/transport/create" element={<TransportForm />} />
+                <Route path="/transport-list" element={<TransportList />} />
+                <Route path="/transport/number/create" element={<CreateTransportNumber />} />
+                <Route path="/update-user" element={<UpdateUser />} />
+                <Route path="/user-list" element={<UserList />} />
+                <Route path="/working-services" element={<WorkingServiceList />} />
+                <Route path="/working-services/create" element={<CreateWorkingService />} />
+                <Route path="/calculate-services/:id" element={<CalculateServices/>}/>
+                <Route path="/transaction/:id" element={<TransactionPage/>}/>
+                <Route path="/transaction" element={<TransactionPage/>}/>
+              </Route>
+            </Routes>
+          </Router>
+        </QueryClientProvider>
+      </Provider>
     </div>
   );
 }

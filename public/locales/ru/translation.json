@@ -272,6 +272,7 @@
   "applicationList": {
     "previous": "Предыдущий",
     "next": "Следующий",
+    "calculate": "Рассчитать",
     "numberOfApplication": "Номер Заявки",
     "totalCost": "Общая Стоимость",
     "title": "Заявки",
@@ -605,5 +606,26 @@
     "submit": "Создать Продукт",
     "successMessage": "Продукт успешно создан!",
     "errorMessage": "Не удалось создать продукт. Пожалуйста, попробуйте снова."
+  },
+  "calculateServices": {
+    "title": "Расчет Услуг",
+    "applicationServices": "Услуги Заявки",
+    "maxAmount": "Макс. количество",
+    "results": "Результаты Расчета",
+    "requestedAmount": "Запрошенное Количество",
+    "totalAmount": "Общее Количество",
+    "price": "Цена",
+    "totalPrice": "Общая Сумма",
+    "proceedToTransaction": "Перейти к Транзакции"
+  },
+  "transaction": {
+    "title": "Создать Транзакцию",
+    "fullName": "ФИО",
+    "phoneNumber": "Номер Телефона",
+    "carNumber": "Номер Машины",
+    "services": "Услуги",
+    "totalPrice": "Общая Сумма",
+    "payments": "Платежи",
+    "addPayment": "Добавить Платеж"
   }
 }

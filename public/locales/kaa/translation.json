@@ -271,6 +271,7 @@
   },
   "applicationList": {
     "previous": "Aldıńǵı",
+    "calculate": "Esablaw",
     "next": "Keyingi",
     "numberOfApplication": "Ótinish Nomeri",
     "totalCost": "Jami Baha",
@@ -656,5 +657,26 @@
     "submit": "Ónim Jaratıw",
     "successMessage": "Ónim tabıslı jaratıldı!",
     "errorMessage": "Ónim jaratıwda qátelik júz berdi. Iltimas, qaytadan urınıp kóriń."
+  },
+  "calculateServices": {
+    "title": "Xızmetlerdi Esaplaw",
+    "applicationServices": "Ótinish Xızmetleri",
+    "maxAmount": "Maksimal mug'dar",
+    "results": "Esaplaw Nátiyjeleri",
+    "requestedAmount": "Soralg'an Mug'dar",
+    "totalAmount": "Ulıwma Mug'dar",
+    "price": "Baha",
+    "totalPrice": "Ulıwma Summa",
+    "proceedToTransaction": "Tólemge Ótiw"
+  },
+  "transaction": {
+    "title": "Tólem Jaratıw",
+    "fullName": "Tolıq Atı",
+    "phoneNumber": "Telefon Nomeri",
+    "carNumber": "Mashina Nomeri",
+    "services": "Xızmetler",
+    "totalPrice": "Ulıwma Summa",
+    "payments": "Tólemler",
+    "addPayment": "Tólem Qosıw"
   }
 }
