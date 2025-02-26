@@ -73,7 +73,7 @@ export default function Transaction() {
           );
         
         const responses = await Promise.all(promises);
-        const names = responses.reduce((acc, response, index) => {
+        const names = responses.reduce((acc: Record<number, string>, response: any, index: number) => {
           const serviceType = calculatedServices[index].service_type;
           return {
             ...acc,

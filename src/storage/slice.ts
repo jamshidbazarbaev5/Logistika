@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Service {
   service_type: number;
@@ -23,7 +23,7 @@ const transactionSlice = createSlice({
   name: 'transaction',
   initialState,
   reducers: {
-    setCalculatedServices: (state, action) => {
+    setCalculatedServices: (state: TransactionState, action: PayloadAction<any>) => {
       state.calculatedServices = action.payload.services.map((service: any) => ({
         service_type: service.service_type_id,
         amount: service.requested_amount,
@@ -31,7 +31,7 @@ const transactionSlice = createSlice({
       }));
       state.totalPrice = action.payload.total_price;
     },
-    setApplicationId: (state, action) => {
+    setApplicationId: (state: TransactionState, action: PayloadAction<number>) => {
       state.applicationId = action.payload;
     },
     clearTransaction: () => {
