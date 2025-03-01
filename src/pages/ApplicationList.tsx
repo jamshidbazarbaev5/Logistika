@@ -250,12 +250,9 @@ export default function ApplicationList() {
     try {
       const params = new URLSearchParams();
       
-      // Add non-empty search params
+      // Always append all parameters, even if empty
       Object.entries(searchParams).forEach(([key, value]) => {
-        if (value) {
-          // Use the value directly without additional encoding
-          params.append(key, value);
-        }
+        params.append(key, value || ''); // Use empty string if value is falsy
       });
       
       // Add page parameter
@@ -424,28 +421,27 @@ export default function ApplicationList() {
   const handleDownloadExcel = () => {
     const params = new URLSearchParams();
     
-    // Add search params with correct field names
-    Object.entries(searchParams).forEach(([key, value]) => {
-      if (value) {
-        // Map the frontend params to backend expected params
-        switch (key) {
-          case 'coming_date_gte':
-            params.append('coming_date__gte', value);
-            break;
-          case 'coming_date_lte':
-            params.append('coming_date__lte', value);
-            break;
-          default:
-            params.append(key, value);
-        }
-      }
+    // Map the frontend date parameters to backend format
+    const searchParamsForExport = {
+      firm_name: searchParams.firm_name,
+      decloration_number: searchParams.decloration_number,
+      number_of_application: searchParams.number_of_application,
+      firm_INN: searchParams.firm_INN,
+      coming_date_gte: searchParams.coming_date_gte, // Single underscore
+      coming_date_lte: searchParams.coming_date_lte, // Single underscore
+      products: searchParams.products
+    };
+
+    // Add all parameters, even if empty
+    Object.entries(searchParamsForExport).forEach(([key, value]) => {
+      console.log(`Adding parameter: ${key} = ${value}`); // Debug log
+      params.append(key, value || '');
     });
 
-    // Create the download URL
-    const downloadUrl = `${api.defaults.baseURL}/export_excel/?${params.toString()}`;
-    console.log('Excel download URL:', downloadUrl);
-    console.log('Search params:', searchParams);
-    console.log('URL params:', params.toString());
+    // Use the exact URL from the backend
+    const downloadUrl = `https://cargo-calc.uz/api/v1/export_excel/?${params.toString()}`;
+    
+    console.log('Download URL:', downloadUrl); // Debug log
 
     // Create a temporary link element and trigger the download
     const link = document.createElement('a');
@@ -493,7 +489,10 @@ export default function ApplicationList() {
           <SearchBar
             fields={searchFields}
             initialValues={searchParams}
-            onSearch={setSearchParams}
+            onSearch={(values) => {
+              console.log('Search values:', values); // Debug log
+              setSearchParams(values);
+            }}
             className="grid grid-cols-12 gap-4"
             t={t}
           />
