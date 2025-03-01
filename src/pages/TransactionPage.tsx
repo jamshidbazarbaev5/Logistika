@@ -41,9 +41,18 @@ interface CalculatedService {
   price: number;
 }
 
+interface WorkingService {
+  requested_amount: any;
+  service_type_id: number;
+  service_name: string;
+  amount: number;
+  price: number;
+  quantity?: number;
+}
+
 export default function Transaction() {
   const { t } = useTranslation();
-  const { calculatedServices = [], totalPrice = 0, applicationId } = useSelector((state: any) => state.transaction);
+  const { calculatedServices = [], workingServices = [], totalPrice = 0, applicationId } = useSelector((state: any) => state.transaction);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     full_name: '',
@@ -180,23 +189,54 @@ export default function Transaction() {
   }, [applicationId]);
 
   useEffect(() => {
+    console.log('calculatedServices:', calculatedServices);
+    console.log('workingServices detail:', {
+      length: workingServices?.length,
+      data: workingServices,
+      isEmpty: !workingServices?.length
+    });
+    console.log('totalPrice:', totalPrice);
+    
     if (!calculatedServices?.length || !applicationId) {
-      navigate('application-list');
+      console.log('Navigating to application-list due to missing data');
+      navigate('/application-list');
       return;
     }
-  }, [calculatedServices, applicationId, navigate]);
+  }, [calculatedServices, workingServices, totalPrice, applicationId, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     console.log('Starting transaction submission...');
+    console.log('Initial state:', {
+      calculatedServices,
+      workingServices,
+      totalPrice,
+      applicationId
+    });
 
     try {
-      const servicesToSubmit = calculatedServices.filter((service: Service) => service.requested_amount > 0);
-      console.log('Services to submit:', servicesToSubmit);
+      const servicesToSubmit = calculatedServices
+        .filter((service: Service) => service.requested_amount > 0)
+        .map((service: Service) => ({
+          service_type: service.service_type_id,
+          amount: service.requested_amount,
+          price: service.price
+        }));
+
+      const workingServicesToSubmit = workingServices && workingServices.length > 0 
+        ? workingServices.map((service: WorkingService) => ({
+            service_type: service.service_type_id,
+            quantity: service.requested_amount,
+            price: service.price
+          }))
+        : [];
       
-      if (servicesToSubmit.length === 0) {
-        throw new Error('At least one service with amount greater than 0 is required');
+      console.log('Services to submit:', servicesToSubmit);
+      console.log('Working services to submit:', workingServicesToSubmit);
+      
+      if (servicesToSubmit.length === 0 && workingServicesToSubmit.length === 0) {
+        throw new Error('At least one service is required');
       }
 
       console.log('Current payments:', payments);
@@ -220,11 +260,8 @@ export default function Transaction() {
         ...formData,
         total_price: totalPrice,
         application_id: applicationId,
-        keeping_services: servicesToSubmit.map((service: Service) => ({
-          service_type: service.service_type_id,
-          amount: service.requested_amount,
-          price: service.price
-        })),
+        keeping_services: servicesToSubmit,
+        working_services: workingServicesToSubmit,
         products: products.map(product => ({
           product_id: product.product_id,
           storage_id: product.storage_id,
@@ -236,7 +273,7 @@ export default function Transaction() {
           comment: payment.comment || ''
         })),
       };
-      console.log('Submitting payload:', payload);
+      console.log('Final payload:', payload);
 
       const response = await api.post('/transactions/', payload);
       console.log('Transaction created successfully:', response.data);
@@ -246,7 +283,8 @@ export default function Transaction() {
     } catch (error) {
       console.error('Error creating transaction:', error);
       console.log('Error details:', {
-        services: calculatedServices,
+        calculatedServices,
+        workingServices,
         payments,
         products,
         formData
@@ -323,22 +361,35 @@ export default function Transaction() {
             {t('transaction.services', 'Services')}
           </h2>
           <div className="space-y-4">
+            {/* Keeping Services */}
             {calculatedServices
               .filter((service: CalculatedService) => service.requested_amount > 0)
               .map((service: CalculatedService, index: number) => (
-                <div key={index} className="flex justify-between">
+                <div key={`keeping-${index}`} className="flex justify-between">
                   <span>
                     {service.service_name} × {service.requested_amount}
                   </span>
+                  <span>{service.price} сум</span>
                 </div>
               ))}
+            
+            {/* Working Services */}
+            {console.log('Working services before display:', workingServices)}
+            {workingServices && workingServices.length > 0 && workingServices.map((service: WorkingService, index: number) => (
+              <div key={`working-${index}`} className="flex justify-between">
+                <span>
+                  {service.service_name} × {service.amount}
+                </span>
+                <span>{service.price} сум</span>
+              </div>
+            ))}
+            
             <div className="font-bold pt-4 border-t">
-              {t('transaction.totalPrice', 'Total Price')}: {totalPrice}
+              {t('transaction.totalPrice', 'Total Price')}: {totalPrice} сум
             </div>
           </div>
         </div>
 
-        {/* Products Selection */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
           <h2 className="text-lg font-medium mb-4">
             {t('transaction.products', 'Products')}

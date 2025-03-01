@@ -16,6 +16,13 @@ interface KeepingService {
 interface Application {
   id: number;
   keeping_services: KeepingService[];
+  working_services: {
+    id: number;
+    quantity: number;
+    price: string;
+    service_id: number;
+    application_id: number;
+  }[];
 }
 
 interface ServiceType {
@@ -31,7 +38,13 @@ interface CalculationResult {
     requested_amount: number;
     price: number;
   }[];
-  working_services: any[]; // Add type definition if needed
+  working_services: {
+    service_type_id: number;
+    service_name: string;
+    total_amount: number;
+    requested_amount: number;
+    price: number;
+  }[];
   total_price: number;
 }
 
@@ -62,6 +75,11 @@ interface TransactionHistory {
     amount: number;
     price: string;
   }[];
+  working_services: {
+    service_type: number;
+    quantity: number;
+    price: string;
+  }[];
 } 
 
 interface Product {
@@ -81,6 +99,19 @@ interface Payment {
 interface PaymentMethod {
   id: number;
   payment_method: string;
+}
+
+interface WorkingServiceType {
+  id: number;
+  service_name: string;
+}
+
+interface WorkingService {
+  id: number;
+  quantity: number;
+  price: string;
+  service_id: number;
+  application_id: number;
 }
 
 export default function CalculateServices() {
@@ -103,6 +134,9 @@ export default function CalculateServices() {
     amount: "",
     comment: ""
   });
+  const [workingAmounts, setWorkingAmounts] = useState<Record<number, number>>({});
+  const [workingServiceTypes, setWorkingServiceTypes] = useState<WorkingServiceType[]>([]);
+  const [originalWorkingServices, setOriginalWorkingServices] = useState<WorkingService[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -114,6 +148,7 @@ export default function CalculateServices() {
 
         setApplication(appResponse.data);
         setServiceTypes(servicesResponse.data.results);
+        setOriginalWorkingServices(appResponse.data.working_services);
 
         // Initialize amounts from existing keeping services
         const initialAmounts: Record<number, number> = {};
@@ -121,6 +156,13 @@ export default function CalculateServices() {
           initialAmounts[service.service_type_id] = service.amount;
         });
         setAmounts(initialAmounts);
+
+        // Initialize working amounts from working services
+        const initialWorkingAmounts: Record<number, number> = {};
+        appResponse.data.working_services.forEach((service: WorkingService) => {
+          initialWorkingAmounts[service.service_id] = 0; // Start with 0
+        });
+        setWorkingAmounts(initialWorkingAmounts);
       } catch (error) {
         console.error('Error fetching data:', error);
       }
@@ -206,6 +248,19 @@ export default function CalculateServices() {
     fetchPayments();
   }, [id]);
 
+  useEffect(() => {
+    const fetchWorkingServices = async () => {
+      try {
+        const response = await api.get('/working_service/name/');
+        setWorkingServiceTypes(response.data.results);
+      } catch (error) {
+        console.error('Error fetching working service types:', error);
+      }
+    };
+
+    fetchWorkingServices();
+  }, []);
+
   const handleAmountChange = (serviceTypeId: number, amount: number) => {
     const originalService = application?.keeping_services.find(
       service => service.service_type_id === serviceTypeId
@@ -219,24 +274,63 @@ export default function CalculateServices() {
     }
   };
 
+  const handleWorkingAmountChange = (serviceTypeId: number, amount: number) => {
+    if (amount >= 0) {
+      setWorkingAmounts(prev => ({
+        ...prev,
+        [serviceTypeId]: amount
+      }));
+    }
+  };
+
   const handleCalculate = async () => {
     if (!application) return;
 
     setLoading(true);
     try {
-      const services = Object.entries(amounts).map(([serviceTypeId, amount]) => ({
+      // Format keeping services
+      const keepingServices = Object.entries(amounts).map(([serviceTypeId, amount]) => ({
         service_type_id: Number(serviceTypeId),
         amount
       }));
 
+      // Format working services using service_id as service_type_id
+      const workingServices = Object.entries(workingAmounts)
+        .filter(([, amount]) => amount > 0)
+        .map(([serviceId, amount]) => ({
+          service_type_id: Number(serviceId),
+          amount
+        }));
+
       const response = await api.post(`/keeping_service/service_calculate/${id}/`, {
-        services
+        keeping_services: keepingServices,
+        working_services: workingServices
       });
 
+      console.log('API Response:', response.data);
+
       if (response.data) {
-        setCalculationResult(response.data);
-        dispatch(setCalculatedServices(response.data));
-        dispatch(setApplicationId(Number(id)));
+        // Map the response to include the original requested amounts
+        const mappedWorkingServices = response.data.working_services.map((service: any) => {
+          const originalAmount = workingAmounts[service.service_type_id];
+          return {
+            ...service,
+            amount: originalAmount || 0,
+            requested_amount: originalAmount || 0,
+            total_amount: service.total_amount
+          };
+        });
+
+        setCalculationResult({
+          ...response.data,
+          working_services: mappedWorkingServices
+        });
+
+        dispatch(setCalculatedServices({
+          services: response.data.keeping_services,
+          working_services: mappedWorkingServices,
+          total_price: response.data.total_price
+        }));
       }
     } catch (error) {
       console.error('Error calculating services:', error);
@@ -247,9 +341,15 @@ export default function CalculateServices() {
 
   const handleProceedToTransaction = () => {
     if (calculationResult) {
-      // Dispatch the entire calculationResult to maintain the correct structure
+      console.log('Proceeding to transaction with:', {
+        keeping_services: calculationResult.keeping_services,
+        working_services: calculationResult.working_services,
+        total_price: calculationResult.total_price
+      });
+      
       dispatch(setCalculatedServices({
         services: calculationResult.keeping_services,
+        working_services: calculationResult.working_services,
         total_price: calculationResult.total_price
       }));
       dispatch(setApplicationId(Number(id)));
@@ -286,6 +386,45 @@ export default function CalculateServices() {
       console.error('Error submitting payment:', error);
     }
   };
+
+  const renderWorkingServices = () => (
+    <div className="mt-6">
+      <h3 className="text-lg font-medium mb-4">
+        {t('calculateServices.workingServices', 'Working Services')}
+      </h3>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {originalWorkingServices.map((service) => {
+          const serviceType = workingServiceTypes.find(st => st.id === service.service_id);
+          return (
+            <div 
+              key={service.id}
+              className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
+            >
+              <div className="flex flex-col space-y-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {serviceType?.service_name || `Service ${service.service_id}`}
+                </label>
+                <div className="flex items-center justify-between space-x-4">
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {t('calculateServices.maxAmount', 'Max amount')}: {service.quantity}
+                  </span>
+                  <input
+                    type="number"
+                    min="0"
+                    max={service.quantity}
+                    value={workingAmounts[service.service_id] || 0}
+                    onChange={(e) => handleWorkingAmountChange(service.service_id, parseInt(e.target.value) || 0)}
+                    className="w-24 rounded-md border border-gray-300 dark:border-gray-600 
+                      bg-white dark:bg-gray-700 px-3 py-2 text-sm"
+                  />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
 
   return (
     <div className="p-6">
@@ -368,6 +507,8 @@ export default function CalculateServices() {
                     );
                   })}
                 </div>
+
+                {renderWorkingServices()}
               </div>
 
               <button
@@ -416,6 +557,40 @@ export default function CalculateServices() {
                       </div>
                     ))}
 
+                  {calculationResult.working_services.map((service, index) => {
+                    const requestedAmount = workingAmounts[service.service_type_id];
+                    console.log(`Rendering service ${service.service_type_id}:`, {
+                      workingAmounts,
+                      requestedAmount,
+                      service
+                    });
+                    
+                    return (
+                      <div 
+                        key={`working-${index}`} 
+                        className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
+                      >
+                        <h3 className="font-medium text-[#6C5DD3] dark:text-[#8B7BE8] mb-2">
+                          {service.service_name} (Working)
+                        </h3>
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between">
+                            <span>{t('calculateServices.requestedAmount')}:</span>
+                            <span className="font-medium">{requestedAmount}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>{t('calculateServices.totalAmount')}:</span>
+                            <span className="font-medium">{service.total_amount}</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span>{t('calculateServices.price')}:</span>
+                            <span className="font-medium">{service.price.toLocaleString()} сум</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+
                   <div className="mt-6 pt-4 border-t dark:border-gray-600">
                     <div className="flex justify-between items-center text-lg font-medium">
                       <div>{t('calculateServices.totalPrice')}:</div>
@@ -428,7 +603,11 @@ export default function CalculateServices() {
 
                 <button
                   onClick={handleProceedToTransaction}
-                  disabled={!calculationResult.keeping_services.some(service => service.requested_amount > 0)}
+                  disabled={
+                    !calculationResult ||
+                    (!calculationResult.keeping_services.some(service => service.requested_amount > 0) && 
+                    !calculationResult.working_services.some(service => service.requested_amount > 0 || service.total_amount > 0))
+                  }
                   className="mt-6 w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 
                     disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -472,11 +651,22 @@ export default function CalculateServices() {
                 <h3 className="font-medium mb-2">{t('transaction.services', 'Services')}:</h3>
                 <div className="space-y-2">
                   {transaction.keeping_services.map((service, index) => (
-                    <div key={index} className="flex justify-between text-sm">
+                    <div key={`keeping-${index}`} className="flex justify-between text-sm">
                       <span>
                         {serviceTypes.find(st => st.id === service.service_type)?.name || 
                           `Service ${service.service_type}`}
                         {' × '}{service.amount}
+                      </span>
+                      <span>{service.price} сум</span>
+                    </div>
+                  ))}
+                  
+                  {transaction.working_services.map((service, index) => (
+                    <div key={`working-${index}`} className="flex justify-between text-sm">
+                      <span>
+                        {workingServiceTypes.find(st => st.id === service.service_type)?.service_name || 
+                          `Working Service ${service.service_type}`}
+                        {' × '}{service.quantity}
                       </span>
                       <span>{service.price} сум</span>
                     </div>
