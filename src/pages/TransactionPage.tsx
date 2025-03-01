@@ -390,28 +390,31 @@ export default function Transaction() {
           </div>
         </div>
 
+        {/* Products Section */}
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
           <h2 className="text-lg font-medium mb-4">
             {t('transaction.products', 'Products')}
           </h2>
           <div className="space-y-4">
-            {availableProducts.map((product) => (
-              <div key={product.product_id} className="flex items-center justify-between p-2 border rounded">
-                <div className="flex items-center space-x-4">
-                  <input
-                    type="checkbox"
-                    checked={product.selected || false}
-                    onChange={() => handleProductSelect(product.product_id)}
-                    className="h-4 w-4 text-blue-600"
-                  />
-                  <div>
-                    <span className="font-medium">{product.name}</span>
-                    <span className="text-sm text-gray-500 ml-2">({product.quantity} units)</span>
+            {availableProducts
+              .filter(product => product.quantity > 0)
+              .map((product) => (
+                <div key={product.product_id} className="flex items-center justify-between p-2 border rounded">
+                  <div className="flex items-center space-x-4">
+                    <input
+                      type="checkbox"
+                      checked={product.selected || false}
+                      onChange={() => handleProductSelect(product.product_id)}
+                      className="h-4 w-4 text-blue-600"
+                    />
+                    <div>
+                      <span className="font-medium">{product.name}</span>
+                      <span className="text-sm text-gray-500 ml-2">({product.quantity} units)</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-            {availableProducts.length === 0 && (
+              ))}
+            {availableProducts.filter(product => product.quantity > 0).length === 0 && (
               <p className="text-gray-500 text-center">
                 {t('transaction.noProducts', 'No products available')}
               </p>

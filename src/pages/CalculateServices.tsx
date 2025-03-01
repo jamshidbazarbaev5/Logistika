@@ -294,9 +294,9 @@ export default function CalculateServices() {
         amount
       }));
 
-      // Format working services using service_id as service_type_id
+      // Format working services, excluding those with amount 0
       const workingServices = Object.entries(workingAmounts)
-        .filter(([, amount]) => amount > 0)
+        .filter(([, amount]) => amount > 0) // Only include services with amount > 0
         .map(([serviceId, amount]) => ({
           service_type_id: Number(serviceId),
           amount
@@ -304,22 +304,24 @@ export default function CalculateServices() {
 
       const response = await api.post(`/keeping_service/service_calculate/${id}/`, {
         keeping_services: keepingServices,
-        working_services: workingServices
+        working_services: workingServices // This will now only include non-zero amounts
       });
 
       console.log('API Response:', response.data);
 
       if (response.data) {
-        // Map the response to include the original requested amounts
-        const mappedWorkingServices = response.data.working_services.map((service: any) => {
-          const originalAmount = workingAmounts[service.service_type_id];
-          return {
-            ...service,
-            amount: originalAmount || 0,
-            requested_amount: originalAmount || 0,
-            total_amount: service.total_amount
-          };
-        });
+        // Map the response to include only the working services that had non-zero amounts
+        const mappedWorkingServices = response.data.working_services
+          .filter((service: any) => workingAmounts[service.service_type_id] > 0)
+          .map((service: any) => {
+            const originalAmount = workingAmounts[service.service_type_id];
+            return {
+              ...service,
+              amount: originalAmount || 0,
+              requested_amount: originalAmount || 0,
+              total_amount: service.total_amount
+            };
+          });
 
         setCalculationResult({
           ...response.data,
