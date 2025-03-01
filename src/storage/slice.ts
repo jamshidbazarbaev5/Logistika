@@ -1,8 +1,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface Service {
-  service_type: number;
-  amount: number;
+  service_type_id: number;
+  service_name: string;
+  total_amount: number;
+  requested_amount: number;
   price: number;
 }
 
@@ -40,23 +42,16 @@ const transactionSlice = createSlice({
   name: 'transaction',
   initialState,
   reducers: {
-    setCalculatedServices: (state: TransactionState, action: PayloadAction<any>) => {
-      state.calculatedServices = action.payload.services.map((service: any) => ({
-        service_type: service.service_type_id,
-        amount: service.requested_amount,
-        price: service.price,
-      }));
+    setCalculatedServices: (state: TransactionState, action: PayloadAction<{services: Service[], total_price: number}>) => {
+      state.calculatedServices = action.payload.services;
       state.totalPrice = action.payload.total_price;
-      // Save to localStorage
       localStorage.setItem('transactionState', JSON.stringify(state));
     },
     setApplicationId: (state: TransactionState, action: PayloadAction<number>) => {
       state.applicationId = action.payload;
-      // Save to localStorage
       localStorage.setItem('transactionState', JSON.stringify(state));
     },
     clearTransaction: () => {
-      // Clear localStorage when transaction is cleared
       localStorage.removeItem('transactionState');
       return {
         calculatedServices: [],

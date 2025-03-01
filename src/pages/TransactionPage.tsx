@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { api } from '../api/api';
 import { useNavigate } from 'react-router-dom';
 import { clearTransaction } from '../storage/slice';
+import SuccessModal from '../components/SuccessModal';
 
 interface Payment {
   payment_method: number;
@@ -24,10 +25,25 @@ interface Product {
   name?: string;
 }
 
+interface Service {
+  service_type_id: number;
+  service_name: string;
+  total_amount: number;
+  requested_amount: number;
+  price: number;
+}
+
+interface CalculatedService {
+  service_type_id: number;
+  service_name: string;
+  total_amount: number;
+  requested_amount: number;
+  price: number;
+}
+
 export default function Transaction() {
   const { t } = useTranslation();
-  const { calculatedServices, totalPrice, applicationId } = useSelector((state: any) => state.transaction);
-  const [serviceNames, setServiceNames] = useState<{ [key: number]: string }>({});
+  const { calculatedServices = [], totalPrice = 0, applicationId } = useSelector((state: any) => state.transaction);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     full_name: '',
@@ -40,6 +56,7 @@ export default function Transaction() {
   const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -128,35 +145,6 @@ export default function Transaction() {
   }, []);
 
   useEffect(() => {
-    const fetchServiceNames = async () => {
-      try {
-        const promises = calculatedServices
-          .filter((service: any) => service.amount > 0)
-          .map((service: any) => 
-            api.get(`/keeping_service/keeping_service_name/${service.service_type}/`)
-          );
-        
-        const responses = await Promise.all(promises);
-        const names = responses.reduce((acc: Record<number, string>, response: any, index: number) => {
-          const serviceType = calculatedServices[index].service_type;
-          return {
-            ...acc,
-            [serviceType]: response.data.name
-          };
-        }, {});
-        
-        setServiceNames(names);
-      } catch (error) {
-        console.error('Error fetching service names:', error);
-      }
-    };
-
-    if (calculatedServices.length > 0) {
-      fetchServiceNames();
-    }
-  }, [calculatedServices]);
-
-  useEffect(() => {
     const fetchApplicationData = async () => {
       try {
         const response = await api.get(`/application/${applicationId}/`);
@@ -193,21 +181,25 @@ export default function Transaction() {
 
   useEffect(() => {
     if (!calculatedServices?.length || !applicationId) {
-      navigate(`/calculate-services/${applicationId || ''}`);
+      navigate('application-list');
+      return;
     }
   }, [calculatedServices, applicationId, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    console.log('Starting transaction submission...');
 
     try {
-      const servicesToSubmit = calculatedServices.filter((service: any) => service.amount > 0);
+      const servicesToSubmit = calculatedServices.filter((service: Service) => service.requested_amount > 0);
+      console.log('Services to submit:', servicesToSubmit);
       
       if (servicesToSubmit.length === 0) {
         throw new Error('At least one service with amount greater than 0 is required');
       }
 
+      console.log('Current payments:', payments);
       if (payments.length === 0) {
         throw new Error('At least one payment method is required');
       }
@@ -218,6 +210,7 @@ export default function Transaction() {
       }
 
       const totalPaymentAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
+      console.log('Total payment amount:', totalPaymentAmount, 'Total price:', totalPrice);
 
       if (totalPaymentAmount !== totalPrice) {
         throw new Error(`Total payment amount (${totalPaymentAmount}) must equal total price (${totalPrice})`);
@@ -227,7 +220,11 @@ export default function Transaction() {
         ...formData,
         total_price: totalPrice,
         application_id: applicationId,
-        keeping_services: servicesToSubmit,
+        keeping_services: servicesToSubmit.map((service: Service) => ({
+          service_type: service.service_type_id,
+          amount: service.requested_amount,
+          price: service.price
+        })),
         products: products.map(product => ({
           product_id: product.product_id,
           storage_id: product.storage_id,
@@ -239,16 +236,31 @@ export default function Transaction() {
           comment: payment.comment || ''
         })),
       };
+      console.log('Submitting payload:', payload);
 
-      await api.post('/transactions/', payload);
-      dispatch(clearTransaction());
-      navigate('/application-list');
+      const response = await api.post('/transactions/', payload);
+      console.log('Transaction created successfully:', response.data);
+      
+      setShowSuccessModal(true);
+      
     } catch (error) {
       console.error('Error creating transaction:', error);
+      console.log('Error details:', {
+        services: calculatedServices,
+        payments,
+        products,
+        formData
+      });
       alert(error instanceof Error ? error.message : 'Error creating transaction');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleModalClose = () => {
+    setShowSuccessModal(false);
+    dispatch(clearTransaction());
+    navigate('/application-list');
   };
 
   return (
@@ -312,11 +324,12 @@ export default function Transaction() {
           </h2>
           <div className="space-y-4">
             {calculatedServices
-              .filter((service: any) => service.amount > 0)
-              .map((service: any, index: any) => (
+              .filter((service: CalculatedService) => service.requested_amount > 0)
+              .map((service: CalculatedService, index: number) => (
                 <div key={index} className="flex justify-between">
-                  <span>{serviceNames[service.service_type] || `Service ${service.service_type}`}   x {service.amount}</span>
-                  <span>{service.total_amount}</span>
+                  <span>
+                    {service.service_name} × {service.requested_amount}
+                  </span>
                 </div>
               ))}
             <div className="font-bold pt-4 border-t">
@@ -412,6 +425,13 @@ export default function Transaction() {
           {loading ? t('common.saving', 'Saving...') : t('common.save', 'Save')}
         </button>
       </form>
+
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleModalClose}
+        title={t('transaction.success.title', 'Transaction Created')}
+        message={t('transaction.success.message', 'Transaction has been successfully created')}
+      />
     </div>
   );
 }

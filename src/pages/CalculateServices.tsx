@@ -24,13 +24,14 @@ interface ServiceType {
 }
 
 interface CalculationResult {
-  services: {
+  keeping_services: {
     service_type_id: number;
     service_name: string;
     total_amount: number;
     requested_amount: number;
     price: number;
   }[];
+  working_services: any[]; // Add type definition if needed
   total_price: number;
 }
 
@@ -232,9 +233,11 @@ export default function CalculateServices() {
         services
       });
 
-      setCalculationResult(response.data);
-      dispatch(setCalculatedServices(response.data));
-      dispatch(setApplicationId(Number(id)));
+      if (response.data) {
+        setCalculationResult(response.data);
+        dispatch(setCalculatedServices(response.data));
+        dispatch(setApplicationId(Number(id)));
+      }
     } catch (error) {
       console.error('Error calculating services:', error);
     } finally {
@@ -243,7 +246,15 @@ export default function CalculateServices() {
   };
 
   const handleProceedToTransaction = () => {
-    navigate('/transaction');
+    if (calculationResult) {
+      // Dispatch the entire calculationResult to maintain the correct structure
+      dispatch(setCalculatedServices({
+        services: calculationResult.keeping_services,
+        total_price: calculationResult.total_price
+      }));
+      dispatch(setApplicationId(Number(id)));
+      navigate('/transaction');
+    }
   };
 
   const handlePaymentSubmit = async (e: React.FormEvent) => {
@@ -371,15 +382,15 @@ export default function CalculateServices() {
           </div>
 
           <div className="lg:col-span-1">
-            {calculationResult ? (
+            {calculationResult && calculationResult.keeping_services ? (
               <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow sticky top-6">
                 <h2 className="text-lg font-medium mb-4">
                   {t('calculateServices.results', 'Calculation Results')}
                 </h2>
 
                 <div className="space-y-4 max-h-[calc(100vh-400px)] overflow-y-auto pr-2">
-                  {calculationResult.services
-                    .filter(service => service.requested_amount > 0)
+                  {calculationResult.keeping_services
+                    .filter(service => service && service.requested_amount > 0)
                     .map((service, index) => (
                       <div 
                         key={index} 
@@ -417,7 +428,7 @@ export default function CalculateServices() {
 
                 <button
                   onClick={handleProceedToTransaction}
-                  disabled={!calculationResult.services.some(service => service.requested_amount > 0)}
+                  disabled={!calculationResult.keeping_services.some(service => service.requested_amount > 0)}
                   className="mt-6 w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 
                     disabled:opacity-50 disabled:cursor-not-allowed"
                 >
