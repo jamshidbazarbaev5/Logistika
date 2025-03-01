@@ -2,12 +2,12 @@ import { useState, useEffect, Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Menu, Transition } from "@headlessui/react";
-import { EllipsisVerticalIcon,  } from "@heroicons/react/24/outline";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { api } from "../api/api";
 import ConfirmModal from "../components/ConfirmModal";
 import SuccessModal from "../components/SuccessModal";
 import { SearchBar, SearchField } from "../components/SearchBar";
-import { Crown, User } from "lucide-react";
+import { Crown, User, Download } from "lucide-react";
 
 import { Calculator } from "lucide-react"; 
 interface ApplicationMode {
@@ -84,9 +84,11 @@ interface Application {
 interface SearchParams extends Record<string, string> {
   firm_name: string;
   decloration_number: string;
+  number_of_application: string;
   firm_INN: string;
-  decloration_date_gte: string;
-  decloration_date_lte: string;
+  coming_date_gte: string;
+  coming_date_lte: string;
+  products: string;
 }
 
 // Add interfaces for API responses
@@ -121,6 +123,17 @@ interface ModesResponse {
   results: Mode[];
 }
 
+// Add interface for Product API response
+interface ProductResponse {
+  id: number;
+  name: string;
+  // add other fields if needed
+}
+
+interface ProductApiResponse {
+  results: ProductResponse[];
+}
+
 export default function ApplicationList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -136,9 +149,11 @@ export default function ApplicationList() {
   const [searchParams, setSearchParams] = useState<SearchParams>({
     firm_name: '',
     decloration_number: '',
+    number_of_application: '',
     firm_INN: '',
-    decloration_date_gte: '',
-    decloration_date_lte: '',
+    coming_date_gte: '',
+    coming_date_lte: '',
+    products: '',
   });
 
   // Add pagination state
@@ -154,44 +169,80 @@ export default function ApplicationList() {
   const [, setWorkingServices] = useState<Array<{ id: number; service_name: string; base_price: number; extra_price: number; units: string }>>([]);
   const [, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
   const [, setStorages] = useState<Array<{ id: number; name: string }>>([]);
-  const [, setProducts] = useState<Array<{ id: number; name: string }>>([]);
+  const [productsList, setProductsList] = useState<ProductResponse[]>([]);
   // const [, setAvailableModes] = useState<Array<{ id: number; name: string }>>([]);
 
   // Add state for available modes
   const [availableModes, setAvailableModes] = useState<Mode[]>([]);
 
+  // Add useEffect to fetch products when component mounts
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await api.get<ProductApiResponse>('/items/product/');
+        if (response.data && Array.isArray(response.data.results)) {
+          setProductsList(response.data.results);
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   const searchFields: SearchField[] = [
     {
       name: 'firm_name',
       label: t('applicationList.table.firmName'),
-      placeholder: t('applicationList.table.firmName'),
-      className: 'col-span-12 sm:col-span-6 lg:col-span-4',
+      placeholder: t('applicationList.searchPlaceholders.firmName', 'Search by firm name'),
+      className: 'col-span-12 sm:col-span-6 lg:col-span-3',
+    },
+    {
+      name: 'number_of_application',
+      label: t('applicationList.table.applicationNumber', 'Application Number'),
+      placeholder: t('applicationList.searchPlaceholders.applicationNumber', 'Search by application number'),
+      className: 'col-span-12 sm:col-span-6 lg:col-span-3',
     },
     {
       name: 'decloration_number',
       label: t('applicationList.table.declarationNumber', 'Declaration Number'),
-      placeholder: t('createApplication.declorationNumberPlaceholder', 'Enter declaration number'),
-      className: 'col-span-12 sm:col-span-6 lg:col-span-4',
+      placeholder: t('applicationList.searchPlaceholders.declarationNumber', 'Search by declaration number'),
+      className: 'col-span-12 sm:col-span-6 lg:col-span-3',
     },
     {
       name: 'firm_INN',
       label: t('createFirm.companyInfo.inn', 'INN'),
-      placeholder: t('createFirm.companyInfo.innPlaceholder', 'Enter INN number'),
+      placeholder: t('applicationList.searchPlaceholders.inn', 'Search by INN'),
+      className: 'col-span-12 sm:col-span-6 lg:col-span-3',
+    },
+    {
+      name: 'products',
+      label: t('applicationList.table.product', 'Product'),
+      placeholder: t('applicationList.table.selectProduct', 'Select Product'),
+      type: 'select',
+      options: [
+        { value: '', label: t('applicationList.table.allProducts', 'All Products') },
+        ...productsList.map(product => ({
+          value: product.id.toString(),
+          label: product.name
+        }))
+      ],
+      className: 'col-span-12 sm:col-span-12 lg:col-span-4',
+    },
+    {
+      name: 'coming_date_gte',
+      label: t('applicationList.table.comingDateFrom', 'Coming Date From'),
+      placeholder: t('applicationList.comingDatePlaceholder', 'From'),
+      type: 'date',
       className: 'col-span-12 sm:col-span-6 lg:col-span-4',
     },
     {
-      name: 'decloration_date_gte',
-      label: t('applicationList.table.dates', 'Declaration Date From'),
-      placeholder: t('createApplication.declorationDatePlaceholder', 'Enter declaration date'),
+      name: 'coming_date_lte',
+      label: t('applicationList.table.comingDateTo', 'Coming Date To'),
+      placeholder: t('applicationList.comingDatePlaceholder', 'To'),
       type: 'date',
-      className: 'col-span-12 sm:col-span-6',
-    },
-    {
-      name: 'decloration_date_lte',
-      label: t('applicationList.table.dates', 'Declaration Date To'),
-      placeholder: t('createApplication.declorationDatePlaceholder', 'Enter declaration date'),
-      type: 'date',
-      className: 'col-span-12 sm:col-span-6',
+      className: 'col-span-12 sm:col-span-6 lg:col-span-4',
     },
   ];
 
@@ -286,7 +337,7 @@ export default function ApplicationList() {
         setWorkingServices(workingRes.data.results);
         setTransportTypes(transportTypesRes.data.results);
         setStorages(storagesRes.data.results);
-        setProducts(productsRes.data.results);
+        setProductsList(productsRes.data.results);
         setAvailableModes(modesRes.data.results);
       } catch (error) {
         console.error('Error fetching form data:', error);
@@ -370,7 +421,40 @@ export default function ApplicationList() {
     navigate(`/edit-application/${application.id}`);
   };
 
+  const handleDownloadExcel = () => {
+    const params = new URLSearchParams();
+    
+    // Add search params with correct field names
+    Object.entries(searchParams).forEach(([key, value]) => {
+      if (value) {
+        // Map the frontend params to backend expected params
+        switch (key) {
+          case 'coming_date_gte':
+            params.append('coming_date__gte', value);
+            break;
+          case 'coming_date_lte':
+            params.append('coming_date__lte', value);
+            break;
+          default:
+            params.append(key, value);
+        }
+      }
+    });
 
+    // Create the download URL
+    const downloadUrl = `${api.defaults.baseURL}/export_excel/?${params.toString()}`;
+    console.log('Excel download URL:', downloadUrl);
+    console.log('Search params:', searchParams);
+    console.log('URL params:', params.toString());
+
+    // Create a temporary link element and trigger the download
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.setAttribute('download', 'applications.xlsx');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   return (
     <div className="p-2 sm:p-4 md:p-6">
@@ -378,24 +462,42 @@ export default function ApplicationList() {
         <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
           {t("applicationList.title", "Applications")}
         </h1>
-        <button
-          onClick={() => navigate("/create-application")}
-          className="w-full sm:w-auto bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
-          hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
-          dark:focus:ring-offset-gray-800 transition-all duration-200"
-        >
-          {t("applicationList.createApplication", "Create Application")}
-        </button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <button
+            onClick={handleDownloadExcel}
+            className="w-full sm:w-auto bg-green-600 text-white px-4 py-2 text-sm rounded-lg 
+            hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2
+            dark:focus:ring-offset-gray-800 transition-all duration-200 flex items-center justify-center"
+          >
+            <Download className="w-4 h-4 mr-2" />
+            {t("applicationList.downloadExcel", "Download Excel")}
+          </button>
+          <button
+            onClick={() => navigate("/create-application")}
+            className="w-full sm:w-auto bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
+            hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
+            dark:focus:ring-offset-gray-800 transition-all duration-200"
+          >
+            {t("applicationList.createApplication", "Create Application")}
+          </button>
+        </div>
       </div>
 
-      <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-        <SearchBar
-          fields={searchFields}
-          initialValues={searchParams}
-          onSearch={setSearchParams}
-          className="grid grid-cols-12 gap-3"
-          t={t}
-        />
+      <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="text-lg font-medium text-gray-900 dark:text-white">
+            {t('applicationList.search.title', 'Search Applications')}
+          </h2>
+        </div>
+        <div className="p-4">
+          <SearchBar
+            fields={searchFields}
+            initialValues={searchParams}
+            onSearch={setSearchParams}
+            className="grid grid-cols-12 gap-4"
+            t={t}
+          />
+        </div>
       </div>
 
       <div className="overflow-x-auto">

@@ -67,11 +67,12 @@ interface KeepingService {
 
 interface WorkingService {
   id: number;
-  base_day: number;
+  tariff_id: number;  // Add this
+  service_id: number; // Add this
   service_name: string;
   base_price: string;
-  extra_price: string;
   units: string;
+  year: number;
 }
 
 interface Product {
@@ -730,42 +731,81 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const { formData, setFormData } = useFormContext();
   const [keepingServices, setKeepingServices] = useState<KeepingService[]>([]);
   const [workingServices, setWorkingServices] = useState<WorkingService[]>([]);
+  const [workingServiceNames] = useState<Map<number, string>>(new Map());
   const [keepingServicesNames, setKeepingServicesNames] = useState<Map<number, string>>(new Map());
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [keepingServicesOpen, setKeepingServicesOpen] = useState(false);
   const [workingServicesOpen, setWorkingServicesOpen] = useState(false);
   const keepingServicesRef = useRef<HTMLDivElement>(null);
   const workingServicesRef = useRef<HTMLDivElement>(null);
-  const {t} = useTranslation()
+  const {t} = useTranslation();
 
   useEffect(() => {
     const fetchServices = async () => {
+      setIsLoading(true);
       try {
-        const [keepingRes, workingRes] = await Promise.all([
-          api.get('/keeping_service/keeping_service_price/'),
-          api.get('/working_service/')
-        ]);
-        setKeepingServices(keepingRes.data.results);
-        setWorkingServices(workingRes.data.results);
-
-        // Fetch names for each keeping service
-        const namePromises = keepingRes.data.results.map((service: any) =>
-          api.get(`/keeping_service/keeping_service_name/${service.keeping_services_id}/`)
-        );
+        // Fetch working service names first
+        const workingNamesRes = await api.get('/working_service/name/');
+        const workingNames = workingNamesRes.data.results || [];
+        console.log('Working service names:', workingNames);
         
-        const nameResponses = await Promise.all(namePromises);
+        // Create a map of service names
         const namesMap = new Map();
-        keepingRes.data.results.forEach((service: any, index: number) => {
-          namesMap.set(service.keeping_services_id, nameResponses[index].data.name);
+        workingNames.forEach((service: { id: number, service_name: string }) => {
+          namesMap.set(service.id, service.service_name);
         });
-        setKeepingServicesNames(namesMap);
+        console.log('Names map:', Object.fromEntries(namesMap));
+
+        // Fetch working service tariffs
+        const workingTariffsRes = await api.get('/working_service/tariff/');
+        const workingTariffs = workingTariffsRes.data.results || [];
+        console.log('Working service tariffs:', workingTariffs);
+
+        // Combine names with tariffs
+        const combinedWorkingServices = workingTariffs.map((tariff: any) => ({
+          id: tariff.id,
+          tariff_id: tariff.id,  // Store the actual tariff ID (3, 4, 7)
+          service_id: tariff.service, // Store the service ID for name lookup
+          service_name: namesMap.get(tariff.service) || t('createApplication.loading'),
+          base_price: tariff.base_price,
+          units: tariff.units,
+          year: tariff.year
+        }));
+        console.log('Combined working services:', combinedWorkingServices);
+
+        setWorkingServices(combinedWorkingServices);
+
+        // Fetch keeping services (assuming this endpoint structure remains the same)
+        const keepingRes = await api.get('/keeping_service/keeping_service_price/');
+        if (keepingRes.data?.results) {
+          setKeepingServices(keepingRes.data.results);
+        }
+
+        // Fetch names for keeping services
+        const keepingNamePromises = keepingRes.data?.results?.map((service: any) =>
+          api.get(`/keeping_service/keeping_service_name/${service.keeping_services_id}/`)
+        ) || [];
+        
+        const keepingNameResponses = await Promise.all(keepingNamePromises);
+        const keepingNamesMap = new Map();
+        keepingRes.data?.results?.forEach((service: any, index: number) => {
+          keepingNamesMap.set(service.keeping_services_id, keepingNameResponses[index].data.name);
+        });
+        setKeepingServicesNames(keepingNamesMap);
+
       } catch (error) {
         console.error('Error fetching services:', error);
+        setError(t('createApplication.errorLoadingServices'));
+      } finally {
+        setIsLoading(false);
       }
     };
-    fetchServices();
-  }, []);
 
-    useEffect(() => {
+    fetchServices();
+  }, [t]);
+
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (keepingServicesRef.current && !keepingServicesRef.current.contains(event.target as Node)) {
         setKeepingServicesOpen(false);
@@ -794,22 +834,27 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     }));
   };
 
-  const handleWorkingServiceChange = (serviceId: number, quantity: number) => {
+  const handleWorkingServiceChange = (tariffId: number, quantity: number) => {
+    console.log('Handling working service change:', { tariffId, quantity });
     if (quantity > 0) {
-      setFormData(prev => ({
-        ...prev,
-        upload_working_services_quantity: [
-          ...prev.upload_working_services_quantity.filter(
-            item => item.service_id !== serviceId
-          ),
-          {
-            service_id: serviceId,
-            quantity: quantity
-          }
-        ]
-      }));
+      setFormData(prev => {
+        const newData = {
+          ...prev,
+          upload_working_services_quantity: [
+            ...prev.upload_working_services_quantity.filter(
+              item => item.service_id !== tariffId
+            ),
+            {
+              service_id: tariffId, // Using the actual tariff ID (3, 4, 7)
+              quantity: quantity
+            }
+          ]
+        };
+        console.log('Updated working services quantity:', newData.upload_working_services_quantity);
+        return newData;
+      });
     } else {
-      handleRemoveWorkingService(serviceId);
+      handleRemoveWorkingService(tariffId);
     }
   };
 
@@ -823,11 +868,11 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     }));
   };
 
-  const handleRemoveWorkingService = (serviceId: number) => {
+  const handleRemoveWorkingService = (tariffId: number) => {
     setFormData(prev => ({
       ...prev,
       upload_working_services_quantity: prev.upload_working_services_quantity.filter(
-        item => item.service_id !== serviceId
+        item => item.service_id !== tariffId
       )
     }));
   };
@@ -838,12 +883,29 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     )?.amount || 0;
   };
 
-  const getSelectedWorkingService = (serviceId: number) => {
+  const getSelectedWorkingService = (tariffId: number) => {
     const service = formData.upload_working_services_quantity.find(
-      item => item.service_id === serviceId
+      item => item.service_id === tariffId
     );
+    console.log('Getting selected working service:', { tariffId, service });
     return service?.quantity || 0;
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-[200px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6C5DD3]"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500 text-center p-4">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 bg-transparent rounded-lg shadow-sm">
@@ -952,36 +1014,42 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
             <div className="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 
               border border-gray-100 dark:border-gray-700 rounded-xl shadow-lg 
               divide-y divide-gray-100 dark:divide-gray-700">
-              {workingServices.map(service => (
-                <div key={`working-${service.id}`} className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 
-                  transition-colors duration-150">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 dark:text-gray-100">
-                        {service.service_name}
-                      </h4>
-                      <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                        <span>{t('createApplication.base')}: {service.base_price}</span>
+              {workingServices.map((service) => {
+                console.log('Rendering service:', service);
+                return (
+                  <div 
+                    key={`working-tariff-${service.tariff_id}`} 
+                    className="p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-150"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-gray-900 dark:text-gray-100">
+                          {service.service_name}
+                        </h4>
+                        <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                          <span>Base: {service.base_price}</span>
+                          <span>•</span>
+                          <span>Units: {service.units}</span>
+                          <span>•</span>
+                          <span>Tariff ID: {service.tariff_id}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3">
+                        <input
+                          type="number"
+                          min="0"
+                          value={getSelectedWorkingService(service.tariff_id)}
+                          onChange={(e) => handleWorkingServiceChange(service.tariff_id, parseInt(e.target.value) || 0)}
+                          className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 
+                            rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 
+                            dark:text-gray-100 focus:ring-2 focus:ring-[#6C5DD3] 
+                            focus:border-[#6C5DD3] outline-none"
+                        />
                       </div>
                     </div>
-                    <div className="flex items-center space-x-3">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {t('createApplication.quantity')}
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={getSelectedWorkingService(service.id)}
-                        onChange={(e) => handleWorkingServiceChange(service.id, parseInt(e.target.value) || 0)}
-                        className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 
-                          rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 
-                          dark:text-gray-100 focus:ring-2 focus:ring-[#6C5DD3] 
-                          focus:border-[#6C5DD3] outline-none"
-                      />
-                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -1053,7 +1121,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
                     >
                       <div className="flex flex-col">
                         <span className="font-medium text-gray-900 dark:text-white">
-                          {service?.service_name}
+                          {workingServiceNames.get(item.service_id) || t('createApplication.loading')}
                         </span>
                         <div className="mt-1 flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-300">
                           <span>{item.quantity} {service?.units}</span>
@@ -1364,8 +1432,6 @@ export default function CreateApplication() {
   const handleSubmit = async () => {
     try {
       const formDataObj = new FormData();
-
-      // Basic fields
       formDataObj.append('firm_id', formData.firm_id.toString());
       formDataObj.append('brutto', formData.brutto?.toString() || '');
       formDataObj.append('netto', formData.netto?.toString() || '');
@@ -1373,7 +1439,9 @@ export default function CreateApplication() {
       formDataObj.append('total_price', formData.total_price?.toString() || '');
       formDataObj.append('number_of_application', formData.number_of_application || '');
 
-      // Arrays need to be stringified
+      formDataObj.append('decloration_number', formData.decloration_number || '');
+      formDataObj.append('decloration_date', formData.decloration_date || '');
+
       formDataObj.append('upload_keeping_services_quantity', 
         JSON.stringify(formData.upload_keeping_services_quantity));
       
@@ -1389,7 +1457,6 @@ export default function CreateApplication() {
       formDataObj.append('upload_products', 
         JSON.stringify(formData.upload_products));
 
-      // File uploads
       if (formData.decloration_file) {
         formDataObj.append('decloration_file', formData.decloration_file);
       }

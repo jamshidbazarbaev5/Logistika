@@ -1,149 +1,275 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { apiService } from "../api/api";
+import { api } from "../api/api";
 import SuccessModal from "../components/SuccessModal";
+import FormLayout from "../components/FormLayout";
+import { useNavigate, useParams } from 'react-router-dom';
+import { Dialog } from "@headlessui/react";
 
 interface WorkingServiceFormData {
-  base_day: number;
-  service_name: string;
+  service_name?: string;
+  year: number;
   base_price: string;
-  extra_price: string;
   units: string;
+  service: number;
+}
+
+interface ServiceName {
+  id: number;
+  service_name: string;
 }
 
 export default function CreateWorkingService() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState<WorkingServiceFormData>({
-    base_day: 1,
-    service_name: "",
-    base_price: "",
-    extra_price: "",
-    units: "day",
-  });
+  const { id } = useParams();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [serviceNames, setServiceNames] = useState<ServiceName[]>([]);
+  const [showCreateNameModal, setShowCreateNameModal] = useState(false);
+  const [newServiceName, setNewServiceName] = useState("");
+  
+  const [formData, setFormData] = useState<WorkingServiceFormData>({
+    year: new Date().getFullYear(),
+    base_price: "",
+    units: "sht",
+    service: 0
+  });
+
+  // Add loading state
+  const [loading, setLoading] = useState(id ? true : false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch service names
+        const serviceResponse = await api.get('https://cargo-calc.uz/api/v1/working_service/name/');
+        setServiceNames(serviceResponse.data.results || []);
+
+        // If we have an ID, fetch the existing service data
+        if (id) {
+          const [serviceData] = await Promise.all([
+            api.get(`https://cargo-calc.uz/api/v1/working_service/tariff/${id}/`)
+          ]);
+
+          // Normalize the units value before setting form data
+          const normalizedUnits = serviceData.data.units === 'час' ? 'hour' : 
+                                serviceData.data.units === 'шт' ? 'sht' : 
+                                serviceData.data.units;
+
+          // Update form with existing data and normalized units
+          setFormData({
+            service: serviceData.data.service,
+            year: serviceData.data.year,
+            base_price: serviceData.data.base_price,
+            units: normalizedUnits // Use the normalized value
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [id]); // Add id as dependency
+
+  // Add loading state display
+  if (loading) {
+    return (
+      <FormLayout
+        title={t('createWorkingService.title', 'Edit Working Service')}
+        subtitle={t('createWorkingService.subtitle', 'Edit details for the working service')}
+      >
+        <div className="flex justify-center items-center min-h-[400px]">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6C5DD3]"></div>
+        </div>
+      </FormLayout>
+    );
+  }
+
+  const handleCreateNewName = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const response = await api.post('/working_service/name/', {
+        service_name: newServiceName
+      });
+      const newService = response.data;
+      setServiceNames([...serviceNames, newService]);
+      setFormData(prev => ({
+        ...prev,
+        service: newService.id
+      }));
+      setShowCreateNameModal(false);
+      setNewServiceName("");
+    } catch (error) {
+      console.error('Error creating service name:', error);
+      alert(t('createWorkingService.errorCreatingName', 'Error creating service name'));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await apiService.createWorkingService(formData);
+      const submitData = {
+        ...formData,
+        units: formData.units // Make sure this is always 'sht' or 'hour'
+      };
+
+      if (id) {
+        await api.put(`/working_service/tariff/${id}/`, submitData);
+      } else {
+        await api.post('/working_service/tariff/', submitData);
+      }
       setShowSuccessModal(true);
+      navigate('/working-services');
     } catch (error) {
-      console.error("Error creating working service:", error);
+      console.error('Error saving working service:', error);
+      alert(t('createWorkingService.errorSaving', 'Error saving service'));
     }
   };
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: name === 'base_day' ? parseInt(value) || 0 : value
-    }));
-  };
-
   return (
-    <div className="p-4 sm:p-6">
-      <div className="mb-6">
-        <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-          {t("createWorkingService.title")}
-        </h1>
-        <p className="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          {t("createWorkingService.subtitle")}
-        </p>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
-        <div className="bg-white dark:bg-gray-800 p-4 sm:p-6 rounded-lg shadow">
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="service_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t("createWorkingService.serviceInfo.name")}
+    <FormLayout
+      title={id ? t('createWorkingService.editTitle', 'Edit Working Service') : t('createWorkingService.title', 'Create Working Service')}
+      subtitle={id ? t('createWorkingService.editSubtitle', 'Edit details for the working service') : t('createWorkingService.subtitle', 'Add details for the working service')}
+    >
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="dark:bg-gray-800 p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            {/* Service Name Selection */}
+            <div className="col-span-2">
+              <label className="block text-sm font-medium text-gray-600 dark:text-white mb-1">
+                {t('createWorkingService.serviceName', 'Service Name')}
               </label>
-              <input
-                type="text"
-                id="service_name"
-                name="service_name"
-                value={formData.service_name}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                required
-              />
+              <div className="relative">
+                <select
+                  value={formData.service}
+                  onChange={(e) => setFormData({ ...formData, service: Number(e.target.value) })}
+                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
+                  required
+                >
+                  <option value="">{t('createWorkingService.selectService', 'Select a service')}</option>
+                  {serviceNames.map((name) => (
+                    <option key={name.id} value={name.id}>
+                      {name.service_name}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => setShowCreateNameModal(true)}
+                  className="mt-2 text-[#6C5DD3] hover:text-[#5c4eb3] text-sm font-medium"
+                >
+                  {t('createWorkingService.createNewName', '+ Create new service name')}
+                </button>
+              </div>
             </div>
 
-          
-
+            {/* Year */}
             <div>
-              <label htmlFor="base_price" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t("createWorkingService.serviceInfo.basePrice")}
+              <label className="block text-sm font-medium text-gray-600 dark:text-white mb-1">
+                {t('createWorkingService.year', 'Year')}
               </label>
               <input
                 type="number"
-                id="base_price"
-                name="base_price"
-                value={formData.base_price}
-                onChange={handleChange}
-                step="0.01"
-                min="0"
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                value={formData.year}
+                onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
+                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
                 required
               />
             </div>
 
-          
-
+            {/* Base Price */}
             <div>
-              <label htmlFor="units" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                {t("createWorkingService.serviceInfo.units")}
+              <label className="block text-sm font-medium text-gray-600 dark:text-white mb-1">
+                {t('createWorkingService.basePrice', 'Base Price')}
+              </label>
+              <input
+                type="text"
+                value={formData.base_price}
+                onChange={(e) => setFormData({ ...formData, base_price: e.target.value })}
+                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
+                required
+              />
+            </div>
+
+            {/* Units */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 dark:text-white mb-1">
+                {t('createWorkingService.units', 'Units')}
               </label>
               <select
-                id="units"
-                name="units"
                 value={formData.units}
-                onChange={handleChange}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                onChange={(e) => setFormData({ ...formData, units: e.target.value })}
+                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
                 required
               >
-                <option value="hour">{t("createWorkingService.serviceInfo.unitsSelect.hour")}</option>
-                <option value="piece">{t("createWorkingService.serviceInfo.unitsSelect.piece")}</option>
+                <option value="sht">{t('createWorkingService.sht', 'sht')}</option>
+                <option value="hour">{t('createWorkingService.hour', 'hour')}</option>
               </select>
             </div>
           </div>
         </div>
 
-        <div className="flex justify-end space-x-3">
-          <button
-            type="button"
-            onClick={() => navigate("/working-services")}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
-          >
-            {t("common.cancel")}
-          </button>
+        <div className="flex justify-end">
           <button
             type="submit"
-            className="px-4 py-2 text-sm font-medium text-white bg-[#6C5DD3] rounded-md hover:bg-[#5c4eb3]"
+            className="bg-[#6C5DD3] text-white px-4 py-2 rounded-lg hover:bg-[#5c4eb3]"
           >
-            {t("common.create")}
+            {id ? t('common.update', 'Update') : t('common.create', 'Create')}
           </button>
         </div>
       </form>
 
+      {/* Create Name Modal */}
+      <Dialog
+        open={showCreateNameModal}
+        onClose={() => setShowCreateNameModal(false)}
+        className="relative z-50"
+      >
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <Dialog.Panel className="mx-auto w-full max-w-md rounded-lg bg-white dark:bg-gray-800 p-6">
+            <Dialog.Title className="text-lg font-medium text-gray-900 dark:text-white mb-4">
+              {t('createWorkingService.createNewService', 'Create New Service')}
+            </Dialog.Title>
+
+            <form onSubmit={handleCreateNewName}>
+              <input
+                type="text"
+                value={newServiceName}
+                onChange={(e) => setNewServiceName(e.target.value)}
+                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
+                placeholder={t('createWorkingService.enterServiceName', 'Enter service name')}
+                required
+              />
+              
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateNameModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                >
+                  {t('common.cancel', 'Cancel')}
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-[#6C5DD3] rounded-md hover:bg-[#5c4eb3]"
+                >
+                  {t('common.create', 'Create')}
+                </button>
+              </div>
+            </form>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
+
       <SuccessModal
         isOpen={showSuccessModal}
-        onClose={() => {
-          setShowSuccessModal(false);
-          navigate("/working-services");
-        }}
-        message={t("workingService.createSuccess")}
+        onClose={() => setShowSuccessModal(false)}
+        message={t('createWorkingService.successMessage', 'Service has been saved successfully!')}
       />
-    </div>
+    </FormLayout>
   );
 }

@@ -13,11 +13,28 @@ interface TransactionState {
   applicationId: number | null;
 }
 
-const initialState: TransactionState = {
-  calculatedServices: [],
-  totalPrice: 0,
-  applicationId: null,
+// Load initial state from localStorage if available
+const loadState = () => {
+  try {
+    const serializedState = localStorage.getItem('transactionState');
+    if (serializedState === null) {
+      return {
+        calculatedServices: [],
+        totalPrice: 0,
+        applicationId: null,
+      };
+    }
+    return JSON.parse(serializedState);
+  } catch (err) {
+    return {
+      calculatedServices: [],
+      totalPrice: 0,
+      applicationId: null,
+    };
+  }
 };
+
+const initialState: TransactionState = loadState();
 
 const transactionSlice = createSlice({
   name: 'transaction',
@@ -30,12 +47,22 @@ const transactionSlice = createSlice({
         price: service.price,
       }));
       state.totalPrice = action.payload.total_price;
+      // Save to localStorage
+      localStorage.setItem('transactionState', JSON.stringify(state));
     },
     setApplicationId: (state: TransactionState, action: PayloadAction<number>) => {
       state.applicationId = action.payload;
+      // Save to localStorage
+      localStorage.setItem('transactionState', JSON.stringify(state));
     },
     clearTransaction: () => {
-      return initialState;
+      // Clear localStorage when transaction is cleared
+      localStorage.removeItem('transactionState');
+      return {
+        calculatedServices: [],
+        totalPrice: 0,
+        applicationId: null,
+      };
     },
   },
 });

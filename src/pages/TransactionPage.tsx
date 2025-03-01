@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { api } from '../api/api';
 import { useNavigate } from 'react-router-dom';
+import { clearTransaction } from '../storage/slice';
 
 interface Payment {
   payment_method: number;
@@ -13,6 +14,14 @@ interface Payment {
 interface PaymentMethod {
   id: number;
   payment_method: string;
+}
+
+interface Product {
+  product_id: number;
+  quantity: number;
+  storage_id: number;
+  selected?: boolean;
+  name?: string;
 }
 
 export default function Transaction() {
@@ -27,7 +36,10 @@ export default function Transaction() {
   });
   const [payments, setPayments] = useState<Payment[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [availableProducts, setAvailableProducts] = useState<Product[]>([]);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -38,17 +50,69 @@ export default function Transaction() {
   };
 
   const handleAddPayment = () => {
-    setPayments(prev => [...prev, {
-      payment_method: 1,
-      amount: 0,
-      comment: ''
-    }]);
+    setPayments(prev => {
+      const currentTotal = prev.reduce((sum, payment) => sum + (payment.amount || 0), 0);
+      const remainingAmount = Math.max(0, totalPrice - currentTotal);
+      
+      return [...prev, {
+        payment_method: paymentMethods[0]?.id || 1,
+        amount: remainingAmount,
+        comment: ''
+      }];
+    });
   };
 
   const handlePaymentChange = (index: number, field: keyof Payment, value: any) => {
-    setPayments(prev => prev.map((payment, i) => 
-      i === index ? { ...payment, [field]: value } : payment
-    ));
+    setPayments(prev => {
+      const newPayments = [...prev];
+      
+      if (field === 'amount') {
+        newPayments[index] = { ...newPayments[index], [field]: value };
+        
+        if (index < newPayments.length - 1) {
+          const totalExceptLast = newPayments.reduce((sum, payment, i) => 
+            i === newPayments.length - 1 ? sum : sum + (payment.amount || 0), 0
+          );
+          
+          const remainingAmount = Math.max(0, totalPrice - totalExceptLast);
+          newPayments[newPayments.length - 1] = {
+            ...newPayments[newPayments.length - 1],
+            amount: remainingAmount
+          };
+        }
+      } else {
+        newPayments[index] = { ...newPayments[index], [field]: value };
+      }
+      
+      return newPayments;
+    });
+  };
+
+  const handleProductSelect = (productId: number) => {
+    setAvailableProducts(prev => prev.map(product => ({
+      ...product,
+      selected: product.product_id === productId 
+        ? !product.selected 
+        : product.selected
+    })));
+
+    setProducts(prev => {
+      const selectedProduct = availableProducts.find(p => p.product_id === productId);
+      if (!selectedProduct) return prev;
+
+      const existingIndex = prev.findIndex(p => p.product_id === productId);
+      
+      if (existingIndex >= 0) {
+        return prev.filter(p => p.product_id !== productId);
+      } else {
+        return [...prev, {
+          product_id: selectedProduct.product_id,
+          quantity: selectedProduct.quantity,
+          storage_id: selectedProduct.storage_id,
+          name: selectedProduct.name
+        }];
+      }
+    });
   };
 
   useEffect(() => {
@@ -92,33 +156,69 @@ export default function Transaction() {
     }
   }, [calculatedServices]);
 
+  useEffect(() => {
+    const fetchApplicationData = async () => {
+      try {
+        const response = await api.get(`/application/${applicationId}/`);
+        
+        // First fetch the available products to get their correct IDs
+        const productsResponse = await api.get('/items/product/');
+        const availableProductsMap = productsResponse.data.results.reduce((acc: any, product: any) => {
+          acc[product.name] = product;
+          return acc;
+        }, {});
+        
+        // Map products using the correct IDs from available products
+        const productsWithDetails = response.data.products.map((product: any) => {
+          const matchingProduct = availableProductsMap[product.product_name];
+          return {
+            product_id: matchingProduct?.id, // Use the ID from available products
+            quantity: product.quantity,
+            storage_id: product.storage_name === "Склад 1" ? 1 : 2,
+            selected: false,
+            name: product.product_name
+          };
+        }).filter((product: any) => product.product_id); // Only include products with valid IDs
+        
+        setAvailableProducts(productsWithDetails);
+      } catch (error) {
+        console.error('Error fetching application data:', error);
+      }
+    };
+
+    if (applicationId) {
+      fetchApplicationData();
+    }
+  }, [applicationId]);
+
+  useEffect(() => {
+    if (!calculatedServices?.length || !applicationId) {
+      navigate(`/calculate-services/${applicationId || ''}`);
+    }
+  }, [calculatedServices, applicationId, navigate]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // Filter out services with zero amounts and validate the remaining ones
       const servicesToSubmit = calculatedServices.filter((service: any) => service.amount > 0);
       
       if (servicesToSubmit.length === 0) {
         throw new Error('At least one service with amount greater than 0 is required');
       }
 
-      // Validate payments array is not empty
       if (payments.length === 0) {
         throw new Error('At least one payment method is required');
       }
 
-      // Validate each payment has valid amount
       const invalidPayment = payments.find(payment => payment.amount <= 0);
       if (invalidPayment) {
         throw new Error('All payments must have an amount greater than 0');
       }
 
-      // Calculate total payment amount
       const totalPaymentAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
-      // Validate total payment matches total price
       if (totalPaymentAmount !== totalPrice) {
         throw new Error(`Total payment amount (${totalPaymentAmount}) must equal total price (${totalPrice})`);
       }
@@ -128,7 +228,11 @@ export default function Transaction() {
         total_price: totalPrice,
         application_id: applicationId,
         keeping_services: servicesToSubmit,
-        products: [],
+        products: products.map(product => ({
+          product_id: product.product_id,
+          storage_id: product.storage_id,
+          quantity: product.quantity
+        })),
         payments: payments.map(payment => ({
           payment_method: payment.payment_method,
           amount: payment.amount,
@@ -137,6 +241,7 @@ export default function Transaction() {
       };
 
       await api.post('/transactions/', payload);
+      dispatch(clearTransaction());
       navigate('/application-list');
     } catch (error) {
       console.error('Error creating transaction:', error);
@@ -210,13 +315,43 @@ export default function Transaction() {
               .filter((service: any) => service.amount > 0)
               .map((service: any, index: any) => (
                 <div key={index} className="flex justify-between">
-                  <span>{serviceNames[service.service_type] || `Service ${service.service_type}`}</span>
-                  <span>{service.amount} x {service.price} = {service.amount * service.price}</span>
+                  <span>{serviceNames[service.service_type] || `Service ${service.service_type}`}   x {service.amount}</span>
+                  <span>{service.total_amount}</span>
                 </div>
               ))}
             <div className="font-bold pt-4 border-t">
               {t('transaction.totalPrice', 'Total Price')}: {totalPrice}
             </div>
+          </div>
+        </div>
+
+        {/* Products Selection */}
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+          <h2 className="text-lg font-medium mb-4">
+            {t('transaction.products', 'Products')}
+          </h2>
+          <div className="space-y-4">
+            {availableProducts.map((product) => (
+              <div key={product.product_id} className="flex items-center justify-between p-2 border rounded">
+                <div className="flex items-center space-x-4">
+                  <input
+                    type="checkbox"
+                    checked={product.selected || false}
+                    onChange={() => handleProductSelect(product.product_id)}
+                    className="h-4 w-4 text-blue-600"
+                  />
+                  <div>
+                    <span className="font-medium">{product.name}</span>
+                    <span className="text-sm text-gray-500 ml-2">({product.quantity} units)</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+            {availableProducts.length === 0 && (
+              <p className="text-gray-500 text-center">
+                {t('transaction.noProducts', 'No products available')}
+              </p>
+            )}
           </div>
         </div>
 

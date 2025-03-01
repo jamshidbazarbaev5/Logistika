@@ -89,6 +89,7 @@ function App() {
                 <Route path="/user-list" element={<UserList />} />
                 <Route path="/working-services" element={<WorkingServiceList />} />
                 <Route path="/working-services/create" element={<CreateWorkingService />} />
+                <Route path="/working-services/edit/:id" element={<CreateWorkingService />} />
                 <Route path="/calculate-services/:id" element={<CalculateServices/>}/>
                 <Route path="/transaction/:id" element={<TransactionPage/>}/>
                 <Route path="/transaction" element={<TransactionPage/>}/>

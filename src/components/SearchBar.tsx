@@ -1,11 +1,17 @@
 import { useState, useEffect, useCallback } from 'react';
 import { MagnifyingGlassIcon, CalendarIcon } from '@heroicons/react/24/outline';
 
+interface SelectOption {
+  value: string;
+  label: string;
+}
+
 export interface SearchField {
   name: string;
   label: string;
   placeholder: string;
-  type?: 'text' | 'date';
+  type?: 'text' | 'date' | 'select';
+  options?: SelectOption[];
   className?: string;
 }
 
@@ -24,7 +30,6 @@ export function SearchBar<T extends Record<keyof T, string>>({
   initialValues, 
   onSearch, 
   className = "",
-
 }: SearchBarProps<T>) {
   const [localValues, setLocalValues] = useState<T>(initialValues);
 
@@ -46,7 +51,9 @@ export function SearchBar<T extends Record<keyof T, string>>({
     };
   }, [localValues, onSearch]);
 
-  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     console.log('Input changed:', { name, value });
     setLocalValues(prev => {
@@ -82,33 +89,61 @@ export function SearchBar<T extends Record<keyof T, string>>({
             {field.label}
           </label>
           <div className="relative group">
-            {field.type === 'date' ? (
-              <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 
-                group-hover:text-gray-500 pointer-events-none" />
+            {field.type === 'select' ? (
+              <select
+                id={field.name}
+                name={field.name}
+                value={localValues[field.name as keyof T] || ''}
+                onChange={handleInputChange}
+                className={`
+                  w-full rounded-lg border border-gray-300 bg-white py-2
+                  px-3 text-sm placeholder-gray-400
+                  shadow-sm transition-all duration-200
+                  focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                  hover:border-gray-400
+                  dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 
+                  dark:placeholder-gray-500 dark:hover:border-gray-500
+                  dark:focus:border-[#6C5DD3] dark:focus:ring-[#6C5DD3]
+                `}
+              >
+                <option value="">{field.placeholder}</option>
+                {field.options?.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
             ) : (
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 
-                group-hover:text-gray-500 pointer-events-none" />
+              <>
+                {field.type === 'date' ? (
+                  <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 
+                    group-hover:text-gray-500 pointer-events-none" />
+                ) : (
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 
+                    group-hover:text-gray-500 pointer-events-none" />
+                )}
+                <input
+                  id={field.name}
+                  type={field.type || 'text'}
+                  name={field.name}
+                  value={localValues[field.name as keyof T] || ''}
+                  onChange={handleInputChange}
+                  placeholder={field.placeholder}
+                  className={`
+                    w-full rounded-lg border border-gray-300 bg-white py-2
+                    pl-10 pr-3 text-sm placeholder-gray-400
+                    shadow-sm transition-all duration-200
+                    focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                    hover:border-gray-400
+                    dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 
+                    dark:placeholder-gray-500 dark:hover:border-gray-500
+                    dark:focus:border-[#6C5DD3] dark:focus:ring-[#6C5DD3]
+                    ${field.type === 'date' ? 'cursor-pointer' : ''}
+                  `}
+                />
+              </>
             )}
-            <input
-              id={field.name}
-              type={field.type || 'text'}
-              name={field.name}
-              value={localValues[field.name as keyof T] || ''}
-              onChange={handleInputChange}
-              placeholder={field.placeholder}
-              className={`
-                w-full rounded-lg border border-gray-300 bg-white py-2
-                pl-10 pr-3 text-sm placeholder-gray-400
-                shadow-sm transition-all duration-200
-                focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-                hover:border-gray-400
-                dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100 
-                dark:placeholder-gray-500 dark:hover:border-gray-500
-                dark:focus:border-[#6C5DD3] dark:focus:ring-[#6C5DD3]
-                ${field.type === 'date' ? 'cursor-pointer' : ''}
-              `}
-            />
-            {localValues[field.name as keyof T] && (
+            {localValues[field.name as keyof T] && field.type !== 'select' && (
               <button
                 type="button"
                 onClick={() => handleClearInput(field.name)}
