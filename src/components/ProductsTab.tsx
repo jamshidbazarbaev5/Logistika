@@ -133,6 +133,24 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   const handleAddProduct = () => {
     if (!quantity || !selectedProduct || !selectedStorage) return;
 
+    console.log('Before adding - Current formData:', {
+      products: formData.products,
+      upload_products: formData.upload_products
+    });
+
+    // Check if product with same product_id and storage_id already exists
+    const isDuplicate = formData.products.some(
+      product => 
+        product.product_id === selectedProduct && 
+        product.storage_id === selectedStorage
+    );
+
+    if (isDuplicate) {
+      console.log('Product already exists in this storage');
+      // Optionally show an error message to the user
+      return;
+    }
+
     // Create new product with the required format matching API structure
     const newProduct = {
       quantity,
@@ -146,12 +164,22 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
     // Get existing products
     const existingProducts = Array.isArray(formData.products) ? [...formData.products] : [];
     
-    // Create upload_products array from scratch to ensure correct format
+    // Create upload_products array
     const updatedUploadProducts = [...existingProducts, newProduct].map(product => ({
       quantity: product.quantity,
-      product_id: product.product_id || selectedProduct,  // Use selectedProduct as fallback
-      storage_id: product.storage_id || selectedStorage   // Use selectedStorage as fallback
-    }));
+      product_id: product.product_id || selectedProduct,
+      storage_id: product.storage_id || selectedStorage
+    })).filter(product => 
+      product.product_id && 
+      product.storage_id && 
+      product.quantity
+    );
+
+    console.log('Debug mapping:', {
+      existingProducts,
+      newProduct,
+      updatedUploadProducts
+    });
 
     // Update form data with both arrays
     setFormData({
@@ -178,7 +206,11 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
       quantity: product.quantity,
       product_id: product.product_id,
       storage_id: product.storage_id
-    }));
+    })).filter(product => 
+      product.product_id && 
+      product.storage_id && 
+      product.quantity
+    );
 
     setFormData({
       ...formData,

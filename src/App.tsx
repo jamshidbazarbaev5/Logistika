@@ -42,6 +42,7 @@ import CalculateServices from "./pages/CalculateServices";
 import TransactionPage from "./pages/TransactionPage";
 import { Provider } from "react-redux";
 import store from "./storage/storage";
+import ArchiveApplicationList from "./pages/ArchiveApplicationList";
 const queryClient = new QueryClient();
 
 function App() {
@@ -93,6 +94,7 @@ function App() {
                 <Route path="/calculate-services/:id" element={<CalculateServices/>}/>
                 <Route path="/transaction/:id" element={<TransactionPage/>}/>
                 <Route path="/transaction" element={<TransactionPage/>}/>
+                <Route path="/archive-application-list" element={<ArchiveApplicationList/>}/>
               </Route>
             </Routes>
           </Router>

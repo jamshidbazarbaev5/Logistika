@@ -21,6 +21,7 @@ const mainMenuItems = [
 
   // { name: "Photo Report", icon: RiCameraFill, href: "/photo-report" },
   { name: "menu.createApplication", icon: RiFileAddFill, href: "/application-list" },
+  { name: "menu.archiveApplication", icon: RiFileAddFill, href: "/archive-application-list" },
 ];
 
 const generalItems = [

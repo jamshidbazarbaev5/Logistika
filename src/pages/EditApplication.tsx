@@ -563,26 +563,6 @@ export default function EditApplication() {
                   <div className="sm:col-span-2 mb-4">
                     <div className="flex items-center">
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-3">
-                        {t('editApplication.status')}
-                      </label>
-                      <select
-                        value={formData.status}
-                        onChange={(e) => setFormData(prev => ({ 
-                          ...prev, 
-                          status: e.target.value as 'active' | 'unpaid' | 'completed' 
-                        }))}
-                        className={`${inputClassName} capitalize`}
-                      >
-                        <option value="active">{t('status.active')}</option>
-                        <option value="unpaid">{t('status.unpaid')}</option>
-                        <option value="completed">{t('status.completed')}</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="sm:col-span-2 mb-4">
-                    <div className="flex items-center">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-3">
                         {t('editApplication.vipApplication')}
                       </label>
                       <button
@@ -834,6 +814,7 @@ export default function EditApplication() {
                   setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
                   onSubmit={handleSubmit}
                   availableModes={availableModes}
+                  inputClassName={inputClassName}
                 />
               </div>
             </Tab.Panel>
