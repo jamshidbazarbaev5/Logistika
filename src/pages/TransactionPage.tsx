@@ -137,7 +137,7 @@ export default function Transaction() {
       } else {
         return [...prev, {
           product_id: selectedProduct.product_id,
-          quantity: 1,
+          quantity: selectedProduct.quantity || 1,
           storage_id: selectedProduct.storage_id,
           name: selectedProduct.name
         }];
