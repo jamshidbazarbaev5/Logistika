@@ -79,6 +79,7 @@ interface Application {
   transport: Transport[];
   number_of_application:string
   products: Product[];
+  status: ApplicationStatus;
 }
 
 interface SearchParams extends Record<string, string> {
@@ -133,6 +134,23 @@ interface ProductResponse {
 interface ProductApiResponse {
   results: ProductResponse[];
 }
+
+// Add this type definition near other interfaces
+type ApplicationStatus = 'active' | 'unpaid' | 'completed';
+
+// Add this helper function to get status color classes
+const getStatusClasses = (status: ApplicationStatus) => {
+  switch (status) {
+    case 'active':
+      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+    case 'unpaid':
+      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+    case 'completed':
+      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+    default:
+      return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+  }
+};
 
 export default function ApplicationList() {
   const { t } = useTranslation();
@@ -195,31 +213,31 @@ export default function ApplicationList() {
     {
       name: 'firm_name',
       label: t('applicationList.table.firmName'),
-      placeholder: t('applicationList.searchPlaceholders.firmName', 'Search by firm name'),
+      placeholder: t('applicationList.table.firmName'),
       className: 'col-span-12 sm:col-span-6 lg:col-span-3',
     },
     {
       name: 'number_of_application',
-      label: t('applicationList.table.applicationNumber', 'Application Number'),
-      placeholder: t('applicationList.searchPlaceholders.applicationNumber', 'Search by application number'),
+      label: t('applicationList.table.applicationNumber'),
+      placeholder: t('applicationList.table.applicationNumber'),
       className: 'col-span-12 sm:col-span-6 lg:col-span-3',
     },
     {
       name: 'decloration_number',
-      label: t('applicationList.table.declarationNumber', 'Declaration Number'),
-      placeholder: t('applicationList.searchPlaceholders.declarationNumber', 'Search by declaration number'),
+      label: t('applicationList.table.declarationNumber', ),
+      placeholder: t('applicationList.table.declarationNumber',),
       className: 'col-span-12 sm:col-span-6 lg:col-span-3',
     },
     {
       name: 'firm_INN',
-      label: t('createFirm.companyInfo.inn', 'INN'),
-      placeholder: t('applicationList.searchPlaceholders.inn', 'Search by INN'),
+      label: t('createFirm.companyInfo.inn', ),
+      placeholder: t('applicationList.table.inn', ),
       className: 'col-span-12 sm:col-span-6 lg:col-span-3',
     },
     {
       name: 'products',
-      label: t('applicationList.table.product', 'Product'),
-      placeholder: t('applicationList.table.selectProduct', 'Select Product'),
+      label: t('applicationList.table.product', ),
+      placeholder: t('applicationList.table.selectProduct', ),
       type: 'select',
       options: [
         { value: '', label: t('applicationList.table.allProducts', 'All Products') },
@@ -232,8 +250,8 @@ export default function ApplicationList() {
     },
     {
       name: 'coming_date_gte',
-      label: t('applicationList.table.comingDateFrom', 'Coming Date From'),
-      placeholder: t('applicationList.comingDatePlaceholder', 'From'),
+      label: t('applicationList.table.comingDateFrom',),
+      placeholder: t('applicationList.table.comingDateFrom', ),
       type: 'date',
       className: 'col-span-12 sm:col-span-6 lg:col-span-4',
     },
@@ -521,7 +539,9 @@ export default function ApplicationList() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("applicationList.table.dates", "Dates")}
               </th>
-            
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t("applicationList.table.status", "Status")}
+              </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("applicationList.table.modes", "Modes")}
               </th>
@@ -566,7 +586,11 @@ export default function ApplicationList() {
                       {t("applicationList.declarationDate", "Declaration")}: {application.decloration_date}
                     </div>
                   </td>
-                 
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusClasses(application.status as ApplicationStatus)}`}>
+                      {t(`applicationList.status.${application.status}`, application.status)}
+                    </span>
+                  </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {application.modes?.map((mode) => {
                       const modeInfo = Array.isArray(availableModes) 

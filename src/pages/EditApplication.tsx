@@ -50,12 +50,19 @@ export default function EditApplication() {
     photo_report: [],
     transport: [],
     modes: [],
-    products: []
+    products: [],
+    upload_products: [],
   });
 
   const [firms, setFirms] = useState<Array<{ id: number; firm_name: string }>>([]);
   const [keepingServices, setKeepingServices] = useState<Array<{ id: number; name: string; base_price: number }>>([]);
-  const [workingServices, setWorkingServices] = useState<Array<{ id: number; service_name: string; base_price: number }>>([]);
+  const [workingServices, setWorkingServices] = useState<Array<{
+    id: number;
+    year: number;
+    base_price: string;
+    units: string;
+    service: number;
+  }>>([]);
   const [transportTypes, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
   const [storages, setStorages] = useState<Array<{ id: number; storage_name: string; storage_location: string }>>([]);
   const [products, setProducts] = useState<Array<{
@@ -75,7 +82,7 @@ export default function EditApplication() {
           applicationRes,
           firmsRes,
           keepingServicesRes,
-          workingServicesRes,
+          workingServicesTariffRes,
           transportTypesRes,
           storagesRes,
           productsRes,
@@ -84,7 +91,7 @@ export default function EditApplication() {
           api.get(`/application/${id}/`),
           api.get('/firms/'),
           api.get('/keeping_service/keeping_service_price/'),
-          api.get('/working_service/'),
+          api.get('/working_service/tariff/'),
           api.get('/transport/type/'),
           api.get('/storage/'),
           api.get('/items/product/'),
@@ -125,7 +132,7 @@ export default function EditApplication() {
         setFormData(applicationData);
         setFirms(firmsRes.data.results);
         setKeepingServices(keepingServicesRes.data.results);
-        setWorkingServices(workingServicesRes.data.results);
+        setWorkingServices(workingServicesTariffRes.data.results);
         setTransportTypes(transportTypesRes.data.results);
         setStorages(storagesRes.data.results);
         
@@ -152,13 +159,6 @@ export default function EditApplication() {
     try {
       const formDataToSend = new FormData();
 
-      // Transform products array to upload_products format
-      const upload_products = formData.products.map(product => ({
-        quantity: product.quantity,
-        product_id: product.product_id,
-        storage_id: product.storage_id
-      }));
-
       Object.entries(formData).forEach(([key, value]) => {
         if (key === 'decloration_date' && value) {
           formDataToSend.append(key, formatDateForAPI(value as string));
@@ -166,9 +166,8 @@ export default function EditApplication() {
           formDataToSend.append(key, formatDateForAPI(value as string));
         } else if (value !== null && value !== undefined && key !== 'decloration_file' && key !== 'photo_report') {
           if (Array.isArray(value)) {
-            if (key === 'products') {
-              // Use the upload_products format instead
-              formDataToSend.append('upload_products', JSON.stringify(upload_products));
+            if (key === 'upload_products') {
+              formDataToSend.append(key, JSON.stringify(value));
             } else {
               formDataToSend.append(key, JSON.stringify(value));
             }

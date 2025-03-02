@@ -42,6 +42,7 @@ export interface Product {
 }
 
 export interface ApplicationFormData {
+  id?: number;
   firm_id: number;
   number_of_application: string;
   brutto: number | null;
@@ -94,11 +95,16 @@ export interface ApplicationFormData {
     application_id?: number;
   }>;
   products: Array<{
-    id?: number;
     quantity: number;
     product_id: number;
     storage_id: number;
-    application_id?: number;
+    product_name?: string;
+    storage_name?: string;
+  }>;
+  upload_products: Array<{
+    quantity: number;
+    product_id: number;
+    storage_id: number;
   }>;
   decloration_file?: File;
 }

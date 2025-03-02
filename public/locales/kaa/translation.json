@@ -272,7 +272,14 @@
   "applicationList": {
     "previous": "Aldıńǵı",
     "calculate": "Esablaw",
+    "STATUS":"Status",
+    "status":{
+      "active": "Aktiv",
+      "unpaid": "To'lenbedi",
+      "completed": "Juwmaqlandi"
+    },
     "next": "Keyingi",
+
     "numberOfApplication": "Ótinish Nomeri",
     "totalCost": "Jami Baha",
     "title": "Ótinishler",
@@ -289,10 +296,17 @@
       "declarationNumber": "Deklaraciya Nomeri",
       "firmName": "Organizaciya ",
       "brutto": "Brutto",
+      "applicationNumber": "Ótinish Nomeri",
+      "inn": "STIR",
       "dates": "Sáneler",
       "quantities": "Mug'darlar",
       "modes": "Rejimler",
-      "actions": "Háreketler"
+      "actions": "Háreketler",
+      "comingDateFrom": "Keliw Sáneden",
+      "comingDateTo": "Ketiw Sánege",
+      "product": "Ónim",
+      "selectProduct": "Ónimni tanlaw",
+      "allProducts": "Barliq Ónimler"
     },
     "regular": "Oddiy",
     "vip": "VIP",
@@ -667,7 +681,26 @@
     "totalAmount": "Ulıwma Mug'dar",
     "price": "Baha",
     "totalPrice": "Ulıwma Summa",
-    "proceedToTransaction": "Tólemge Ótiw"
+    "proceedToTransaction": "Tólemge Ótiw",
+    "calculate": "Esaplaw",
+    "history": "Tariyx",
+    "payments": "Tólemler",
+    "status": "Status",
+    "newPayment": "Jańa tólem",
+    "paymentMethod": "Tólem usılı",
+    "paymentMethodPlaceholder": "Tólem usılın tańlań",
+    "amount": "Summa",
+    "amountPlaceholder": "Summanı kiritiń",
+    "comment": "Kommentariy",
+    "commentPlaceholder": "Kommentariydi kiritiń",
+    "transactionId": "Tranzaksiya",
+    "fullName": "Tolıq atı",
+    "phoneNumber": "Telefon nomeri",
+    "carNumber": "Mashina nomeri",
+    "products": "Ónimler",
+    "quantity": "Mug'dar",
+    "total": "Ulıwma",
+    "noTransactions": "Tranzaksiyalar tabılmadı"
   },
   "transaction": {
     "title": "Tólem Jaratıw",
@@ -677,6 +710,19 @@
     "services": "Xızmetler",
     "totalPrice": "Ulıwma Summa",
     "payments": "Tólemler",
-    "addPayment": "Tólem Qosıw"
+    "addPayment": "Tólem Qosıw",
+    "fullNamePlaceholder": "Tolıq atın kiritiń",
+    "phoneNumberPlaceholder": "Telefon nomerin kiritiń",
+    "carNumberPlaceholder": "Mashina nomerin kiritiń",
+    "amountPlaceholder": "Summanı kiritiń",
+    "commentPlaceholder": "Kommentariydi kiritiń",
+    "noProducts": "Qol jetimli ónimler joq",
+    "availableUnits": "Qol jetimli: {{count}} dana",
+    "selectPaymentMethod": "Tólem usılın tańlań",
+    "products": "Ónimler",
+    "keepingServices": "Saqlaw Xızmetleri",
+    "workingServices": "Jumıs Xızmetleri",
+    "amount": "Mug'darı",
+    "comment": "Kommentariy"
   }
 }

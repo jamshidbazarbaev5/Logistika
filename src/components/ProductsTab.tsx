@@ -14,9 +14,11 @@ interface CreateProductResponse {
 interface Product {
   id?: number;
   quantity: number;
-  product_id: number;
-  storage_id: number;
+  product_id?: number;
+  storage_id?: number;
   application_id?: number;
+  product_name?: string;
+  storage_name?: string;
 }
 
 interface Storage {
@@ -52,12 +54,14 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [products, setProducts] = useState<ProductDisplay[]>(initialProducts);
 
-  const getProductName = (productId: number) => {
+  const getProductName = (productId: number | undefined) => {
+    if (!productId) return 'Unknown Product';
     const product = products.find(p => p.id === productId);
     return product ? product.name : 'Unknown Product';
   };
 
-  const getStorageName = (storageId: number) => {
+  const getStorageName = (storageId: number | undefined) => {
+    if (!storageId) return 'Unknown Storage';
     const storage = storages.find(s => s.id === storageId);
     return storage ? storage.storage_name : 'Unknown Storage';
   };
@@ -103,15 +107,50 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   const handleAddProduct = () => {
     if (!quantity || !selectedProduct || !selectedStorage) return;
 
-    const newProduct: Product = {
+    console.log('Before adding - Current products:', formData.products);
+    console.log('Before adding - Current upload_products:', formData.upload_products);
+
+    // Create new product with the required format matching API structure
+    const newProduct = {
+      quantity,
+      application_id: formData.id,
+      product_id: selectedProduct,
+      storage_id: selectedStorage,
+      product_name: getProductName(selectedProduct),
+      storage_name: getStorageName(selectedStorage)
+    };
+
+    // Create upload product format
+    const uploadProduct = {
       quantity,
       product_id: selectedProduct,
       storage_id: selectedStorage
     };
 
+    // Get existing products from API response
+    const existingProducts = Array.isArray(formData.products) 
+      ? formData.products
+      : [];
+
+    // Get existing upload products
+    const existingUploadProducts = Array.isArray(formData.upload_products)
+      ? formData.upload_products
+      : existingProducts.map(product => ({
+          quantity: product.quantity,
+          product_id: selectedProduct,
+          storage_id: selectedStorage
+        }));
+
+    const updatedProducts = [...existingProducts, newProduct];
+    const updatedUploadProducts = [...existingUploadProducts, uploadProduct];
+
+    console.log('Updated products array:', updatedProducts);
+    console.log('Updated upload_products array:', updatedUploadProducts);
+
     setFormData({
       ...formData,
-      products: [...formData.products, newProduct]
+      products: updatedProducts,
+      upload_products: updatedUploadProducts
     });
 
     // Reset form fields
@@ -119,12 +158,31 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
     setSelectedProduct(0);
     setSelectedStorage(0);
     setProductSearch('');
+
+    console.log('After adding - Updated formData:', {
+      products: updatedProducts,
+      upload_products: updatedUploadProducts
+    });
   };
+
   const handleRemoveProduct = (index: number) => {
-    const updatedProducts = formData.products.filter((_, i) => i !== index);
+    console.log('Before removing - Current products:', formData.products);
+    console.log('Removing product at index:', index);
+
+    const currentProducts = Array.isArray(formData.products) ? formData.products : [];
+    const currentUploadProducts = Array.isArray(formData.upload_products) 
+      ? formData.upload_products 
+      : [];
+
+    const updatedProducts = currentProducts.filter((_, i) => i !== index);
+    const updatedUploadProducts = currentUploadProducts.filter((_, i) => i !== index);
+
+    console.log('After removing - Updated products:', updatedProducts);
+
     setFormData({
       ...formData,
-      products: updatedProducts
+      products: updatedProducts,
+      upload_products: updatedUploadProducts
     });
   };
 
@@ -228,18 +286,18 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
         </div>
 
         <div className="space-y-3">
-          {formData.products.map((product: any, index: number) => (
+          {formData.products.map((product: Product, index: number) => (
             <div key={index} 
               className="flex flex-col sm:flex-row sm:items-center justify-between 
                 p-2 sm:p-3 bg-gray-50 dark:bg-gray-800 rounded-lg text-xs sm:text-sm"
             >
               <div className="flex-1 mb-2 sm:mb-0">
                 <span className="block sm:inline font-medium">
-                  {getProductName(product.product_id)}
+                  {product.product_name || getProductName(product.product_id)}
                 </span>
                 <span className="block sm:inline sm:mx-2">-</span>
                 <span className="text-gray-600 dark:text-gray-400">
-                  {getStorageName(product.storage_id)}
+                  {product.storage_name || getStorageName(product.storage_id)}
                 </span>
               </div>
               <div className="flex items-center justify-between sm:justify-end">

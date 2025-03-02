@@ -5,6 +5,7 @@ import { api } from '../api/api';
 import { useNavigate } from 'react-router-dom';
 import { clearTransaction } from '../storage/slice';
 import SuccessModal from '../components/SuccessModal';
+import ErrorModal from '../components/ErrorModal';
 
 interface Payment {
   payment_method: number;
@@ -23,6 +24,7 @@ interface Product {
   storage_id: number;
   selected?: boolean;
   name?: string;
+  customQuantity?: number;
 }
 
 interface Service {
@@ -66,6 +68,8 @@ export default function Transaction() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -133,12 +137,20 @@ export default function Transaction() {
       } else {
         return [...prev, {
           product_id: selectedProduct.product_id,
-          quantity: selectedProduct.quantity,
+          quantity: 1,
           storage_id: selectedProduct.storage_id,
           name: selectedProduct.name
         }];
       }
     });
+  };
+
+  const handleProductQuantityChange = (productId: number, quantity: number) => {
+    setProducts(prev => prev.map(product => 
+      product.product_id === productId 
+        ? { ...product, quantity: Math.min(quantity, availableProducts.find(p => p.product_id === productId)?.quantity || 0) }
+        : product
+    ));
   };
 
   useEffect(() => {
@@ -240,20 +252,13 @@ export default function Transaction() {
       }
 
       console.log('Current payments:', payments);
-      if (payments.length === 0) {
-        throw new Error('At least one payment method is required');
-      }
+      // if (payments.length === 0) {
+      //   throw new Error('At least one payment method is required');
+      // }
 
       const invalidPayment = payments.find(payment => payment.amount <= 0);
       if (invalidPayment) {
         throw new Error('All payments must have an amount greater than 0');
-      }
-
-      const totalPaymentAmount = payments.reduce((sum, payment) => sum + payment.amount, 0);
-      console.log('Total payment amount:', totalPaymentAmount, 'Total price:', totalPrice);
-
-      if (totalPaymentAmount !== totalPrice) {
-        throw new Error(`Total payment amount (${totalPaymentAmount}) must equal total price (${totalPrice})`);
       }
 
       const payload = {
@@ -280,16 +285,30 @@ export default function Transaction() {
       
       setShowSuccessModal(true);
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating transaction:', error);
-      console.log('Error details:', {
-        calculatedServices,
-        workingServices,
-        payments,
-        products,
-        formData
-      });
-      alert(error instanceof Error ? error.message : 'Error creating transaction');
+      
+      // Enhanced error handling
+      let errorMsg = 'Error creating transaction';
+      
+      if (error.response?.data) {
+        // Handle array or string error messages
+        if (Array.isArray(error.response.data)) {
+          errorMsg = error.response.data.join(', ');
+        } else if (typeof error.response.data === 'object') {
+          // Convert object of errors into readable format
+          errorMsg = Object.entries(error.response.data)
+            .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+            .join('\n');
+        } else if (typeof error.response.data === 'string') {
+          errorMsg = error.response.data;
+        }
+      } else if (error instanceof Error) {
+        errorMsg = error.message;
+      }
+      
+      setErrorMessage(errorMsg);
+      setShowErrorModal(true);
     } finally {
       setLoading(false);
     }
@@ -312,42 +331,42 @@ export default function Transaction() {
           <div className="grid grid-cols-1 gap-6">
             <div>
               <label className="block text-sm font-medium mb-1">
-                {t('transaction.fullName', 'Full Name')}
+                {t('transaction.fullName')}
               </label>
               <input
                 type="text"
                 name="full_name"
                 value={formData.full_name}
                 onChange={handleInputChange}
+                placeholder={t('transaction.fullNamePlaceholder')}
                 className="w-full rounded-md border p-2"
                 required
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium mb-1">
-                {t('transaction.phoneNumber', 'Phone Number')}
+                {t('transaction.phoneNumber')}
               </label>
               <input
-                type="tel"
+                type="text"
                 name="phone_number"
                 value={formData.phone_number}
                 onChange={handleInputChange}
-                placeholder="+998991234567"
+                placeholder={t('transaction.phoneNumberPlaceholder')}
                 className="w-full rounded-md border p-2"
                 required
               />
             </div>
-
             <div>
               <label className="block text-sm font-medium mb-1">
-                {t('transaction.carNumber', 'Car Number')}
+                {t('transaction.carNumber')}
               </label>
               <input
                 type="text"
                 name="car_number"
                 value={formData.car_number}
                 onChange={handleInputChange}
+                placeholder={t('transaction.carNumberPlaceholder')}
                 className="w-full rounded-md border p-2"
                 required
               />
@@ -409,14 +428,29 @@ export default function Transaction() {
                     />
                     <div>
                       <span className="font-medium">{product.name}</span>
-                      <span className="text-sm text-gray-500 ml-2">({product.quantity} units)</span>
+                      <span className="text-sm text-gray-500 ml-2">
+                        {t('transaction.availableUnits', { count: product.quantity })}
+                      </span>
                     </div>
                   </div>
+                  {product.selected && (
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="number"
+                        min="1"
+                        max={product.quantity}
+                        value={products.find(p => p.product_id === product.product_id)?.quantity || 1}
+                        onChange={(e) => handleProductQuantityChange(product.product_id, parseInt(e.target.value))}
+                        className="w-20 rounded-md border p-2"
+                      />
+                      <span className="text-sm text-gray-500">units</span>
+                    </div>
+                  )}
                 </div>
               ))}
             {availableProducts.filter(product => product.quantity > 0).length === 0 && (
               <p className="text-gray-500 text-center">
-                {t('transaction.noProducts', 'No products available')}
+                {t('transaction.noProducts')}
               </p>
             )}
           </div>
@@ -445,6 +479,7 @@ export default function Transaction() {
                   onChange={(e) => handlePaymentChange(index, 'payment_method', Number(e.target.value))}
                   className="rounded-md border p-2"
                 >
+                  <option value="">{t('transaction.selectPaymentMethod')}</option>
                   {paymentMethods.map((method) => (
                     <option key={method.id} value={method.id}>
                       {method.payment_method}
@@ -455,15 +490,15 @@ export default function Transaction() {
                   type="number"
                   value={payment.amount}
                   onChange={(e) => handlePaymentChange(index, 'amount', Number(e.target.value))}
+                  placeholder={t('transaction.amountPlaceholder')}
                   className="rounded-md border p-2"
-                  placeholder="Amount"
                 />
                 <input
                   type="text"
                   value={payment.comment}
                   onChange={(e) => handlePaymentChange(index, 'comment', e.target.value)}
+                  placeholder={t('transaction.commentPlaceholder')}
                   className="rounded-md border p-2"
-                  placeholder="Comment"
                 />
               </div>
             ))}
@@ -485,6 +520,12 @@ export default function Transaction() {
         onClose={handleModalClose}
         title={t('transaction.success.title', 'Transaction Created')}
         message={t('transaction.success.message', 'Transaction has been successfully created')}
+      />
+
+      <ErrorModal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        message={errorMessage}
       />
     </div>
   );

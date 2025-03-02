@@ -12,6 +12,10 @@ interface Service {
   extra_price?: string;
   year?: number;
   base_day?: number;
+  service?: number  ;
+  units?: string;
+
+
 }
 
 interface ServicesTabProps {
@@ -32,6 +36,13 @@ interface WorkingServiceQuantity {
   quantity: number;
 }
 
+
+
+interface WorkingServiceName {
+  id: number;
+  service_name: string;
+}
+
 const ServicesTab: React.FC<ServicesTabProps> = ({
   formData,
   setFormData,
@@ -41,6 +52,7 @@ const ServicesTab: React.FC<ServicesTabProps> = ({
 }) => {
   const { t } = useTranslation();
   const [keepingServicesNames, setKeepingServicesNames] = useState<Map<number, string>>(new Map());
+  const [workingServiceNames, setWorkingServiceNames] = useState<Map<number, string>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -85,6 +97,27 @@ const ServicesTab: React.FC<ServicesTabProps> = ({
 
     fetchServiceNames();
   }, [keepingServices]);
+
+  useEffect(() => {
+    const fetchWorkingServiceNames = async () => {
+      try {
+        const [, namesRes] = await Promise.all([
+          api.get('/working_service/tariff/'),
+          api.get('/working_service/name/')
+        ]);
+
+        const namesMap = new Map();
+        namesRes.data.results.forEach((nameItem: WorkingServiceName) => {
+          namesMap.set(nameItem.id, nameItem.service_name);
+        });
+        setWorkingServiceNames(namesMap);
+      } catch (error) {
+        console.error('Error fetching working service names:', error);
+      }
+    };
+
+    fetchWorkingServiceNames();
+  }, []);
 
   const handleKeepingServiceChange = (serviceId: number, amount: number) => {
     const currentServices = formData.upload_keeping_services_quantity || [];
@@ -217,7 +250,16 @@ const ServicesTab: React.FC<ServicesTabProps> = ({
 
             return (
               <div key={service.id} className="flex items-center gap-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <span className="flex-1 text-gray-700 dark:text-gray-300">{service.service_name}</span>
+                <div className="flex-1">
+                  <span className="text-gray-700 dark:text-gray-300">
+                    {service.service ? workingServiceNames.get(service.service) : t('loading')}
+                  </span>
+                  <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                    {t('basePrice')}: {service.base_price} • 
+                    {t('units')}: {service.units} •
+                    {t('year')}: {service.year}
+                  </div>
+                </div>
                 <input
                   type="number"
                   min="0"
