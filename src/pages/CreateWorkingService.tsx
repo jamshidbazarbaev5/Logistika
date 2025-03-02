@@ -28,8 +28,11 @@ export default function CreateWorkingService() {
   const [showCreateNameModal, setShowCreateNameModal] = useState(false);
   const [newServiceName, setNewServiceName] = useState("");
   
+  const currentYear = new Date().getFullYear();
+  const availableYears = [currentYear];
+
   const [formData, setFormData] = useState<WorkingServiceFormData>({
-    year: new Date().getFullYear(),
+    year: currentYear,
     base_price: "",
     units: "sht",
     service: 0
@@ -51,6 +54,14 @@ export default function CreateWorkingService() {
             api.get(`https://cargo-calc.uz/api/v1/working_service/tariff/${id}/`)
           ]);
 
+          // Validate year when editing
+          const serviceYear = serviceData.data.year;
+          if (!availableYears.includes(serviceYear)) {
+            alert(t('createWorkingService.invalidYear', 'Cannot edit service from this year. Only current, previous, and next year are allowed.'));
+            navigate('/working-services');
+            return;
+          }
+
           // Normalize the units value before setting form data
           const normalizedUnits = serviceData.data.units === 'час' ? 'hour' : 
                                 serviceData.data.units === 'шт' ? 'sht' : 
@@ -59,19 +70,20 @@ export default function CreateWorkingService() {
           // Update form with existing data and normalized units
           setFormData({
             service: serviceData.data.service,
-            year: serviceData.data.year,
+            year: serviceYear,
             base_price: serviceData.data.base_price,
             units: normalizedUnits // Use the normalized value
           });
         }
       } catch (error) {
         console.error('Error fetching data:', error);
+        navigate('/working-services');
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [id]); // Add id as dependency
+  }, [id, navigate, t]);
 
   // Add loading state display
   if (loading) {
@@ -170,13 +182,18 @@ export default function CreateWorkingService() {
               <label className="block text-sm font-medium text-gray-600 dark:text-white mb-1">
                 {t('createWorkingService.year', 'Year')}
               </label>
-              <input
-                type="number"
+              <select
                 value={formData.year}
                 onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
                 className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
                 required
-              />
+              >
+                {availableYears.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Base Price */}

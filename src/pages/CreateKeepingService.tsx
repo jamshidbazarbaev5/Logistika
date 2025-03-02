@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { api } from "../api/api";
 import SuccessModal from "../components/SuccessModal";
 import FormLayout from "../components/FormLayout";
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useParams } from 'react-router-dom';
 import { Dialog } from "@headlessui/react";
 
 interface KeepingServiceFormData {
@@ -22,11 +22,13 @@ interface KeepingServiceName {
 export default function CreateKeepingService() {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
+  const { id } = useParams();
   const serviceId = Number(searchParams.get('id'));
   const serviceName = searchParams.get('name');
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const currentYear = new Date().getFullYear();
   const [formData, setFormData] = useState<KeepingServiceFormData>({
-    year: new Date().getFullYear(),
+    year: currentYear,
     base_day: 0,
     base_price: "",
     extra_price: "",
@@ -61,6 +63,29 @@ export default function CreateKeepingService() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isDropdownOpen]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (id) {
+          const response = await api.get(`/keeping_service/keeping_service_price/${id}/`);
+          const serviceData = response.data;
+
+          setFormData({
+            year: serviceData.year,
+            base_day: serviceData.base_day,
+            base_price: serviceData.base_price,
+            extra_price: serviceData.extra_price,
+            keeping_services_id: serviceData.keeping_services_id
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching service data:', error);
+        navigate('/keeping-services');
+      }
+    };
+    fetchData();
+  }, [id, navigate]);
 
   const filteredNames = serviceNames.filter(service => 
     service.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -120,7 +145,7 @@ export default function CreateKeepingService() {
       
       // Reset form
       setFormData({
-        year: new Date().getFullYear(),
+        year: currentYear,
         base_day: 0,
         base_price: "",
         extra_price: "",
@@ -231,10 +256,10 @@ export default function CreateKeepingService() {
                 type="number"
                 name="year"
                 id="year"
-                value={formData.year}
-                onChange={handleChange}
+                value={currentYear}
+                disabled
                 className="block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
+                  bg-gray-100 dark:bg-gray-600 text-gray-900 dark:text-white 
                   px-3 py-2 text-sm md:text-base
                   focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
                 required

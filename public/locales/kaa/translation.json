@@ -30,6 +30,12 @@
   "createApplication": {
     "title": "Ótinish Jaratıw",
     "storage": "Ombor",
+    "product": "Ónim",
+    "units": "Birlikler",
+    "tariff": "Tarif",
+    "year": "Jıl",
+    "base": "Baslang'ish baxa",
+    "extra": "Qosımsha",
     "noProductsFound": "Ónim tawilmadi",
     "createNewProduct": "Ónim Jaratıw",
     "remove": "Óshiriw",
@@ -275,8 +281,8 @@
     "STATUS":"Status",
     "status":{
       "active": "Aktiv",
-      "unpaid": "To'lenbedi",
-      "completed": "Juwmaqlandi"
+      "unpaid": "Tólenbegen",
+      "completed": "Tamamlanǵan"
     },
     "next": "Keyingi",
 
@@ -606,6 +612,7 @@
     "apply": "Qollanıw"
   },
   "editApplication": {
+    "numberOfApplication":"Ariza Raqami",
     "selectPhotos": "Foto tanlash",
     "uploadPhotos": "Foto yuklash",
     "photos": "Foto",
@@ -674,6 +681,8 @@
   },
   "calculateServices": {
     "title": "Xızmetlerdi Esaplaw",
+    "unpaidAmount": "To'lanmagan Summa",
+    "goToPayments": "To'lovlarga o'tish",
     "applicationServices": "Ótinish Xızmetleri",
     "maxAmount": "Maksimal mug'dar",
     "results": "Esaplaw Nátiyjeleri",
@@ -724,5 +733,10 @@
     "workingServices": "Jumıs Xızmetleri",
     "amount": "Mug'darı",
     "comment": "Kommentariy"
+  },
+  "status": {
+    "active": "Aktiv",
+    "unpaid": "Tólenbegen",
+    "completed": "Tamamlanǵan"
   }
 }

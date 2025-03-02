@@ -24,8 +24,9 @@ export default function WorkingServiceList() {
   const [loading, setLoading] = useState(true);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
-  const [selectedYear, setSelectedYear] = useState(2025);
-  const availableYears = [2024, 2025, 2026, 2027, 2028, 2029, 2030];
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+  const currentYear = new Date().getFullYear();
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
 
   const fetchServices = async () => {
     try {
@@ -37,12 +38,15 @@ export default function WorkingServiceList() {
       const names = namesResponse.data.results || [];
       const services = servicesResponse.data || [];
 
-      // Combine the data and normalize units
       const servicesWithNames = services.map((service: any) => ({
         ...service,
         service_name: names.find((name: any) => name.id === service.service)?.service_name,
         units: normalizeUnits(service.units)
       }));
+
+      const yearsFromServices = [...new Set(services.map((service: any) => service.year))];
+      const uniqueYears:any = [...new Set([currentYear, ...yearsFromServices])];
+      setAvailableYears(uniqueYears.sort((a:any, b:any) => b - a));
 
       setServices(servicesWithNames);
       setLoading(false);
@@ -80,6 +84,9 @@ export default function WorkingServiceList() {
   };
 
   const handleCreateService = () => {
+    if (selectedYear !== currentYear) {
+      setSelectedYear(currentYear);
+    }
     navigate('/working-services/create');
   };
 
@@ -113,21 +120,22 @@ export default function WorkingServiceList() {
       <div className="mb-6">
         <div className="border-b border-gray-200 dark:border-gray-700">
           <nav className="-mb-px flex space-x-4" aria-label="Tabs">
-            {availableYears.map((year) => (
-              <button
-                key={year}
-                onClick={() => setSelectedYear(year)}
-                className={`
-                  whitespace-nowrap px-4 py-2 border-b-2 font-medium text-sm
-                  ${selectedYear === year
-                    ? 'border-[#6C5DD3] text-[#6C5DD3]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }
-                `}
-              >
-                {year}
-              </button>
-            ))}
+            {availableYears
+              .map((year) => (
+                <button
+                  key={year}
+                  onClick={() => setSelectedYear(year)}
+                  className={`
+                    whitespace-nowrap px-4 py-2 border-b-2 font-medium text-sm
+                    ${selectedYear === year
+                      ? 'border-[#6C5DD3] text-[#6C5DD3]'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }
+                  `}
+                >
+                  {year}
+                </button>
+              ))}
           </nav>
         </div>
       </div>

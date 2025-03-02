@@ -73,8 +73,9 @@ export default function KeepingServiceList() {
     extra_price: '',
     year: new Date().getFullYear(),
   });
-  const [selectedYear, setSelectedYear] = useState(2025);
-  const availableYears = [2024, 2025,2026,2027,2028,2029,2030];
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
 
   const fetchServices = async () => {
     try {
@@ -89,10 +90,20 @@ export default function KeepingServiceList() {
       const names = (namesResponse?.data as PaginatedResponse<KeepingServiceName>)?.results || [];
       const prices = (pricesResponse?.data as PaginatedResponse<KeepingServicePrice>)?.results || [];
 
-      const yearPrices = prices.filter(price => price.year === selectedYear);
+      // Fix the type issue by ensuring we're working with numbers
+      const yearsFromServices = [...new Set(prices.map(price => price.year))] as number[];
+      const uniqueYears = [...new Set([currentYear, ...yearsFromServices])];
+      setAvailableYears(uniqueYears.sort((a, b) => b - a));
+
+      // If no year is selected, use the most recent year
+      const currentSelectedYear = selectedYear || (yearsFromServices.length > 0 ? Math.max(...yearsFromServices) : currentYear);
+      setSelectedYear(currentSelectedYear);
+
+      // Filter prices for selected year
+      const yearPrices = prices.filter(price => price.year === currentSelectedYear);
 
       console.log('Names:', names);
-      console.log('Filtered Prices for year', selectedYear, ':', yearPrices);
+      console.log('Filtered Prices for year', currentSelectedYear, ':', yearPrices);
 
       if (names.length === 0 && yearPrices.length > 0) {
         const servicesFromPrices: KeepingServiceWithPriceId[] = yearPrices.map((price: KeepingServicePrice) => ({
@@ -139,7 +150,6 @@ export default function KeepingServiceList() {
   };
 
   useEffect(() => {
-    setLoading(true); 
     fetchServices();
   }, [selectedYear]);
 
@@ -263,21 +273,23 @@ export default function KeepingServiceList() {
       <div className="mb-6">
         <div className="border-b border-gray-200 dark:border-gray-700">
           <nav className="-mb-px flex space-x-4" aria-label="Tabs">
-            {availableYears.map((year) => (
-              <button
-                key={year}
-                onClick={() => setSelectedYear(year)}
-                className={`
-                  whitespace-nowrap px-4 py-2 border-b-2 font-medium text-sm
-                  ${selectedYear === year
-                    ? 'border-[#6C5DD3] text-[#6C5DD3]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }
-                `}
-              >
-                {year}
-              </button>
-            ))}
+            {availableYears
+              .sort((a, b) => a-b)
+              .map((year) => (
+                <button
+                  key={year}
+                  onClick={() => setSelectedYear(year)}
+                  className={`
+                    whitespace-nowrap px-4 py-2 border-b-2 font-medium text-sm
+                    ${selectedYear === year
+                      ? 'border-[#6C5DD3] text-[#6C5DD3]'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }
+                  `}
+                >
+                  {year}
+                </button>
+              ))}
           </nav>
         </div>
       </div>
@@ -423,7 +435,7 @@ export default function KeepingServiceList() {
                     </label>
                     <input
                       type="number"
-                      value={formData.year}
+                      value={currentYear}
                       onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
                       className="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-gray-900 focus:border-[#6C5DD3] focus:ring-[#6C5DD3] sm:text-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                       required

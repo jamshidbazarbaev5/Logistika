@@ -73,17 +73,23 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
         setShowProductDropdown(false);
         return;
       }
+
+      if (selectedProduct !== 0) {
+        return;
+      }
+
       const response = await api.get(`/items/product/?product_name=${searchTerm}`);
       const results = response.data.results || [];
       setFilteredProducts(results);
       setShowProductDropdown(true);
       
-      // Update local products state with any new products found
+      const newProducts = [...products];
       results.forEach((newProduct: ProductDisplay) => {
-        if (!products.some(p => p.id === newProduct.id)) {
-          setProducts(prev => [...prev, newProduct]);
+        if (!newProducts.some(p => p.id === newProduct.id)) {
+          newProducts.push(newProduct);
         }
       });
+      setProducts(newProducts);
     } catch (error) {
       console.error('Error searching products:', error);
       setFilteredProducts([]);
@@ -98,6 +104,26 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
     return () => clearTimeout(timeoutId);
   }, [productSearch]);
 
+  useEffect(() => {
+    if (formData.products && formData.products.length > 0) {
+      const updatedProducts = [...initialProducts];
+      formData.products.forEach((product: Product) => {
+        if (product.product_id) {
+          const existingProduct = initialProducts.find(p => p.id === product.product_id);
+          if (!existingProduct) {
+            updatedProducts.push({
+              id: product.product_id,
+              name: product.product_name || 'Unknown Product',
+              measurement_id: 0,
+              category_id: 0,
+            });
+          }
+        }
+      });
+      setProducts(updatedProducts);
+    }
+  }, [formData.products, initialProducts]);
+
   const handleProductSelect = (product: ProductDisplay) => {
     setSelectedProduct(product.id);
     setProductSearch(product.name);
@@ -106,9 +132,6 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
 
   const handleAddProduct = () => {
     if (!quantity || !selectedProduct || !selectedStorage) return;
-
-    console.log('Before adding - Current products:', formData.products);
-    console.log('Before adding - Current upload_products:', formData.upload_products);
 
     // Create new product with the required format matching API structure
     const newProduct = {
@@ -120,36 +143,20 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
       storage_name: getStorageName(selectedStorage)
     };
 
-    // Create upload product format
-    const uploadProduct = {
-      quantity,
-      product_id: selectedProduct,
-      storage_id: selectedStorage
-    };
+    // Get existing products
+    const existingProducts = Array.isArray(formData.products) ? [...formData.products] : [];
+    
+    // Create upload_products array from scratch to ensure correct format
+    const updatedUploadProducts = [...existingProducts, newProduct].map(product => ({
+      quantity: product.quantity,
+      product_id: product.product_id || selectedProduct,  // Use selectedProduct as fallback
+      storage_id: product.storage_id || selectedStorage   // Use selectedStorage as fallback
+    }));
 
-    // Get existing products from API response
-    const existingProducts = Array.isArray(formData.products) 
-      ? formData.products
-      : [];
-
-    // Get existing upload products
-    const existingUploadProducts = Array.isArray(formData.upload_products)
-      ? formData.upload_products
-      : existingProducts.map(product => ({
-          quantity: product.quantity,
-          product_id: selectedProduct,
-          storage_id: selectedStorage
-        }));
-
-    const updatedProducts = [...existingProducts, newProduct];
-    const updatedUploadProducts = [...existingUploadProducts, uploadProduct];
-
-    console.log('Updated products array:', updatedProducts);
-    console.log('Updated upload_products array:', updatedUploadProducts);
-
+    // Update form data with both arrays
     setFormData({
       ...formData,
-      products: updatedProducts,
+      products: [...existingProducts, newProduct],
       upload_products: updatedUploadProducts
     });
 
@@ -158,26 +165,20 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
     setSelectedProduct(0);
     setSelectedStorage(0);
     setProductSearch('');
-
-    console.log('After adding - Updated formData:', {
-      products: updatedProducts,
-      upload_products: updatedUploadProducts
-    });
   };
 
   const handleRemoveProduct = (index: number) => {
-    console.log('Before removing - Current products:', formData.products);
-    console.log('Removing product at index:', index);
-
-    const currentProducts = Array.isArray(formData.products) ? formData.products : [];
-    const currentUploadProducts = Array.isArray(formData.upload_products) 
-      ? formData.upload_products 
-      : [];
-
+    const currentProducts = Array.isArray(formData.products) ? [...formData.products] : [];
+    
+    // Remove the product at the specified index
     const updatedProducts = currentProducts.filter((_, i) => i !== index);
-    const updatedUploadProducts = currentUploadProducts.filter((_, i) => i !== index);
-
-    console.log('After removing - Updated products:', updatedProducts);
+    
+    // Recreate upload_products array from the remaining products, ensuring all required fields
+    const updatedUploadProducts = updatedProducts.map(product => ({
+      quantity: product.quantity,
+      product_id: product.product_id,
+      storage_id: product.storage_id
+    }));
 
     setFormData({
       ...formData,
@@ -194,6 +195,12 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
     handleProductSelect(newProduct);
   };
 
+  const handleInputClick = () => {
+    if (selectedProduct === 0) {
+      setShowProductDropdown(true);
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-gray-900 p-3 sm:p-6 rounded-lg shadow-sm">
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
@@ -206,6 +213,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
               type="text"
               value={productSearch}
               onChange={(e) => setProductSearch(e.target.value)}
+              onClick={handleInputClick}
               className="w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]
                 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"

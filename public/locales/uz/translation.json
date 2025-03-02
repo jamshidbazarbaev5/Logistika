@@ -30,6 +30,11 @@
   "createApplication": {
     "currentDeclorationFile": "Deklaratsiya Fayli",
     "title": "Ariza Yaratish",
+    "base": "Asosiy",
+    
+    "extra": "Qo'shimcha",
+    "year": "Yil",
+    "tariff": "Tarif",
     "vipApplication": "VIP Ariza",
     "storage": "Ombor",
     "product": "Mahsulot",
@@ -242,9 +247,9 @@
     "previous": "Oldingi",
     "STATUS":"Status",
     "status":{
-      "active": "Aktiv",
-      "unpaid": "To'lanmadi",
-      "completed": "Yakunlandi"
+      "active": "Faol",
+      "unpaid": "To'lanmagan",
+      "completed": "Yakunlangan"
     },
     "calculate": "Hisoblash",
     "next": "Keyingi",
@@ -477,6 +482,8 @@
   },
   "calculateServices": {
     "title": "Hisoblash Xizmatlari",
+    "unpaidAmount": "To'lanmagan Summa",
+    "goToPayments": "To'lovlarga o'tish",
     "applicationServices": "Arizani Xizmatlari",
     "maxAmount": "Maksimal miqdori",
     "results": "Hisoblash Natijalari",
@@ -577,6 +584,7 @@
   },
   "editApplication": {
     "amount":"Qiymati",
+    "numberOfApplication":"Ariza Raqami",
     "basePrice":"Asosiy Narx",
     "extraPrice":"Qoshimcha Narx",
     "title": "Arizani Tahrirlash",
@@ -641,5 +649,10 @@
     "submit": "Mahsulot Yaratish",
     "successMessage": "Mahsulot muvaffaqiyatli yaratildi!",
     "errorMessage": "Mahsulot yaratishda xatolik yuz berdi. Iltimos, qaytadan urinib ko'ring."
+  },
+  "status": {
+    "active": "Faol",
+    "unpaid": "To'lanmagan",
+    "completed": "Yakunlangan"
   }
 } 

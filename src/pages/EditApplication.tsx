@@ -52,6 +52,7 @@ export default function EditApplication() {
     modes: [],
     products: [],
     upload_products: [],
+    status: 'active',
   });
 
   const [firms, setFirms] = useState<Array<{ id: number; firm_name: string }>>([]);
@@ -100,6 +101,11 @@ export default function EditApplication() {
 
         const applicationData = applicationRes.data;
         
+        // Make sure status is set with a default value if it's not provided
+        if (!applicationData.status) {
+          applicationData.status = 'active';
+        }
+
         // Transform dates
         if (applicationData.coming_date) {
           const [day, month, year] = applicationData.coming_date.split('.');
@@ -424,6 +430,18 @@ export default function EditApplication() {
     );
   };
 
+  // Add this helper function at the top of your component
+  const truncateFileName = (url: string, maxLength: number = 30) => {
+    const fileName = url.split('/').pop() || '';
+    if (fileName.length <= maxLength) return fileName;
+    
+    const extension = fileName.split('.').pop() || '';
+    const nameWithoutExt = fileName.slice(0, fileName.lastIndexOf('.'));
+    
+    const truncatedName = nameWithoutExt.slice(0, maxLength - extension.length - 4) + '...'; // -4 for '...' and '.'
+    return `${truncatedName}.${extension}`;
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -545,6 +563,26 @@ export default function EditApplication() {
                   <div className="sm:col-span-2 mb-4">
                     <div className="flex items-center">
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-3">
+                        {t('editApplication.status')}
+                      </label>
+                      <select
+                        value={formData.status}
+                        onChange={(e) => setFormData(prev => ({ 
+                          ...prev, 
+                          status: e.target.value as 'active' | 'unpaid' | 'completed' 
+                        }))}
+                        className={`${inputClassName} capitalize`}
+                      >
+                        <option value="active">{t('status.active')}</option>
+                        <option value="unpaid">{t('status.unpaid')}</option>
+                        <option value="completed">{t('status.completed')}</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="sm:col-span-2 mb-4">
+                    <div className="flex items-center">
+                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-3">
                         {t('editApplication.vipApplication')}
                       </label>
                       <button
@@ -566,6 +604,19 @@ export default function EditApplication() {
                         />
                       </button>
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t('editApplication.applicationNumber')}
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.number_of_application || ''}
+                      onChange={(e) => setFormData({ ...formData, number_of_application: e.target.value })}
+                      className={inputClassName}
+                      placeholder={t('editApplication.enterApplicationNumber')}
+                    />
                   </div>
 
                   <div className="relative">
@@ -672,15 +723,15 @@ export default function EditApplication() {
                       <div className="mb-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
-                            <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-8 h-8 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            <div>
+                            <div className="min-w-0">
                               <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                                 {t('editApplication.currentDeclorationFile')}
                               </p>
-                              <p className="text-xs text-gray-500 dark:text-gray-400">
-                                {(formData.decloration_file as string).split('/').pop()}
+                              <p className="text-xs text-gray-500 dark:text-gray-400 truncate" title={(formData.decloration_file as string).split('/').pop()}>
+                                {truncateFileName(formData.decloration_file as string)}
                               </p>
                             </div>
                           </div>
@@ -688,7 +739,7 @@ export default function EditApplication() {
                             href={formData.decloration_file as string}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="px-3 py-1 text-sm text-[#6C5DD3] hover:bg-[#6C5DD3]/10 rounded-lg transition-colors"
+                            className="px-3 py-1 text-sm text-[#6C5DD3] hover:bg-[#6C5DD3]/10 rounded-lg transition-colors flex-shrink-0"
                           >
                             {t('editApplication.view')}
                           </a>

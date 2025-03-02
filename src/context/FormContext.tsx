@@ -44,6 +44,7 @@ export interface Product {
 export interface ApplicationFormData {
   id?: number;
   firm_id: number;
+  status: 'active' | 'unpaid' | 'completed';
   number_of_application: string;
   brutto: number | null;
   netto: number | null;

@@ -67,6 +67,24 @@ const BasicInfoTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   return (
     <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow-sm w-full max-w-full overflow-hidden">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 sm:gap-6 w-full">
+        <div className="sm:col-span-2 mb-4">
+          <label className="block text-sm sm:text-base font-medium text-gray-700 dark:text-gray-300 mb-2">
+            {t('editApplication.status')}
+          </label>
+          <select
+            value={formData.status}
+            onChange={(e) => setFormData(prev => ({ 
+              ...prev, 
+              status: e.target.value as 'active' | 'unpaid' | 'completed' 
+            }))}
+            className={`${inputClassName} capitalize`}
+          >
+            <option value="active">Active</option>
+            <option value="unpaid">Unpaid</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+
         <div className="relative sm:col-span-2 w-full">
           <label htmlFor="firm_search" className="block text-sm sm:text-base font-medium text-gray-600 dark:text-gray-300 mb-1 break-words">
             {t('createApplication.firm')}

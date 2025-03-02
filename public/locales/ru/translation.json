@@ -30,9 +30,12 @@
   "createApplication": {
     "title": "Создать Заявку",
     "storage": "Склад",
-    "vipApplication": "VIP Заявка",
-    "currentDeclorationFile": "Файл Декларации",
     "product": "Товар",
+    "units": "Единицы",
+    "tariff": "Тариф",
+    "year": "Год",
+    "base": "Базовый",
+    "extra": "Дополнительный",
     "noProductsFound": "Товар не найден",
     "createNewProduct": "Создать Новый Товар",
     "remove": "Удалить",
@@ -275,8 +278,8 @@
     "STATUS":"Статус",
     "status":{
       "active": "Активный",
-      "unpaid": "Не оплачен",
-      "completed": "Завершен"
+      "unpaid": "Неоплаченный",
+      "completed": "Завершенный"
     },
     "calculate": "Рассчитать",
     "numberOfApplication": "Номер Заявки",
@@ -556,6 +559,7 @@
     "createSuccess": "Пользователь успешно создан"
   },
   "editApplication": {
+    "numberOfApplication":"Номер Заявки",
     "title": "Редактирование Заявки",
     "subtitle": "Изменение данных заявки",
     "firm": "Организация",
@@ -623,6 +627,8 @@
   },
   "calculateServices": {
     "title": "Расчет Услуг",
+    "goToPayments": "Перейти к Платежам",
+    "unpaidAmount": "Неоплаченная сумма",
     "applicationServices": "Услуги Заявки",
     "maxAmount": "Макс. количество",
     "results": "Результаты Расчета",
@@ -673,5 +679,10 @@
     "workingServices": "Рабочие Услуги",
     "amount": "Сумма",
     "comment": "Комментарий"
+  },
+  "status": {
+    "active": "Активный",
+    "unpaid": "Неоплаченный",
+    "completed": "Завершенный"
   }
 }

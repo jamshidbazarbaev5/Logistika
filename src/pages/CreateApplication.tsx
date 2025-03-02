@@ -8,6 +8,7 @@ import { classNames } from '../../utils/classNames'
 import { useNavigate } from "react-router-dom";
 import { createContext, useContext } from 'react';
 import CreateProductModal from "../components/CreateProductModal";
+import ErrorModal from '../components/ErrorModal';
 
 interface ApplicationFormData {
   firm_id: number;
@@ -16,11 +17,9 @@ interface ApplicationFormData {
   vip_application: boolean;
   total_price: number | null;
   discount_price: number | null;
-  coming_date?: string;
   decloration_number?: string;
   decloration_date?: string;
   decloration_file?: File;
-  payment_method?: number;
   keeping_services?: number[];
   working_services?: number[];
   upload_keeping_services_quantity: Array<{
@@ -377,9 +376,31 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
         setShowProductDropdown(false);
         return;
       }
+
+      // If exact match exists in productDetails, don't search
+      const existingProduct = Array.from(productDetails.values())
+        .find(p => p.name.toLowerCase() === searchTerm.toLowerCase());
+      
+      if (existingProduct) {
+        setSelectedProduct(existingProduct.id);
+        return;
+      }
+
       const response = await api.get(`/items/product/?product_name=${searchTerm}`);
-      setProducts(response.data.results || []);
-      setShowProductDropdown(true);
+      const results = response.data.results || [];
+      
+      // If there's an exact match in results, select it automatically
+      const exactMatch = results.find(
+        (p: Product) => p.name.toLowerCase() === searchTerm.toLowerCase()
+      );
+      
+      if (exactMatch) {
+        handleProductSelect(exactMatch);
+        setProducts([]);
+      } else {
+        setProducts(results);
+        setShowProductDropdown(true);
+      }
     } catch (error) {
       console.error('Error searching products:', error);
       setProducts([]);
@@ -411,13 +432,15 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
             type="text"
             value={productSearch}
             onChange={(e) => {
-              setProductSearch(e.target.value);
-              setSelectedProduct(0); // Reset selected product when searching
+              const value = e.target.value;
+              setProductSearch(value);
+              setSelectedProduct(0); // Reset selected product when typing
             }}
-            onFocus={() => {
-              if (productSearch) {
-                setShowProductDropdown(true);
-              }
+            onBlur={() => {
+              // Small delay to allow click events to fire on dropdown items
+              setTimeout(() => {
+                setShowProductDropdown(false);
+              }, 200);
             }}
             className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
               px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
@@ -731,7 +754,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const { formData, setFormData } = useFormContext();
   const [keepingServices, setKeepingServices] = useState<KeepingService[]>([]);
   const [workingServices, setWorkingServices] = useState<WorkingService[]>([]);
-  const [workingServiceNames] = useState<Map<number, string>>(new Map());
+  const [] = useState<Map<number, string>>(new Map());
   const [keepingServicesNames, setKeepingServicesNames] = useState<Map<number, string>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -744,6 +767,8 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   useEffect(() => {
     const fetchServices = async () => {
       setIsLoading(true);
+      const currentYear = new Date().getFullYear();
+      
       try {
         // Fetch working service names first
         const workingNamesRes = await api.get('/working_service/name/');
@@ -757,16 +782,16 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
         });
         console.log('Names map:', Object.fromEntries(namesMap));
 
-        // Fetch working service tariffs
-        const workingTariffsRes = await api.get('/working_service/tariff/');
+        // Fetch working service tariffs for current year
+        const workingTariffsRes = await api.get(`/working_service/tariff/?year=${currentYear}`);
         const workingTariffs = workingTariffsRes.data.results || [];
         console.log('Working service tariffs:', workingTariffs);
 
         // Combine names with tariffs
         const combinedWorkingServices = workingTariffs.map((tariff: any) => ({
           id: tariff.id,
-          tariff_id: tariff.id,  // Store the actual tariff ID (3, 4, 7)
-          service_id: tariff.service, // Store the service ID for name lookup
+          tariff_id: tariff.id,
+          service_id: tariff.service,
           service_name: namesMap.get(tariff.service) || t('createApplication.loading'),
           base_price: tariff.base_price,
           units: tariff.units,
@@ -776,8 +801,8 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
 
         setWorkingServices(combinedWorkingServices);
 
-        // Fetch keeping services (assuming this endpoint structure remains the same)
-        const keepingRes = await api.get('/keeping_service/keeping_service_price/');
+        // Fetch keeping services for current year
+        const keepingRes = await api.get(`/keeping_service/keeping_service_price/?year=${currentYear}`);
         if (keepingRes.data?.results) {
           setKeepingServices(keepingRes.data.results);
         }
@@ -956,6 +981,8 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
                         <span>{t('createApplication.base')}: {service.base_price}</span>
                         <span>•</span>
                         <span>{t('createApplication.extra')}: {service.extra_price}</span>
+                        <span>•</span>
+                        <span>{t('createApplication.year')}: {service.year}</span>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
@@ -1027,11 +1054,11 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
                           {service.service_name}
                         </h4>
                         <div className="mt-1 flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                          <span>Base: {service.base_price}</span>
+                          <span>{t('createApplication.base')}: {service.base_price}</span>
                           <span>•</span>
-                          <span>Units: {service.units}</span>
+                          <span>{t('createApplication.units')}: {service.units}</span>
                           <span>•</span>
-                          <span>Tariff ID: {service.tariff_id}</span>
+                          <span>{t('createApplication.year')}: {service.year}</span>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
@@ -1085,6 +1112,8 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
                           <span>{t('createApplication.base')}: {service?.base_price}</span>
                           <span>•</span>
                           <span>{t('createApplication.extra')}: {service?.extra_price}</span>
+                          <span>•</span>
+                          <span>{t('createApplication.total')}: {service?.year}</span>
                         </div>
                       </div>
                       <button
@@ -1121,7 +1150,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
                     >
                       <div className="flex flex-col">
                         <span className="font-medium text-gray-900 dark:text-white">
-                          {workingServiceNames.get(item.service_id) || t('createApplication.loading')}
+                          {service?.service_name || t('createApplication.loading')}
                         </span>
                         <div className="mt-1 flex items-center space-x-3 text-sm text-gray-500 dark:text-gray-300">
                           <span>{item.quantity} {service?.units}</span>
@@ -1319,7 +1348,7 @@ const ModesTab: React.FC<TabPanelProps> = ({ onSubmit }) => {
 export default function CreateApplication() {
   const { t } = useTranslation();
   const [firms, setFirms] = useState<Firm[]>([]);
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [, setPaymentMethods] = useState<PaymentMethod[]>([]);
   const [, setKeepingServices] = useState<KeepingService[]>([]);
   const [, setWorkingServices] = useState<WorkingService[]>([]);
   const [, setStorages] = useState<any[]>([]);
@@ -1328,8 +1357,7 @@ export default function CreateApplication() {
   const [firmSearch, setFirmSearch] = useState("");
   const [showFirmDropdown, setShowFirmDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [paymentMethodSearch, setPaymentMethodSearch] = useState("");
-  const [showPaymentMethodDropdown, setShowPaymentMethodDropdown] = useState(false);
+  const [, setShowPaymentMethodDropdown] = useState(false);
   const paymentMethodDropdownRef = useRef<HTMLDivElement>(null);
   const [, setKeepingServicesOpen] = useState(false);
   const [, setWorkingServicesOpen] = useState(false);
@@ -1339,11 +1367,9 @@ export default function CreateApplication() {
   const [selectedTab, setSelectedTab] = useState(0);
   const [, setApplicationId] = useState<number | null>(null);
   const navigate = useNavigate();
+  const [errorModalOpen, setErrorModalOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const getCurrentDate = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  };
 
   const [formData, setFormData] = useState<ApplicationFormData>({
     firm_id: 0,
@@ -1352,7 +1378,6 @@ export default function CreateApplication() {
     vip_application: false,
     total_price: null,
     discount_price: null,
-    coming_date: getCurrentDate(),
     decloration_number: '',
     decloration_date: '',
     keeping_services: [],
@@ -1432,34 +1457,48 @@ export default function CreateApplication() {
   const handleSubmit = async () => {
     try {
       const formDataObj = new FormData();
+      
+      // Required fields
+      if (!formData.firm_id) {
+        setErrorMessage('Please select a firm');
+        setErrorModalOpen(true);
+        return;
+      }
+
       formDataObj.append('firm_id', formData.firm_id.toString());
-      formDataObj.append('brutto', formData.brutto?.toString() || '');
-      formDataObj.append('netto', formData.netto?.toString() || '');
       formDataObj.append('vip_application', formData.vip_application ? 'true' : 'false');
-      formDataObj.append('total_price', formData.total_price?.toString() || '');
       formDataObj.append('number_of_application', formData.number_of_application || '');
 
-      formDataObj.append('decloration_number', formData.decloration_number || '');
-      formDataObj.append('decloration_date', formData.decloration_date || '');
+      // Optional fields with validation
+      if (formData.brutto !== null) {
+        formDataObj.append('brutto', formData.brutto.toString());
+      }
+      if (formData.netto !== null) {
+        formDataObj.append('netto', formData.netto.toString());
+      }
 
-      formDataObj.append('upload_keeping_services_quantity', 
-        JSON.stringify(formData.upload_keeping_services_quantity));
-      
-      formDataObj.append('upload_working_services_quantity', 
-        JSON.stringify(formData.upload_working_services_quantity));
-      
-      formDataObj.append('upload_transport', 
-        JSON.stringify(formData.upload_transport));
-      
-      formDataObj.append('upload_modes', 
-        JSON.stringify(formData.upload_modes));
-      
-      formDataObj.append('upload_products', 
-        JSON.stringify(formData.upload_products));
-
+      // Only append declaration fields if they have values
+      if (formData.decloration_number?.trim()) {
+        formDataObj.append('decloration_number', formData.decloration_number);
+      }
+      if (formData.decloration_date?.trim()) {
+        formDataObj.append('decloration_date', formData.decloration_date);
+      }
       if (formData.decloration_file) {
         formDataObj.append('decloration_file', formData.decloration_file);
       }
+
+      // Arrays
+      formDataObj.append('upload_keeping_services_quantity', 
+        JSON.stringify(formData.upload_keeping_services_quantity));
+      formDataObj.append('upload_working_services_quantity', 
+        JSON.stringify(formData.upload_working_services_quantity));
+      formDataObj.append('upload_transport', 
+        JSON.stringify(formData.upload_transport));
+      formDataObj.append('upload_modes', 
+        JSON.stringify(formData.upload_modes));
+      formDataObj.append('upload_products', 
+        JSON.stringify(formData.upload_products));
 
       if (formData.upload_photos?.length) {
         formData.upload_photos.forEach(photo => {
@@ -1480,13 +1519,28 @@ export default function CreateApplication() {
 
     } catch (error: any) {
       console.error('Error submitting application:', error);
-      if (error.response) {
-        console.error('Server error details:', {
-          status: error.response.status,
-          data: error.response.data,
-          headers: error.response.headers
-        });
+      
+      let errorMsg = '';
+      
+      if (error.response?.data) {
+        // Format error messages from the API response
+        const errorData = error.response.data;
+        errorMsg = Object.entries(errorData)
+          .map(([key, value]) => {
+            const fieldName = key.charAt(0).toUpperCase() + key.slice(1).replace(/_/g, ' ');
+            if (Array.isArray(value)) {
+              return `${fieldName}: ${value.join(', ')}`;
+            }
+            return `${fieldName}: ${value}`;
+          })
+          .join('\n');
+      } else {
+        errorMsg = 'An error occurred while creating the application.';
       }
+
+      // Set error message and open modal
+      setErrorMessage(errorMsg);
+      setErrorModalOpen(true);
     }
   };
 
@@ -1573,15 +1627,7 @@ export default function CreateApplication() {
     setShowFirmDropdown(false);
   };
 
-  const handlePaymentMethodSelect = (method: PaymentMethod) => {
-    setFormData(prev => ({ ...prev, payment_method: method.id }));
-    setPaymentMethodSearch(method.payment_method);
-    setShowPaymentMethodDropdown(false);
-  };
-
-  const filteredPaymentMethods = paymentMethods.filter(method =>
-    method.payment_method.toLowerCase().includes(paymentMethodSearch.toLowerCase())
-  );
+ 
 
   const handleFirmCreated = (newFirm: { id: number; firm_name: string }) => {
     setFirms(prevFirms => [...prevFirms, newFirm]);
@@ -1701,21 +1747,7 @@ export default function CreateApplication() {
             <Tab.Panel>
               <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="number_of_application" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-                      {t('createApplication.applicationNumber', 'Application Number')}
-                    </label>
-                    <input
-                      type="text"
-                      name="number_of_application"
-                      id="number_of_application"
-                      value={formData.number_of_application || ''}
-                      onChange={handleChange}
-                      className={inputClassName}
-                    />
-                  </div>
-
-                  <div className="sm:col-span-2 mb-4">
+                <div className="sm:col-span-2 mb-4">
                     <div className="flex items-center">
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mr-3">
                         {t('createApplication.vipApplication')}
@@ -1740,49 +1772,19 @@ export default function CreateApplication() {
                       </button>
                     </div>
                   </div>
-
                   <div>
-                    <label htmlFor="brutto" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-                      {t('createApplication.brutto', 'Brutto')}
+                    <label htmlFor="number_of_application" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                      {t('createApplication.applicationNumber', 'Application Number')}
                     </label>
                     <input
-                      type="number"
-                      name="brutto"
-                      id="brutto"
-                      value={formData.brutto || ''}
+                      type="text"
+                      name="number_of_application"
+                      id="number_of_application"
+                      value={formData.number_of_application || ''}
                       onChange={handleChange}
                       className={inputClassName}
                     />
                   </div>
-
-                  <div>
-                    <label htmlFor="netto" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-                      {t('createApplication.netto', 'Netto')}
-                    </label>
-                    <input
-                      type="number"
-                      name="netto"
-                      id="netto"
-                      value={formData.netto || ''}
-                      onChange={handleChange}
-                      className={inputClassName}
-                    />
-                  </div>
-
-                  <div>
-                    <label htmlFor="coming_date" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-                      {t('createApplication.comingDate', 'Coming Date')}
-                    </label>
-                    <input
-                      type="date"
-                      name="coming_date"
-                      id="coming_date"
-                      value={formData.coming_date}
-                      onChange={handleChange}
-                      className={inputClassName}
-                    />
-                  </div>
-
                   <div className="relative" ref={dropdownRef}>
                     <label htmlFor="firm_search" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
                       {t('createApplication.firmId', 'Firm')}
@@ -1831,7 +1833,39 @@ export default function CreateApplication() {
                     )}
                   </div>
 
-                  <div className="relative" ref={paymentMethodDropdownRef}>
+                 
+
+                  <div>
+                    <label htmlFor="brutto" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                      {t('createApplication.brutto', 'Brutto')}
+                    </label>
+                    <input
+                      type="number"
+                      name="brutto"
+                      id="brutto"
+                      value={formData.brutto || ''}
+                      onChange={handleChange}
+                      className={inputClassName}
+                    />
+                  </div>
+
+                  <div>
+                    <label htmlFor="netto" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                      {t('createApplication.netto', 'Netto')}
+                    </label>
+                    <input
+                      type="number"
+                      name="netto"
+                      id="netto"
+                      value={formData.netto || ''}
+                      onChange={handleChange}
+                      className={inputClassName}
+                    />
+                  </div>
+
+                 
+
+                  {/* <div className="relative" ref={paymentMethodDropdownRef}>
                     <label htmlFor="payment_method_search" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
                       {t('createApplication.paymentMethod', 'Payment Method')}
                     </label>
@@ -1867,7 +1901,7 @@ export default function CreateApplication() {
                         )}
                       </div>
                     )}
-                  </div>
+                  </div> */}
                 </div>
                 
                 <TransportSection />
@@ -1977,13 +2011,19 @@ export default function CreateApplication() {
         <SuccessModal
           isOpen={showSuccessModal}
           onClose={handleSuccessModalClose}
-          message={t('createApplication.successMessage', 'Application created successfully!')}
+          message={t('createApplication.successMessage')}
         />
 
         <CreateFirmModal
           isOpen={showCreateFirmModal}
           onClose={() => setShowCreateFirmModal(false)}
           onFirmCreated={handleFirmCreated}
+        />
+
+        <ErrorModal
+          isOpen={errorModalOpen}
+          onClose={() => setErrorModalOpen(false)}
+          message={errorMessage}
         />
       </div>
     </FormContext.Provider>

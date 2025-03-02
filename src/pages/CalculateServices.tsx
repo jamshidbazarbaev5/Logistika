@@ -143,6 +143,7 @@
     const [errorModalOpen, setErrorModalOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [expandedTransactions, setExpandedTransactions] = useState<number[]>([]);
+    const [, setUnpaidAmount] = useState<number>(0);
 
     useEffect(() => {
       const fetchData = async () => {
@@ -276,6 +277,20 @@
         }));
       }
     }, [activeTab, applicationData]);
+
+    useEffect(() => {
+      const fetchUnpaidAmount = async () => {
+        try {
+          // Assuming there's an API endpoint for getting unpaid amount
+          const response = await api.get('/application/unpaid-amount/');
+          setUnpaidAmount(response.data.amount || 0);
+        } catch (error) {
+          console.error('Error fetching unpaid amount:', error);
+        }
+      };
+
+      fetchUnpaidAmount();
+    }, []);
 
     const handleAmountChange = (serviceTypeId: number, amount: number) => {
       const originalService = application?.keeping_services.find(
@@ -429,44 +444,7 @@
       );
     };
 
-    const renderWorkingServices = () => (
-      <div className="mt-6">
-        <h3 className="text-lg font-medium mb-4">
-          {t('calculateServices.workingServices', 'Working Services')}
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {originalWorkingServices.map((service) => {
-            const serviceType = workingServiceTypes.find(st => st.id === service.service_id);
-            return (
-              <div 
-                key={service.id}
-                className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
-              >
-                <div className="flex flex-col space-y-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {serviceType?.service_name || `Service ${service.service_id}`}
-                  </label>
-                  <div className="flex items-center justify-between space-x-4">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      {t('calculateServices.maxAmount', 'Max amount')}: {service.quantity}
-                    </span>
-                    <input
-                      type="number"
-                      min="0"
-                      max={service.quantity}
-                      value={workingAmounts[service.service_id] || 0}
-                      onChange={(e) => handleWorkingAmountChange(service.service_id, parseInt(e.target.value) || 0)}
-                      className="w-24 rounded-md border border-gray-300 dark:border-gray-600 
-                        bg-white dark:bg-gray-700 px-3 py-2 text-sm"
-                    />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
+   
 
     return (
       <div className="p-6">
@@ -510,159 +488,246 @@
         </div>
 
         {activeTab === 'calculate' ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-                <h2 className="text-lg font-medium mb-4">
-                  {t('calculateServices.applicationServices', 'Application Services')}
-                </h2>
-                
-                <div className="max-h-[calc(100vh-300px)] overflow-y-auto pr-2">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {application?.keeping_services.map((service) => {
-                      const serviceType = serviceTypes.find(st => st.id === service.service_type_id);
-                      return (
-                        <div 
-                          key={service.id} 
-                          className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
-                        >
-                          <div className="flex flex-col space-y-2">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                              {serviceType?.name || `Service ${service.service_type_id}`}
-                            </label>
-                            <div className="flex items-center justify-between space-x-4">
-                              <span className="text-xs text-gray-500 dark:text-gray-400">
-                                {t('calculateServices.maxAmount', 'Max amount')}: {service.amount}
-                              </span>
-                              <input
-                                type="number"
-                                min="0"
-                                max={service.amount}
-                                value={amounts[service.service_type_id] || 0}
-                                onChange={(e) => handleAmountChange(service.service_type_id, parseInt(e.target.value) || 0)}
-                                className="w-24 rounded-md border border-gray-300 dark:border-gray-600 
-                                  bg-white dark:bg-gray-700 px-3 py-2 text-sm"
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+          <>
+            {(!application?.keeping_services.some(service => service.amount > 0) &&
+             !application?.working_services.some(service => service.quantity > 0) &&
+             applicationData?.total_price > 0) && (
+              <div className="mb-6 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                      {t('calculateServices.unpaidAmount', 'You have unpaid amount')}: {applicationData?.total_price} сум
+                    </span>
                   </div>
-
-                  {renderWorkingServices()}
+                  <button
+                    onClick={() => setActiveTab('payments')}
+                    className="text-sm font-medium text-yellow-600 dark:text-yellow-400 hover:text-yellow-800 dark:hover:text-yellow-300"
+                  >
+                    {t('calculateServices.goToPayments', 'Go to Payments')} →
+                  </button>
                 </div>
-
-                <button
-                  onClick={handleCalculate}
-                  disabled={loading || !application?.keeping_services.length}
-                  className="mt-6 w-full bg-[#6C5DD3] text-white px-4 py-2 rounded-lg
-                    hover:bg-[#5c4eb3] disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? t('common.calculating', 'Calculating...') : t('common.calculate', 'Calculate')}
-                </button>
               </div>
-            </div>
+            )}
 
-            <div className="lg:col-span-1">
-              {calculationResult && calculationResult.keeping_services ? (
-                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow sticky top-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
                   <h2 className="text-lg font-medium mb-4">
-                    {t('calculateServices.results', 'Calculation Results')}
+                    {t('calculateServices.applicationServices', 'Application Services')}
                   </h2>
+                  
+                  <div className="max-h-[calc(100vh-300px)] overflow-y-auto pr-2">
+                    {/* Only render keeping services section if there are services with amount > 0 */}
+                    {application?.keeping_services.some(service => service.amount > 0) && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {application.keeping_services
+                          .filter(service => service.amount > 0)
+                          .map((service) => {
+                            const serviceType = serviceTypes.find(st => st.id === service.service_type_id);
+                            return (
+                              <div 
+                                key={service.id} 
+                                className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
+                              >
+                                <div className="flex flex-col space-y-2">
+                                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {serviceType?.name || `Service ${service.service_type_id}`}
+                                  </label>
+                                  <div className="flex items-center justify-between space-x-4">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                      {t('calculateServices.maxAmount', 'Max amount')}: {service.amount}
+                                    </span>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      max={service.amount}
+                                      value={amounts[service.service_type_id] || 0}
+                                      onChange={(e) => handleAmountChange(service.service_type_id, parseInt(e.target.value) || 0)}
+                                      className="w-24 rounded-md border border-gray-300 dark:border-gray-600 
+                                        bg-white dark:bg-gray-700 px-3 py-2 text-sm"
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                      </div>
+                    )}
 
-                  <div className="space-y-4 max-h-[calc(100vh-400px)] overflow-y-auto pr-2">
-                    {calculationResult.keeping_services
-                      .filter(service => service && service.requested_amount > 0)
-                      .map((service, index) => (
-                        <div 
-                          key={index} 
-                          className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
-                        >
-                          <h3 className="font-medium text-[#6C5DD3] dark:text-[#8B7BE8] mb-2">
-                            {service.service_name}
-                          </h3>
-                          <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                              <span>{t('calculateServices.requestedAmount')}:</span>
-                              <span className="font-medium">{service.requested_amount}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>{t('calculateServices.totalAmount')}:</span>
-                              <span className="font-medium">{service.total_amount}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>{t('calculateServices.price')}:</span>
-                              <span className="font-medium">{service.price.toLocaleString()} сум</span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-
-                    {calculationResult.working_services.map((service, index) => {
-                      const requestedAmount = workingAmounts[service.service_type_id];
-                      console.log(`Rendering service ${service.service_type_id}:`, {
-                        workingAmounts,
-                        requestedAmount,
-                        service
-                      });
-                      
-                      return (
-                        <div 
-                          key={`working-${index}`} 
-                          className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
-                        >
-                          <h3 className="font-medium text-[#6C5DD3] dark:text-[#8B7BE8] mb-2">
-                            {service.service_name} (Working)
-                          </h3>
-                          <div className="space-y-2 text-sm">
-                            <div className="flex justify-between">
-                              <span>{t('calculateServices.requestedAmount')}:</span>
-                              <span className="font-medium">{requestedAmount}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>{t('calculateServices.totalAmount')}:</span>
-                              <span className="font-medium">{service.total_amount}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>{t('calculateServices.price')}:</span>
-                              <span className="font-medium">{service.price.toLocaleString()} сум</span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                    <div className="mt-6 pt-4 border-t dark:border-gray-600">
-                      <div className="flex justify-between items-center text-lg font-medium">
-                        <div>{t('calculateServices.totalPrice')}:</div>
-                        <div className="text-[#6C5DD3] dark:text-[#8B7BE8]">
-                          {calculationResult.total_price.toLocaleString()} сум
+                    {/* Only render working services section if there are services with quantity > 0 */}
+                    {application?.working_services.some(service => service.quantity > 0) && (
+                      <div className="mt-6">
+                        <h3 className="text-lg font-medium mb-4">
+                          {t('calculateServices.workingServices', 'Working Services')}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {application.working_services
+                            .filter(service => service.quantity > 0)
+                            .map((service) => {
+                              const serviceType = workingServiceTypes.find(st => st.id === service.service_id);
+                              return (
+                                <div 
+                                  key={service.id}
+                                  className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
+                                >
+                                  <div className="flex flex-col space-y-2">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                      {serviceType?.service_name || `Service ${service.service_id}`}
+                                    </label>
+                                    <div className="flex items-center justify-between space-x-4">
+                                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                                        {t('calculateServices.maxAmount', 'Max amount')}: {service.quantity}
+                                      </span>
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        max={service.quantity}
+                                        value={workingAmounts[service.service_id] || 0}
+                                        onChange={(e) => handleWorkingAmountChange(service.service_id, parseInt(e.target.value) || 0)}
+                                        className="w-24 rounded-md border border-gray-300 dark:border-gray-600 
+                                          bg-white dark:bg-gray-700 px-3 py-2 text-sm"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
                         </div>
                       </div>
-                    </div>
+                    )}
+
+                    {(!application?.keeping_services.some(service => service.amount > 0) && 
+                     !application?.working_services.some(service => service.quantity > 0)) && (
+                      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                        {t('calculateServices.noServicesAvailable', 'No services available for calculation')}
+                      </div>
+                    )}
                   </div>
 
                   <button
-                    onClick={handleProceedToTransaction}
+                    onClick={handleCalculate}
                     disabled={
-                      !calculationResult ||
-                      (!calculationResult.keeping_services.some(service => service.requested_amount > 0) && 
-                      !calculationResult.working_services.some(service => service.requested_amount > 0 || service.total_amount > 0))
+                      loading || 
+                      (!application?.keeping_services.some(service => service.amount > 0) &&
+                       !application?.working_services.some(service => service.quantity > 0))
                     }
-                    className="mt-6 w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 
-                      disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="mt-6 w-full bg-[#6C5DD3] text-white px-4 py-2 rounded-lg
+                      hover:bg-[#5c4eb3] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {t('calculateServices.proceedToTransaction', 'Proceed to Transaction')}
+                    {loading ? t('common.calculating', 'Calculating...') : t('common.calculate', 'Calculate')}
                   </button>
                 </div>
-              ) : (
-                <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 text-center text-gray-500 dark:text-gray-400">
-                  {t('calculateServices.noResults', 'Calculate services to see results')}
-                </div>
-              )}
+              </div>
+
+              <div className="lg:col-span-1">
+                {calculationResult && calculationResult.keeping_services ? (
+                  <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow sticky top-6">
+                    <h2 className="text-lg font-medium mb-4">
+                      {t('calculateServices.results', 'Calculation Results')}
+                    </h2>
+
+                    <div className="space-y-4 max-h-[calc(100vh-400px)] overflow-y-auto pr-2">
+                      {calculationResult.keeping_services
+                        .filter(service => service && service.requested_amount > 0)
+                        .map((service, index) => (
+                          <div 
+                            key={index} 
+                            className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
+                          >
+                            <h3 className="font-medium text-[#6C5DD3] dark:text-[#8B7BE8] mb-2">
+                              {service.service_name}
+                            </h3>
+                            <div className="space-y-2 text-sm">
+                              <div className="flex justify-between">
+                                <span>{t('calculateServices.requestedAmount')}:</span>
+                                <span className="font-medium">{service.requested_amount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>{t('calculateServices.totalAmount')}:</span>
+                                <span className="font-medium">{service.total_amount}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span>{t('calculateServices.price')}:</span>
+                                <span className="font-medium">{service.price.toLocaleString()} сум</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+
+                      {calculationResult.working_services
+                        .filter(service => service.total_amount > 0 || service.price > 0)
+                        .map((service, index) => {
+                          const requestedAmount = workingAmounts[service.service_type_id];
+                          // Log the service and available types to debug
+                          console.log('Result service:', service);
+                          console.log('Available types:', workingServiceTypes);
+                          
+                          // Try to find the service type using both IDs
+                          const serviceType = workingServiceTypes.find(st => 
+                            st.id === service.service_type_id || 
+                            st.id === originalWorkingServices.find(ows => ows.service_id === service.service_type_id)?.service_id
+                          );
+                          
+                          return (
+                            <div 
+                              key={`working-${index}`} 
+                              className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
+                            >
+                              <h3 className="font-medium text-[#6C5DD3] dark:text-[#8B7BE8] mb-2">
+                                {serviceType?.service_name || service.service_name || `Service ${service.service_type_id}`}
+                              </h3>
+                              <div className="space-y-2 text-sm">
+                                <div className="flex justify-between">
+                                  <span>{t('calculateServices.requestedAmount')}:</span>
+                                  <span className="font-medium">{requestedAmount}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>{t('calculateServices.totalAmount')}:</span>
+                                  <span className="font-medium">{service.total_amount}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                  <span>{t('calculateServices.price')}:</span>
+                                  <span className="font-medium">{service.price.toLocaleString()} сум</span>
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+
+                      <div className="mt-6 pt-4 border-t dark:border-gray-600">
+                        <div className="flex justify-between items-center text-lg font-medium">
+                          <div>{t('calculateServices.totalPrice')}:</div>
+                          <div className="text-[#6C5DD3] dark:text-[#8B7BE8]">
+                            {calculationResult.total_price.toLocaleString()} сум
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleProceedToTransaction}
+                      disabled={
+                        !calculationResult ||
+                        (!calculationResult.keeping_services.some(service => service.requested_amount > 0) && 
+                        !calculationResult.working_services.some(service => service.total_amount > 0 || service.price > 0))
+                      }
+                      className="mt-6 w-full bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 
+                        disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {t('calculateServices.proceedToTransaction', 'Proceed to Transaction')}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 text-center text-gray-500 dark:text-gray-400">
+                    {t('calculateServices.noResults', 'Calculate services to see results')}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
+          </>
         ) : activeTab === 'history' ? (
           <div className="space-y-4">
             {transactionHistory.length === 0 ? (
@@ -705,12 +770,7 @@
                             day: 'numeric'
                           })}
                         </span>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          {new Date(transaction.date_of_transaction).toLocaleTimeString(undefined, {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </p>
+                       
                       </div>
                     </div>
                   </button>
@@ -838,24 +898,23 @@
                     {t('payments.totalAmount', 'Total Amount')}:
                   </h2>
                   <span className={`text-xl font-bold ${
-                    applicationData.total_price === 0 || !applicationData.total_price
-                      ? 'text-red-500'
+                    applicationData.total_price === 0
+                      ? 'text-green-500'
                       : 'text-[#6C5DD3]'
                   }`}>
                     {(applicationData.total_price || 0).toLocaleString()} сум
                   </span>
                 </div>
-                {applicationData.status && (
-                  <div className="mt-2 text-sm">
-                    <span className="font-medium">{t('payments.status', 'Status')}:</span>
-                    <span className={`ml-2 ${
-                      applicationData.status === 'unpaid' ? 'text-red-500' : 'text-green-500'
-                    }`}>
-                      {applicationData.status}
-                    </span>
-                  </div>
-                )}
-               
+                <div className="mt-2 text-sm">
+                  <span className="font-medium">{t('payments.status', 'Status')}:</span>
+                  <span className={`ml-2 ${
+                    applicationData.total_price === 0 ? 'text-green-500' : 'text-red-500'
+                  }`}>
+                    {applicationData.total_price === 0 
+                      ? t('payments.fullyPaid', 'Полностью оплачено')
+                      : t('payments.unpaid', 'Не оплачено')}
+                  </span>
+                </div>
               </div>
             )}
 
