@@ -462,7 +462,7 @@
               }`}
               onClick={() => setActiveTab('calculate')}
             >
-              {t('calculateServices.calculate', 'Calculate')}
+              {t('calculateServices.calculate', )}
             </button>
             <button
               className={`py-2 px-4 ${
@@ -617,7 +617,7 @@
                     className="mt-6 w-full bg-[#6C5DD3] text-white px-4 py-2 rounded-lg
                       hover:bg-[#5c4eb3] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? t('common.calculating', 'Calculating...') : t('common.calculate', 'Calculate')}
+                    {loading ? t('common.calculating', 'Calculating...') : t('calculateServices.calculate')}
                   </button>
                 </div>
               </div>
@@ -722,7 +722,7 @@
                   </div>
                 ) : (
                   <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg border border-dashed border-gray-300 dark:border-gray-600 text-center text-gray-500 dark:text-gray-400">
-                    {t('calculateServices.noResults', 'Calculate services to see results')}
+                    {t('calculateServices.noResults',)}
                   </div>
                 )}
               </div>
@@ -733,7 +733,7 @@
             {transactionHistory.length === 0 ? (
               <div className="bg-gray-50 dark:bg-gray-700 p-8 rounded-lg text-center">
                 <p className="text-gray-500 dark:text-gray-400">
-                  {t('transaction.noHistory', 'No transaction history available')}
+                  {t('transaction.noHistory',)}
                 </p>
               </div>
             ) : (
@@ -895,7 +895,7 @@
               <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
                 <div className="flex justify-between items-center">
                   <h2 className="text-lg font-medium">
-                    {t('payments.totalAmount', 'Total Amount')}:
+                    {t('calculateServices.totalAmount')}:
                   </h2>
                   <span className={`text-xl font-bold ${
                     applicationData.total_price === 0
@@ -911,8 +911,8 @@
                     applicationData.total_price === 0 ? 'text-green-500' : 'text-red-500'
                   }`}>
                     {applicationData.total_price === 0 
-                      ? t('payments.fullyPaid', 'Полностью оплачено')
-                      : t('payments.unpaid', 'Не оплачено')}
+                      ? t('calculateServices.fullyPaid', )
+                      : t('calculateServices.unpaid')}
                   </span>
                 </div>
               </div>
@@ -920,7 +920,7 @@
 
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
               <h2 className="text-lg font-medium mb-4">
-                {t('payments.newPayment', 'New Payment')}
+                {t('calculateServices.newPayment', )}
               </h2>
               <form onSubmit={handlePaymentSubmit} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -946,7 +946,7 @@
                       amount: e.target.value
                     }))}
                     className="rounded-md border p-2"
-                    placeholder={t('payments.amount', 'Amount')}
+                    placeholder={t('calculateServices.amount',)}
                     required
                   />
                   <input
@@ -957,21 +957,21 @@
                       comment: e.target.value
                     }))}
                     className="rounded-md border p-2"
-                    placeholder={t('payments.comment', 'Comment')}
+                    placeholder={t('calculateServices.comment',)}
                   />
                 </div>
                 <button
                   type="submit"
                   className="bg-[#6C5DD3] text-white px-4 py-2 rounded-lg hover:bg-[#5c4eb3]"
                 >
-                  {t('payments.submit', 'Submit Payment')}
+                  {t('calculateServices.submit', )}
                 </button>
               </form>
             </div>
 
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
               <h2 className="text-lg font-medium mb-4">
-                {t('payments.history', 'Payment History')}
+                {t('calculateServices.history', )}
               </h2>
               <div className="space-y-4">
                 {payments.map((payment) => (

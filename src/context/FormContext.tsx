@@ -101,6 +101,7 @@ export interface ApplicationFormData {
     storage_id: number;
     product_name?: string;
     storage_name?: string;
+    id?: number;
   }>;
   upload_products: Array<{
     quantity: number;

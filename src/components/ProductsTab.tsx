@@ -34,15 +34,31 @@ interface ProductDisplay {
   category_id: number;
 }
 
+interface UploadProduct {
+  quantity: number;
+  product_id: number;
+  storage_id: number;
+}
+
+interface MappedProduct {
+  quantity: number;
+  product_id: number;
+  storage_id: number;
+  product_name?: string;
+  storage_name?: string;
+  application_id?: number;
+}
+
 interface ProductsTabProps {
   formData: ApplicationFormData;
-  setFormData: (data: ApplicationFormData) => void;
+  setFormData: React.Dispatch<React.SetStateAction<ApplicationFormData>>;
   products: ProductDisplay[];
   storages: Storage[];
   onSuccess: () => void;
+  readOnly?: boolean;
 }
 
-const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, products: initialProducts, storages, onSuccess }) => {
+const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, products: initialProducts, storages, onSuccess, readOnly = false }) => {
   const { t } = useTranslation();
   const [quantity, setQuantity] = useState<number>(0);
   const [selectedProduct, setSelectedProduct] = useState<number>(0);
@@ -107,12 +123,33 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   useEffect(() => {
     if (formData.products && formData.products.length > 0) {
       const updatedProducts = [...initialProducts];
+      
+      if (!readOnly) {
+        const uploadProducts = formData.products
+          .map(product => {
+            const productId = product.id || product.product_id;
+            if (!productId || !product.storage_id) return null;
+            return {
+              quantity: product.quantity,
+              product_id: productId,
+              storage_id: product.storage_id
+            };
+          })
+          .filter((product): product is UploadProduct => product !== null);
+
+        setFormData(prev => ({
+          ...prev,
+          upload_products: uploadProducts
+        }));
+      }
+
       formData.products.forEach((product: Product) => {
-        if (product.product_id) {
-          const existingProduct = initialProducts.find(p => p.id === product.product_id);
-          if (!existingProduct) {
+        if (product.product_id || product.id) {
+          const productId = product.id || product.product_id;
+          const existingProduct = initialProducts.find(p => p.id === productId);
+          if (!existingProduct && productId) {
             updatedProducts.push({
-              id: product.product_id,
+              id: productId,
               name: product.product_name || 'Unknown Product',
               measurement_id: 0,
               category_id: 0,
@@ -122,7 +159,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
       });
       setProducts(updatedProducts);
     }
-  }, [formData.products, initialProducts]);
+  }, [formData.products, initialProducts, readOnly]);
 
   const handleProductSelect = (product: ProductDisplay) => {
     setSelectedProduct(product.id);
@@ -133,59 +170,64 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   const handleAddProduct = () => {
     if (!quantity || !selectedProduct || !selectedStorage) return;
 
-    console.log('Before adding - Current formData:', {
-      products: formData.products,
-      upload_products: formData.upload_products
-    });
+    console.log('Current formData.products:', formData.products);
+    console.log('Current formData.upload_products:', formData.upload_products);
 
-    // Check if product with same product_id and storage_id already exists
     const isDuplicate = formData.products.some(
-      product => 
-        product.product_id === selectedProduct && 
+      (product: Product) => 
+        (product.product_id === selectedProduct || product.id === selectedProduct) && 
         product.storage_id === selectedStorage
     );
 
     if (isDuplicate) {
       console.log('Product already exists in this storage');
-      // Optionally show an error message to the user
       return;
     }
 
-    // Create new product with the required format matching API structure
-    const newProduct = {
+    const newProduct: MappedProduct = {
       quantity,
-      application_id: formData.id,
       product_id: selectedProduct,
       storage_id: selectedStorage,
+      application_id: formData.id,
       product_name: getProductName(selectedProduct),
       storage_name: getStorageName(selectedStorage)
     };
 
-    // Get existing products
-    const existingProducts = Array.isArray(formData.products) ? [...formData.products] : [];
-    
-    // Create upload_products array
-    const updatedUploadProducts = [...existingProducts, newProduct].map(product => ({
-      quantity: product.quantity,
-      product_id: product.product_id || selectedProduct,
-      storage_id: product.storage_id || selectedStorage
-    })).filter(product => 
-      product.product_id && 
-      product.storage_id && 
-      product.quantity
-    );
+    setFormData((prev: ApplicationFormData): ApplicationFormData => {
+      // Handle existing products
+      const existingProducts = prev.products.map((product: Product): MappedProduct | null => {
+        const productFromList = products.find(p => 
+          p.name === product.product_name || 
+          p.id === (product.product_id || product.id)
+        );
+        
+        const storage = storages.find(s => s.storage_name === product.storage_name);
+        const storage_id = storage?.id || product.storage_id;
+        const product_id = productFromList?.id || product.product_id || product.id;
 
-    console.log('Debug mapping:', {
-      existingProducts,
-      newProduct,
-      updatedUploadProducts
-    });
+        if (!storage_id || !product_id) {
+          console.warn('Missing required ID for product:', product);
+          return null;
+        }
 
-    // Update form data with both arrays
-    setFormData({
-      ...formData,
-      products: [...existingProducts, newProduct],
-      upload_products: updatedUploadProducts
+        return {
+          quantity: product.quantity,
+          application_id: product.application_id,
+          product_id,
+          storage_id,
+          product_name: product.product_name,
+          storage_name: product.storage_name
+        };
+      }).filter((product): product is MappedProduct => product !== null);
+
+      const updatedFormData: ApplicationFormData = {
+        ...prev,
+        products: [...existingProducts, newProduct],
+        upload_products: prev.upload_products
+      };
+
+      console.log('Final updated formData:', updatedFormData);
+      return updatedFormData;
     });
 
     // Reset form fields
@@ -196,34 +238,24 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   };
 
   const handleRemoveProduct = (index: number) => {
-    const currentProducts = Array.isArray(formData.products) ? [...formData.products] : [];
-    
-    // Remove the product at the specified index
-    const updatedProducts = currentProducts.filter((_, i) => i !== index);
-    
-    // Recreate upload_products array from the remaining products, ensuring all required fields
-    const updatedUploadProducts = updatedProducts.map(product => ({
-      quantity: product.quantity,
-      product_id: product.product_id,
-      storage_id: product.storage_id
-    })).filter(product => 
-      product.product_id && 
-      product.storage_id && 
-      product.quantity
-    );
+    setFormData(prev => {
+      const existingProducts = Array.isArray(prev.products) ? [...prev.products] : [];
+      const existingUploadProducts = Array.isArray(prev.upload_products) ? [...prev.upload_products] : [];
+      
+      const updatedProducts = existingProducts.filter((_, i) => i !== index);
+      const updatedUploadProducts = existingUploadProducts.filter((_, i) => i !== index);
 
-    setFormData({
-      ...formData,
-      products: updatedProducts,
-      upload_products: updatedUploadProducts
+      return {
+        ...prev,
+        products: updatedProducts,
+        upload_products: updatedUploadProducts
+      };
     });
   };
 
   const handleCreateProductSuccess = (newProduct: CreateProductResponse) => {
-    // Update the products state with the newly created product
     setProducts(prev => [...prev, newProduct]);
     setFilteredProducts(prev => [...prev, newProduct]);
-    // Select the newly created product
     handleProductSelect(newProduct);
   };
 
@@ -234,7 +266,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   };
 
   return (
-    <div className="bg-white dark:bg-gray-900 p-3 sm:p-6 rounded-lg shadow-sm">
+    <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow-sm">
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
         <div className="space-y-2 sm:space-y-4">
           <label className="block text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
@@ -246,10 +278,12 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
               value={productSearch}
               onChange={(e) => setProductSearch(e.target.value)}
               onClick={handleInputClick}
-              className="w-full rounded-md border border-gray-300 dark:border-gray-600 
+              className={`w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ${readOnly ? 'cursor-not-allowed bg-gray-50' : ''}`}
               placeholder={t('editApplication.searchProduct')}
+              readOnly={readOnly}
+              disabled={readOnly}
             />
             {showProductDropdown && (
               <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
@@ -286,9 +320,10 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
           <select
             value={selectedStorage}
             onChange={(e) => setSelectedStorage(Number(e.target.value))}
-            className="w-full rounded-md border border-gray-300 dark:border-gray-600 
+            className={`w-full rounded-md border border-gray-300 dark:border-gray-600 
               px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]
-              bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ${readOnly ? 'cursor-not-allowed bg-gray-50' : ''}`}
+            disabled={readOnly}
           >
             <option value={0} className="dark:bg-gray-700">{t('editApplication.selectStorage')}</option>
             {storages.map((storage) => (
@@ -309,16 +344,17 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
               min="0"
               value={quantity}
               onChange={(e) => setQuantity(Number(e.target.value))}
-              className="flex-1 rounded-md border border-gray-300 dark:border-gray-600 
+              className={`flex-1 rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ${readOnly ? 'cursor-not-allowed bg-gray-50' : ''}`}
+              disabled={readOnly}
             />
             <button
               onClick={handleAddProduct}
-              disabled={!quantity || !selectedProduct || !selectedStorage}
-              className="px-6 py-2 bg-[#6C5DD3] text-white rounded-lg font-medium
+              disabled={!quantity || !selectedProduct || !selectedStorage || readOnly}
+              className={`px-6 py-2 bg-[#6C5DD3] text-white rounded-lg font-medium
                 hover:bg-[#5b4eb3] disabled:opacity-50 disabled:cursor-not-allowed
-                transition-colors duration-200 ease-in-out shadow-sm whitespace-nowrap"
+                transition-colors duration-200 ease-in-out shadow-sm whitespace-nowrap ${readOnly ? 'cursor-not-allowed bg-gray-50' : ''}`}
             >
               {t('editApplication.addProduct')}
             </button>
@@ -365,15 +401,17 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
         initialProductName={productSearch}
       />
 
-      <div className="mt-6 flex justify-end">
-        <button
-          onClick={onSuccess}
-          className="px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
-            hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out shadow-sm"
-        >
-          {t('editApplication.next', 'Next')}
-        </button>
-      </div>
+      {!readOnly && (
+        <div className="mt-6 flex justify-end">
+          <button
+            onClick={onSuccess}
+            className="px-6 py-2.5 bg-[#6C5DD3] text-white rounded-lg font-medium
+              hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out shadow-sm"
+          >
+            {t('editApplication.next', 'Next')}
+          </button>
+        </div>
+      )}
     </div>
   );
 };

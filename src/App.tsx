@@ -43,6 +43,7 @@ import TransactionPage from "./pages/TransactionPage";
 import { Provider } from "react-redux";
 import store from "./storage/storage";
 import ArchiveApplicationList from "./pages/ArchiveApplicationList";
+import ArchiveApplicationShowDetails from "./pages/ArchiveApplicationShowDetails";
 const queryClient = new QueryClient();
 
 function App() {
@@ -95,6 +96,7 @@ function App() {
                 <Route path="/transaction/:id" element={<TransactionPage/>}/>
                 <Route path="/transaction" element={<TransactionPage/>}/>
                 <Route path="/archive-application-list" element={<ArchiveApplicationList/>}/>
+                <Route path="/archive/:id" element={<ArchiveApplicationShowDetails/>}/>
               </Route>
             </Routes>
           </Router>

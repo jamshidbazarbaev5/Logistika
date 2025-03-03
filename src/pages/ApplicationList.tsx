@@ -484,7 +484,7 @@ export default function ApplicationList() {
             dark:focus:ring-offset-gray-800 transition-all duration-200 flex items-center justify-center"
           >
             <Download className="w-4 h-4 mr-2" />
-            {t("applicationList.downloadExcel", "Download Excel")}
+            {t("applicationList.downloadExcel")}
           </button>
           <button
             onClick={() => navigate("/create-application")}
@@ -500,7 +500,7 @@ export default function ApplicationList() {
       <div className="mb-6 bg-white dark:bg-gray-800 rounded-lg shadow">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-lg font-medium text-gray-900 dark:text-white">
-            {t('applicationList.search.title', 'Search Applications')}
+            {t('applicationList.search.title')}
           </h2>
         </div>
         <div className="p-4">

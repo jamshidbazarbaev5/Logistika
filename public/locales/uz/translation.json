@@ -251,6 +251,10 @@
       "unpaid": "To'lanmagan",
       "completed": "Yakunlangan"
     },
+    "search":{
+      "title":"Ariza izlash"
+    },
+    "downloadExcel": "Excel yuklash",
     "calculate": "Hisoblash",
     "next": "Keyingi",
     "numberOfApplication": "Ariza Raqami",
@@ -460,6 +464,7 @@
   "menu": {
     "mainMenu": "ASOSIY MENYU",
     "general": "UMUMIY",
+    "archiveApplication": "Arxiv Arizalar",
     "others": "BOSHQALAR",
     "firm": "Organizatsiyalar",
     "storage": "Omborlar",
@@ -482,6 +487,7 @@
   },
   "calculateServices": {
     "title": "Hisoblash Xizmatlari",
+    "noResults": "Xizmatlar topilmadi",
     "unpaidAmount": "To'lanmagan Summa",
     "goToPayments": "To'lovlarga o'tish",
     "applicationServices": "Arizani Xizmatlari",
@@ -583,7 +589,9 @@
     "inputPlaceholder": "Mahsulot nomini kiriting"
   },
   "editApplication": {
+    "status": "Status",
     "amount":"Qiymati",
+
     "numberOfApplication":"Ariza Raqami",
     "basePrice":"Asosiy Narx",
     "extraPrice":"Qoshimcha Narx",

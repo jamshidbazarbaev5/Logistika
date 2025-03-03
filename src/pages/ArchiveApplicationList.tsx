@@ -1,15 +1,10 @@
-import { useState, useEffect, Fragment } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { Menu, Transition } from "@headlessui/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-import { api } from "../api/api";
-import ConfirmModal from "../components/ConfirmModal";
-import SuccessModal from "../components/SuccessModal";
 import { SearchBar, SearchField } from "../components/SearchBar";
-import { Crown, User, Download } from "lucide-react";
+import { Crown, User, Download, Eye } from "lucide-react";
+import { api } from "../api/api";
+import { useNavigate } from "react-router-dom";
 
-import { Calculator } from "lucide-react"; 
 interface ApplicationMode {
   id: number;
   mode_id: number;
@@ -137,29 +132,28 @@ interface ProductApiResponse {
 
 type ApplicationStatus = 'active' | 'unpaid' | 'completed';
 
-const getStatusClasses = (status: ApplicationStatus) => {
-  switch (status) {
-    case 'active':
-      return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-    case 'unpaid':
-      return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-    case 'completed':
-      return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
-    default:
-      return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+const STATUS_CONFIG = {
+  completed: {
+    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300',
+    label: 'Completed'
+  },
+  active: {
+    color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300',
+    label: 'Active'
+  },
+  unpaid: {
+    color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300',
+    label: 'Unpaid'
   }
-};
+} as const;
+
+
 
 export default function ArchiveApplicationList() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [applicationToDelete] = useState<Application | null>(null);
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
   const [firms, setFirms] = useState<Record<number, string>>({});
   const [modes, setModes] = useState<Record<number, ApplicationMode[]>>({});
   const [searchParams, setSearchParams] = useState<SearchParams>({
@@ -189,6 +183,9 @@ export default function ArchiveApplicationList() {
 
   // Add state for available modes
   const [availableModes, setAvailableModes] = useState<Mode[]>([]);
+
+  // Add navigation hook
+  const navigate = useNavigate();
 
   // Add useEffect to fetch products when component mounts
   useEffect(() => {
@@ -367,6 +364,11 @@ export default function ArchiveApplicationList() {
     }
   }, [isFormModalOpen]);
 
+  // Add handler for viewing details
+  const handleViewDetails = (applicationId: number) => {
+    navigate(`/archive/${applicationId}`);
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -515,6 +517,12 @@ export default function ArchiveApplicationList() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("applicationList.table.modes", "Modes")}
               </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t("applicationList.table.status", "Status")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t("applicationList.table.actions", "Actions")}
+              </th>
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
@@ -567,6 +575,20 @@ export default function ArchiveApplicationList() {
                         </span>
                       );
                     })}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_CONFIG[application.status].color}`}>
+                      {t(`applicationList.status.${application.status}`, STATUS_CONFIG[application.status].label)}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    <button
+                      onClick={() => handleViewDetails(application.id)}
+                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-[#6C5DD3] hover:bg-[#5b4eb3] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6C5DD3]"
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      {t("applicationList.viewDetails", "View Details")}
+                    </button>
                   </td>
                 </tr>
               );

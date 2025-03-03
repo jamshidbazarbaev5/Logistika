@@ -6,14 +6,14 @@ const BASE_URL = 'https://cargo-calc.uz/api/v1';
 
 export const api = axios.create({
   baseURL: BASE_URL,
-  headers:{
-    'Accept':"application/json"
-  }
+  headers: {
+    'Content-Type': 'application/json',
+  },
 });
 
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

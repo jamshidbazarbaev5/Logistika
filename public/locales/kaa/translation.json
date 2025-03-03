@@ -29,6 +29,7 @@
   },
   "createApplication": {
     "title": "Ótinish Jaratıw",
+    "vipApplication": "VIP Ariza",
     "storage": "Ombor",
     "product": "Ónim",
     "units": "Birlikler",
@@ -276,6 +277,9 @@
     "cancelText": "Biykarlaw"
   },
   "applicationList": {
+    "search":{
+      "title":"O'tinishlerid izlew"
+    },
     "previous": "Aldıńǵı",
     "calculate": "Esablaw",
     "STATUS":"Status",
@@ -285,7 +289,7 @@
       "completed": "Tamamlanǵan"
     },
     "next": "Keyingi",
-
+    "downloadExcel": "Excel yuklash",
     "numberOfApplication": "Ótinish Nomeri",
     "totalCost": "Jami Baha",
     "title": "Ótinishler",
@@ -504,6 +508,7 @@
   "menu": {
     "mainMenu": "BAS MENYU",
     "general": "ULÍWMA",
+    "archiveApplication": "Arxiv arızalar",
     "others": "BASQALAR",
     "firm": "Organizatsiyalar",
     "storage": "Qoymalar",
@@ -617,6 +622,7 @@
     "uploadPhotos": "Foto yuklash",
     "photos": "Foto",
     "amount":"Mug'dar",
+    "status": "Status",
     "basePrice":"Asasiy baxa",
     "extraPrice":"Qosımsha baxa",
     "currentDeclorationFile": "Deklaraciya Faylı",
@@ -680,6 +686,7 @@
     "errorMessage": "Ónim jaratıwda qátelik júz berdi. Iltimas, qaytadan urınıp kóriń."
   },
   "calculateServices": {
+    "noResults": " xizmetler joq",
     "title": "Xızmetlerdi Esaplaw",
     "unpaidAmount": "To'lanmagan Summa",
     "goToPayments": "To'lovlarga o'tish",
