@@ -79,7 +79,7 @@ interface Application {
   transport: Transport[];
   number_of_application:string
   products: Product[];
-  status: ApplicationStatus;
+  status: 'active' | 'unpaid' | 'completed' | string;
 }
 
 interface SearchParams extends Record<string, string> {
@@ -150,6 +150,11 @@ const getStatusClasses = (status: ApplicationStatus) => {
     default:
       return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
   }
+};
+
+// Add this function before your component
+const isRelevantStatus = (status: string) => {
+  return status === 'active' || status === 'unpaid';
 };
 
 export default function ApplicationList() {
@@ -376,7 +381,6 @@ export default function ApplicationList() {
     return <div className="text-red-500 text-center p-4">{error}</div>;
   }
 
-
   const confirmDelete = async () => {
     if (!applicationToDelete) return;
 
@@ -430,8 +434,6 @@ export default function ApplicationList() {
     );
   };
 
-
-
   const handleEditClick = (application: Application) => {
     navigate(`/edit-application/${application.id}`);
   };
@@ -469,6 +471,9 @@ export default function ApplicationList() {
     link.click();
     document.body.removeChild(link);
   };
+
+  // Inside your component, before rendering the table:
+  const filteredApplications = applications.filter(app => isRelevantStatus(app.status));
 
   return (
     <div className="p-2 sm:p-4 md:p-6">
@@ -551,7 +556,7 @@ export default function ApplicationList() {
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            {applications.map((application, index) => {
+            {filteredApplications.map((application, index) => {
               console.log(`Modes for application ${application.id}:`, modes[application.id]);
               return (
                 <tr key={application.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">

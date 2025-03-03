@@ -165,6 +165,18 @@ export default function EditApplication() {
     try {
       const formDataToSend = new FormData();
 
+      // Get the auth token from wherever you store it (localStorage, context, etc.)
+      const token = localStorage.getItem('accessToken'); // or however you store your token
+
+      if (!token) {
+        setModalMessage(t('common.unauthorized'));
+        setShowSuccessModal(true);
+        setTimeout(() => {
+          navigate('/login'); // or wherever your login page is
+        }, 1500);
+        return;
+      }
+
       Object.entries(formData).forEach(([key, value]) => {
         if (key === 'decloration_date' && value) {
           formDataToSend.append(key, formatDateForAPI(value as string));
@@ -200,6 +212,7 @@ export default function EditApplication() {
       const response = await api.put(`/application/${id}/`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`, // Add the auth token
         },
       });
       
@@ -212,6 +225,17 @@ export default function EditApplication() {
       }
     } catch (error: any) {
       console.error('Error updating application:', error);
+      if (error.response?.status === 401) {
+        // Handle unauthorized error
+        setModalMessage(t('common.sessionExpired'));
+        setShowSuccessModal(true);
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
+        return;
+      }
+      
+      // Handle other errors as before
       let errorMessages = '';
       if (error.response?.data) {
         errorMessages = Object.entries(error.response.data)
