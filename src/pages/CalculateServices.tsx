@@ -602,7 +602,7 @@
                     {(!application?.keeping_services.some(service => service.amount > 0) && 
                      !application?.working_services.some(service => service.quantity > 0)) && (
                       <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-                        {t('calculateServices.noServicesAvailable', 'No services available for calculation')}
+                        {t('calculateServices.noServicesAvailable')}
                       </div>
                     )}
                   </div>
@@ -733,7 +733,7 @@
             {transactionHistory.length === 0 ? (
               <div className="bg-gray-50 dark:bg-gray-700 p-8 rounded-lg text-center">
                 <p className="text-gray-500 dark:text-gray-400">
-                  {t('transaction.noHistory',)}
+                  {t('calculateServices.noHistory',)}
                 </p>
               </div>
             ) : (

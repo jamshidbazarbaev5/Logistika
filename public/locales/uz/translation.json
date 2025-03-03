@@ -488,6 +488,7 @@
   "calculateServices": {
     "title": "Hisoblash Xizmatlari",
     "noResults": "Xizmatlar topilmadi",
+    "noServicesAvailable": "Xizmatlar mavjud emas",
     "unpaidAmount": "To'lanmagan Summa",
     "goToPayments": "To'lovlarga o'tish",
     "applicationServices": "Arizani Xizmatlari",

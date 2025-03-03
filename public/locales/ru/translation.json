@@ -638,6 +638,7 @@
     "noResults": "Услуги не найдены",
     "noHistory": "История транзакций не найдена",
     "fullyPaid": "Полностью оплачено",
+    "noServicesAvailable": "Услуги не найдены",
     "unpaid": "Не оплачено",
     "goToPayments": "Перейти к Платежам",
     "unpaidAmount": "Неоплаченная сумма",

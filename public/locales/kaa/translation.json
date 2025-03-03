@@ -688,6 +688,7 @@
   "calculateServices": {
     "noResults": " xizmetler joq",
     "title": "Xızmetlerdi Esaplaw",
+    "noServicesAvailable": "Xizmatlar mavjud emas",
     "unpaidAmount": "To'lanmagan Summa",
     "goToPayments": "To'lovlarga o'tish",
     "applicationServices": "Ótinish Xızmetleri",
