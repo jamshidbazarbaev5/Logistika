@@ -7,6 +7,7 @@
   import { useNavigate } from 'react-router-dom';
   import ErrorModal from '../components/ErrorModal';
   import { ChevronDownIcon } from '@heroicons/react/24/outline';
+  import { ArrowLeft } from 'lucide-react';
 
   interface KeepingService {
     id: number;
@@ -458,9 +459,18 @@
 
     return (
       <div className="p-6">
-        <h1 className="text-2xl font-semibold mb-6">
-          {t('calculateServices.title', 'Calculate Services')}
-        </h1>
+        <div className="flex items-center gap-4 mb-6">
+          <button
+            onClick={() => navigate(`/edit-application/${id}`)}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+            title={t('common.back')}
+          >
+            <ArrowLeft className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+          </button>
+          <h1 className="text-2xl font-semibold">
+            {t('calculateServices.title', 'Calculate Services')}
+          </h1>
+        </div>
 
         <div className="mb-6 border-b">
           <div className="flex space-x-4">
