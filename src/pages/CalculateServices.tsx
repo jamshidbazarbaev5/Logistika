@@ -458,7 +458,7 @@
    
 
     return (
-      <div className="p-6">
+      <div className="p-6 bg-white dark:bg-gray-900">
         <div className="flex items-center gap-4 mb-6">
           <button
             onClick={() => navigate(`/edit-application/${id}`)}
@@ -472,7 +472,7 @@
           </h1>
         </div>
 
-        <div className="mb-6 border-b">
+        <div className="mb-6 border-b border-gray-200 dark:border-gray-700">
           <div className="flex space-x-4">
             <button
               className={`py-2 px-4 ${
@@ -567,7 +567,8 @@
                                       value={amounts[service.service_type_id] || 0}
                                       onChange={(e) => handleAmountChange(service.service_type_id, parseInt(e.target.value) || 0)}
                                       className="w-24 rounded-md border border-gray-300 dark:border-gray-600 
-                                        bg-white dark:bg-gray-700 px-3 py-2 text-sm"
+                                        bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100
+                                        focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]"
                                     />
                                   </div>
                                 </div>
@@ -608,7 +609,8 @@
                                         value={workingAmounts[service.service_id] || 0}
                                         onChange={(e) => handleWorkingAmountChange(service.service_id, parseInt(e.target.value) || 0)}
                                         className="w-24 rounded-md border border-gray-300 dark:border-gray-600 
-                                          bg-white dark:bg-gray-700 px-3 py-2 text-sm"
+                                          bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100
+                                          focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]"
                                       />
                                     </div>
                                   </div>
@@ -751,7 +753,7 @@
         ) : activeTab === 'history' ? (
           <div className="space-y-4">
             {transactionHistory.length === 0 ? (
-              <div className="bg-gray-50 dark:bg-gray-700 p-8 rounded-lg text-center">
+              <div className="bg-gray-50 dark:bg-gray-800 p-8 rounded-lg text-center">
                 <p className="text-gray-500 dark:text-gray-400">
                   {t('calculateServices.noHistory',)}
                 </p>
@@ -762,15 +764,15 @@
                   key={transaction.id}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
                 >
-                  {/* Clickable Header */}
+                  {/* Header */}
                   <button
                     onClick={() => toggleTransaction(transaction.id)}
-                    className="w-full text-left px-6 py-4 bg-gray-50 dark:bg-gray-750 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150 ease-in-out"
+                    className="w-full text-left px-6 py-4 bg-gray-50 dark:bg-gray-800"
                   >
                     <div className="flex justify-between items-center">
                       <div className="flex items-center space-x-4">
                         <ChevronDownIcon 
-                          className={`h-5 w-5 text-gray-500 transition-transform duration-200 
+                          className={`h-5 w-5 text-gray-500 dark:text-gray-400 transition-transform duration-200 
                             ${expandedTransactions.includes(transaction.id) ? 'transform rotate-180' : ''}`}
                         />
                         <div>
@@ -784,20 +786,15 @@
                       </div>
                       <div className="text-right">
                         <span className="text-sm text-gray-500 dark:text-gray-400">
-                          {new Date(transaction.date_of_transaction).toLocaleDateString(undefined, {
-                            year: 'numeric',
-                            month: 'long',
-                            day: 'numeric'
-                          })}
+                          {new Date(transaction.date_of_transaction).toLocaleDateString()}
                         </span>
-                       
                       </div>
                     </div>
                   </button>
 
                   {/* Expandable Content */}
                   {expandedTransactions.includes(transaction.id) && (
-                    <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700">
+                    <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                       {/* Customer Info */}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                         <div className="space-y-1">
@@ -826,11 +823,11 @@
                           <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
                             {t('transaction.services', 'Services')}
                           </h4>
-                          <div className="bg-gray-50 dark:bg-gray-750 rounded-lg p-4 space-y-3">
+                          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
                             {transaction.keeping_services.map((service, index) => (
                               <div 
                                 key={`keeping-${index}`} 
-                                className="flex justify-between items-center text-sm border-b last:border-0 border-gray-200 dark:border-gray-700 pb-2 last:pb-0"
+                                className="flex justify-between items-center text-sm border-b last:border-0 border-gray-200 dark:border-gray-600 pb-2 last:pb-0"
                               >
                                 <div className="flex items-center space-x-2">
                                   <span className="text-gray-900 dark:text-gray-100">
@@ -850,7 +847,7 @@
                             {transaction.working_services.map((service, index) => (
                               <div 
                                 key={`working-${index}`} 
-                                className="flex justify-between items-center text-sm border-b last:border-0 border-gray-200 dark:border-gray-700 pb-2 last:pb-0"
+                                className="flex justify-between items-center text-sm border-b last:border-0 border-gray-200 dark:border-gray-600 pb-2 last:pb-0"
                               >
                                 <div className="flex items-center space-x-2">
                                   <span className="text-gray-900 dark:text-gray-100">
@@ -876,11 +873,11 @@
                           <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
                             {t('transaction.products', 'Products')}
                           </h4>
-                          <div className="bg-gray-50 dark:bg-gray-750 rounded-lg p-4 space-y-3">
+                          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
                             {transaction.products.map((item, index) => (
                               <div 
                                 key={index} 
-                                className="flex justify-between items-center text-sm border-b last:border-0 border-gray-200 dark:border-gray-700 pb-2 last:pb-0"
+                                className="flex justify-between items-center text-sm border-b last:border-0 border-gray-200 dark:border-gray-600 pb-2 last:pb-0"
                               >
                                 <div className="flex items-center space-x-2">
                                   <span className="text-gray-900 dark:text-gray-100">
@@ -950,10 +947,16 @@
                       ...prev,
                       payment_method: Number(e.target.value)
                     }))}
-                    className="rounded-md border p-2"
+                    className="rounded-md border border-gray-300 dark:border-gray-600 
+                      bg-white dark:bg-gray-700 p-2 text-gray-900 dark:text-gray-100
+                      focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]"
                   >
                     {paymentMethods.map((method) => (
-                      <option key={method.id} value={method.id}>
+                      <option 
+                        key={method.id} 
+                        value={method.id}
+                        className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                      >
                         {method.payment_method}
                       </option>
                     ))}
@@ -965,7 +968,10 @@
                       ...prev,
                       amount: e.target.value
                     }))}
-                    className="rounded-md border p-2"
+                    className="rounded-md border border-gray-300 dark:border-gray-600 
+                      bg-white dark:bg-gray-700 p-2 text-gray-900 dark:text-gray-100
+                      focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]
+                      placeholder-gray-500 dark:placeholder-gray-400"
                     placeholder={t('calculateServices.amount',)}
                     required
                   />
@@ -976,7 +982,10 @@
                       ...prev,
                       comment: e.target.value
                     }))}
-                    className="rounded-md border p-2"
+                    className="rounded-md border border-gray-300 dark:border-gray-600 
+                      bg-white dark:bg-gray-700 p-2 text-gray-900 dark:text-gray-100
+                      focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]
+                      placeholder-gray-500 dark:placeholder-gray-400"
                     placeholder={t('calculateServices.comment', 'Comment (optional)')}
                   />
                 </div>
@@ -1065,6 +1074,7 @@
           isOpen={errorModalOpen}
           onClose={() => setErrorModalOpen(false)}
           message={errorMessage}
+          // className="bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
         />
       </div>
     );

@@ -337,7 +337,7 @@ export default function Transaction() {
         <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
           <div className="grid grid-cols-1 gap-6">
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium mb-1 dark:text-gray-200">
                 {t('transaction.fullName')}
               </label>
               <input
@@ -346,11 +346,11 @@ export default function Transaction() {
                 value={formData.full_name}
                 onChange={handleInputChange}
                 placeholder={t('transaction.fullNamePlaceholder')}
-                className="w-full rounded-md border p-2"
+                className="w-full rounded-md border p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium mb-1 dark:text-gray-200">
                 {t('transaction.phoneNumber')}
               </label>
               <input
@@ -359,11 +359,11 @@ export default function Transaction() {
                 value={formData.phone_number}
                 onChange={handleInputChange}
                 placeholder={t('transaction.phoneNumberPlaceholder')}
-                className="w-full rounded-md border p-2"
+                className="w-full rounded-md border p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
+              <label className="block text-sm font-medium mb-1 dark:text-gray-200">
                 {t('transaction.carNumber')}
               </label>
               <input
@@ -372,7 +372,7 @@ export default function Transaction() {
                 value={formData.car_number}
                 onChange={handleInputChange}
                 placeholder={t('transaction.carNumberPlaceholder')}
-                className="w-full rounded-md border p-2"
+                className="w-full rounded-md border p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               />
             </div>
           </div>
@@ -445,7 +445,7 @@ export default function Transaction() {
                         max={product.quantity}
                         value={products.find(p => p.product_id === product.product_id)?.quantity || 1}
                         onChange={(e) => handleProductQuantityChange(product.product_id, parseInt(e.target.value))}
-                        className="w-20 rounded-md border p-2"
+                        className="w-20 rounded-md border p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                       />
                       <span className="text-sm text-gray-500">units</span>
                     </div>
@@ -481,7 +481,7 @@ export default function Transaction() {
                 <select
                   value={payment.payment_method}
                   onChange={(e) => handlePaymentChange(index, 'payment_method', Number(e.target.value))}
-                  className="rounded-md border p-2"
+                  className="rounded-md border p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 >
                   <option value="">{t('transaction.selectPaymentMethod')}</option>
                   {paymentMethods.map((method) => (
@@ -495,14 +495,14 @@ export default function Transaction() {
                   value={payment.amount}
                   onChange={(e) => handlePaymentChange(index, 'amount', Number(e.target.value))}
                   placeholder={t('transaction.amountPlaceholder')}
-                  className="rounded-md border p-2"
+                  className="rounded-md border p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 />
                 <input
                   type="text"
                   value={payment.comment}
                   onChange={(e) => handlePaymentChange(index, 'comment', e.target.value)}
                   placeholder={t('transaction.commentPlaceholder')}
-                  className="w-full rounded-md border p-2"
+                  className="w-full rounded-md border p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                 />
               </div>
             ))}

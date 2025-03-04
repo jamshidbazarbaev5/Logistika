@@ -606,7 +606,7 @@ export default function ApplicationList() {
                           key={mode.mode_id}
                           className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 mr-2 mb-1"
                         >
-                          {modeInfo ? `  (${modeInfo.code_mode})` : `Mode ${mode.mode_id}`}
+                          {modeInfo ? `  ${modeInfo.code_mode}` : `Mode ${mode.mode_id}`}
                         </span>
                       );
                     })}
