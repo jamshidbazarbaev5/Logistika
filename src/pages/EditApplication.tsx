@@ -14,6 +14,7 @@ import type { ApplicationFormData } from '../context/FormContext';
 
 interface EditApplicationFormState extends Omit<ApplicationFormData, 'decloration_file'> {
   decloration_file?: string | File;
+  deported_date?: string;
   [key: string]: any;
 }
 
@@ -106,14 +107,15 @@ export default function EditApplication() {
           applicationData.status = 'active';
         }
 
-        // Transform dates
+        // Transform dates using the new helper function
         if (applicationData.coming_date) {
-          const [day, month, year] = applicationData.coming_date.split('.');
-          applicationData.coming_date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          applicationData.coming_date = formatDateString(applicationData.coming_date);
         }
         if (applicationData.decloration_date) {
-          const [day, month, year] = applicationData.decloration_date.split('.');
-          applicationData.decloration_date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+          applicationData.decloration_date = formatDateString(applicationData.decloration_date);
+        }
+        if (applicationData.deported_date) {
+          applicationData.deported_date = formatDateString(applicationData.deported_date);
         }
 
         // Transform keeping services
@@ -257,7 +259,7 @@ export default function EditApplication() {
     // If it's in DD.MM.YYYY format, convert it
     if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateString)) {
       const [day, month, year] = dateString.split('.');
-      return `${year}-${month}-${day}`;
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     }
 
     // Try to create a valid date object and format it
@@ -466,6 +468,32 @@ export default function EditApplication() {
     return `${truncatedName}.${extension}`;
   };
 
+  // Add this helper function if it doesn't exist
+  const formatDateString = (dateStr: string | null | undefined): string => {
+    if (!dateStr) return '';
+
+    // Handle DD/MM/YY format
+    if (dateStr.includes('/')) {
+      const [day, month, year] = dateStr.split('/');
+      // Convert 2-digit year to 4-digit year
+      const fullYear = year.length === 2 ? `20${year}` : year;
+      return `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+
+    // Handle DD.MM.YYYY format
+    if (dateStr.includes('.')) {
+      const [day, month, year] = dateStr.split('.');
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    }
+
+    // If it's already in YYYY-MM-DD format, return as is
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+      return dateStr;
+    }
+
+    return dateStr;
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -672,6 +700,19 @@ export default function EditApplication() {
                       value={formData.coming_date || ''}
                       onChange={(e) => handleDateChange(e, 'coming_date')}
                       className={inputClassName}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {t('editApplication.deportedDate')}
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.deported_date ? formatDateString(formData.deported_date) : ''}
+                      readOnly
+                      disabled
+                      className={`${inputClassName} bg-gray-100 dark:bg-gray-800 cursor-not-allowed`}
                     />
                   </div>
                 </div>

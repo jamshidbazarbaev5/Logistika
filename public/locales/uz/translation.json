@@ -629,6 +629,7 @@
     "inputPlaceholder": "Mahsulot nomini kiriting"
   },
   "editApplication": {
+    "deportedDate":"Ketish sanasi",
     "status": "Status",
     "amount":"Qiymati",
     "clickToUpload":"Yuklash uchun bosing",
