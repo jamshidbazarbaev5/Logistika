@@ -335,7 +335,7 @@ export default function ProductList() {
             <form onSubmit={handleEditSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t("productList.form.name", "Name")}
+                  {t("productList.form.name")}
                 </label>
                 <input
                   type="text"
@@ -348,7 +348,7 @@ export default function ProductList() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t("productList.form.measurement", "Measurement")}
+                  {t("productList.form.measurement", )}
                 </label>
                 <select
                   name="measurement_id"
@@ -366,7 +366,7 @@ export default function ProductList() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t("productList.form.category", "Category")}
+                  {t("productList.form.category",)}
                 </label>
                 <select
                   name="category_id"

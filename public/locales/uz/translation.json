@@ -139,17 +139,27 @@
     "submit": "Rasm Yuklash",
     "successMessage": "Rasm muvaffaqiyatli yuklandi!"
   },
-  "userManagement":{
-    "addUser":"Foydalanuvchini Yaratish",
-    "title":"Foydalanuvchilar",
-    "createUser":"Foydalanuvchini Yaratish",
-    "editUser":"Foydalanuvchini Tahrirlash",
-    "cancel":"Bekor qilish",
-    "email":"Elektron pochta",
-    "firstName":"Ism",
-    "lastName":"Familiya",
-    "username":"Foydalanuvchi nomi",
-    "password":"Parol"
+  "userManagement": {
+    "create":"Foydalanuvchi Yaratish",
+    "title": "Foydalanuvchilar",
+    "addUser": "Foydalanuvchi Qo'shish",
+    "editUser": "Foydalanuvchini Tahrirlash",
+    "createUser": "Foydalanuvchi Yaratish",
+    "username": "Foydalanuvchi Nomi",
+    "email": "Elektron Pochta",
+    "firstName": "Ism",
+    "lastName": "Familiya",
+    "password": "Parol",
+    "actions": "Amallar",
+    "cancel": "Bekor qilish",
+    "update": "Yangilash",
+    "delete": "O'chirish",
+    "deleteTitle": "Foydalanuvchini O'chirish",
+    "deleteConfirmation": "Haqiqatan ham \"{{username}}\" foydalanuvchisini o'chirishni xohlaysizmi? Bu amalni qaytarib bo'lmaydi.",
+    "deleteSuccess": "Foydalanuvchi muvaffaqiyatli o'chirildi",
+    "createSuccess": "Foydalanuvchi muvaffaqiyatli yaratildi",
+    "updateSuccess": "Foydalanuvchi muvaffaqiyatli yangilandi",
+    "errorMessage": "Foydalanuvchini saqlashda xatolik yuz berdi"
   },
   "createKeepingService": {
     "baseDays":"Asosiy kunlar",
@@ -243,6 +253,8 @@
     "successMessage": "Mahsulot miqdori muvaffaqiyatli yaratildi!"
   },
   "mode": {
+    "createSubtitle": "Rejim Yaratish",
+    "createTitle": "Rejim Yaratish",
     "title": "Rejim Yaratish",
     "subtitle": "Yangi rejim qo'shish",
     "name": "Rejim Nomi",
@@ -350,9 +362,11 @@
     "subtitle": "Tizimga yangi to'lov usulini qo'shing",
     "paymentMethodName": "To'lov Usuli Nomi",
     "successMessage": "To'lov usuli muvaffaqiyatli yaratildi!",
-    "placeholder": "To'lov usuli nomini kiriting"
+    "placeholder": "To'lov usuli nomini kiriting",
+    "submit":"To'lov Usulini Yaratish"
   },
   "paymentMethodList": {
+    "subtitle":"Tizimdagi to'lov usullarini ko'rish",
     "title": "To'lov Usullari",
     "createPaymentMethod": "To'lov Usulini Yaratish",
     "idColumn": "ID",
@@ -450,7 +464,14 @@
     "firmInputPlaceholder": "Organizatsiya nomini kiriting",
     "INNInputPlaceholder": "STIR raqamini kiriting"
   },
+  "basePrice":"Asosiy Narx",
+  "extraPrice":"Qo'shimcha Narx",
+  "units":"O'lchov Birligi",
   "transportList": {
+    "form":{
+      "type":"Transport Turi",
+      "number":"Transport Raqami"
+    },
     "title": "Transportlar",
     "createTransport": "Transport Turini Yaratish",
     "createNumber": "Transport Raqamini Qo'shish",
@@ -557,6 +578,10 @@
     "noTransactions": "Tranzaksiyalar topilmadi"
   },
 "transaction":{
+  "success":{
+    "title": "To'lov Yaratildi",
+    "message": "To'lov muvaffaqiyatli yaratildi"
+  },
   "title": "To'lov Yaratish",
   "transactionID":"Tranzaksiya",
   "fullName": "To'liq Ismi",
@@ -614,6 +639,7 @@
     "createSuccess": "Saqlash xizmati muvaffaqiyatli yaratildi"
   },
   "productList": {
+    "editTitle": "Mahsulotni Tahrirlash",
     "title": "Mahsulotlar",
     "createProduct": "Mahsulot Yaratish",
     "errorLoading": "Mahsulotlarni yuklashda xatolik yuz berdi",
@@ -626,7 +652,12 @@
     "actions": "Amallar",
     "edit": "Tahrirlash",
     "delete": "O'chirish",
-    "inputPlaceholder": "Mahsulot nomini kiriting"
+    "inputPlaceholder": "Mahsulot nomini kiriting",
+    "form":{
+      "measurement": "O'lchov Birligi",
+      "category": "Kategoriya",
+      "name": "Mahsulot Nomi"
+    }
   },
   "editApplication": {
     "deportedDate":"Ketish sanasi",

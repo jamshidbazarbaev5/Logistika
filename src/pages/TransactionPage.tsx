@@ -522,8 +522,8 @@ export default function Transaction() {
       <SuccessModal
         isOpen={showSuccessModal}
         onClose={handleModalClose}
-        title={t('transaction.success.title', 'Transaction Created')}
-        message={t('transaction.success.message', 'Transaction has been successfully created')}
+        title={t('transaction.success.title', )}
+        message={t('transaction.success.message', )}
       />
 
       <ErrorModal

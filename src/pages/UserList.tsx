@@ -215,7 +215,7 @@ export default function Users() {
               <form onSubmit={handleSubmit}>
                 <div className="space-y-4">
                   <div className="relative">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Username</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('userManagement.username')}</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <User className="h-5 w-5 text-gray-400 dark:text-gray-500" />
@@ -231,7 +231,7 @@ export default function Users() {
                   </div>
 
                   <div className="relative">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('userManagement.email')}</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Mail className="h-5 w-5 text-gray-400 dark:text-gray-500" />
@@ -247,7 +247,7 @@ export default function Users() {
                   </div>
 
                   <div className="relative">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">First Name</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('userManagement.firstName')}</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <UserCircle className="h-5 w-5 text-gray-400 dark:text-gray-500" />
@@ -262,7 +262,7 @@ export default function Users() {
                   </div>
 
                   <div className="relative">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Last Name</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('userManagement.lastName')}</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <UserCircle className="h-5 w-5 text-gray-400 dark:text-gray-500" />
@@ -277,7 +277,7 @@ export default function Users() {
                   </div>
 
                   <div className="relative">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{t('userManagement.password')}</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                         <Key className="h-5 w-5 text-gray-400 dark:text-gray-500" />

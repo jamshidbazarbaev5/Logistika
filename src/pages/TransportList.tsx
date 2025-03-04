@@ -128,7 +128,7 @@ export default function TransportList() {
               hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
               dark:focus:ring-offset-gray-800 transition-all duration-200"
             >
-              {t('transportList.createTransport', 'Create Transport Type')}
+              {t('transportList.createTransport')}
             </button>
           </div>
         </div>
@@ -141,7 +141,7 @@ export default function TransportList() {
                   {t('transportList.table.id', 'ID')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  {t('transportList.table.type', 'Transport Type')}
+                  {t('transportList.table.type', )}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   {t('transportList.actions')}
@@ -244,7 +244,7 @@ export default function TransportList() {
             <form onSubmit={handleEditSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {t("transportList.form.type", "Transport Type")}
+                  {t("transportList.form.type", )}
                 </label>
                 <input
                   type="text"

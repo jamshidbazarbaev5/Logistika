@@ -102,7 +102,7 @@ export default function PaymentMethodList() {
             {t("paymentMethodList.title")}
           </h1>
           <p className="mt-1 sm:mt-2 text-sm text-gray-600 dark:text-gray-400">
-            {t("paymentMethodList.subtitle", "Manage payment methods")}
+            {t("paymentMethodList.subtitle", )}
           </p>
         </div>
         <div className="mt-4 sm:mt-0">

@@ -43,10 +43,10 @@ export default function ModeCreate() {
     <div className="p-4 sm:p-6">
       <div className="mb-6 sm:mb-8">
         <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-          {t('mode.createTitle', 'Create New Mode')}
+          {t('mode.createTitle',)}
         </h1>
         <p className="mt-1 sm:mt-2 text-sm text-gray-600 dark:text-gray-400">
-          {t('mode.createSubtitle', 'Add a new mode with name and code')}
+          {t('mode.createSubtitle',)}
         </p>
       </div>
 
@@ -68,7 +68,7 @@ export default function ModeCreate() {
                 className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
                 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder={t('mode.namePlaceholder', 'Enter mode name')}
+                placeholder={t('mode.name')}
               />
             </div>
 
@@ -87,7 +87,7 @@ export default function ModeCreate() {
                 className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
                 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-                placeholder={t('mode.codePlaceholder', 'Enter mode code')}
+                placeholder={t('mode.code')}
               />
             </div>
 

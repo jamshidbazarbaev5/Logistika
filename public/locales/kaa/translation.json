@@ -27,6 +27,7 @@
     },
     "submit": "Firma Jaratıw"
   },
+
   "createApplication": {
     "title": "Ótinish Jaratıw",
     "numberOfApplication": "Ótinish Nomeri",
@@ -392,9 +393,11 @@
     "subtitle": "Sistemag'a jańa tólew usılın qosıw",
     "paymentMethodName": "Tólew Usılınıń Atı",
     "successMessage": "Tólew usılı tabıslı jaratıldı!",
+    "submit":"Tólew Usılın Jaratıw",
     "placeholder":"Tólew usılınıń atın kiritiń"
   },
   "paymentMethodList": {
+    "subtitle":"Tizimdagi tólew usılların kórish",
     "title": "Tólew Usılları",
     "createPaymentMethod": "Tólew Usılın Jaratıw",
     "idColumn": "ID",
@@ -502,8 +505,15 @@
       "type": "Transport Túri",
       "number": "Transport Nomeri"
     },
-    "actions": "Háreketler"
+    "actions": "Háreketler",
+    "form":{
+      "type":"Transport Túri",
+      "number":"Transport Nomeri"
+    }
   },
+  "basePrice":"Asasiy baxa",
+  "extraPrice":"Qosımsha baxa",
+  "units":"O'lshem birligi",
   "storageList": {
     "title": "Qoymalar",
     "createStorage": "Qoyma Jaratıw",
@@ -548,6 +558,11 @@
     "keepingServices": "Saqlaw Xızmetleri"
   },
   "productList": {
+    "form":{
+      "name":"Ónim Atı",
+      "category":"Kategoriya",
+      "measurement":"O'lshem birligi"
+    },
     "title": "Tovarlar",
     "createProduct": "Ónim Jaratıw",
     "errorLoading": "Ónimlerdi júklewde qátelik júz berdi",
@@ -572,23 +587,26 @@
     "placeholder": "Transport turini kiriting"
   },
   "userManagement": {
-    "addUser": "Foydalanuvchini Yaratish",
-    "title": "Foydalanuvchilar",
-    "createUser": "Foydalanuvchini Yaratish",
-    "editUser": "Foydalanuvchini Jańalaw",
-    "cancel": "Biykar etiw",
-    "email": "Elektron pochta",
-    "firstName": "Ism",
-    "lastName": "Familiya",
-    "username": "Paydalanıwshı atı",
+    "create":"Paydalanıwshı Jaratıw",
+    "title": "Paydalanıwshılar",
+    "addUser": "Paydalanıwshı Qosıw",
+    "editUser": "Paydalanıwshını Ózgertiw",
+    "createUser": "Paydalanıwshı Jaratıw",
+    "username": "Paydalanıwshı Atı",
+    "email": "Elektron Pochta",
+    "firstName": "Atı",
+    "lastName": "Familiyası",
     "password": "Parol",
-    "update": "Jańalaw",
     "actions": "Háreketler",
+    "cancel": "Biykar etiw",
+    "update": "Jańalaw",
     "delete": "Óshiriw",
-    "deleteTitle": "Foydalanuvchini Óshiriw",
-    "deleteSuccess": "Foydalanuvchi tabıslı óshirildi",
-    "deleteConfirmation": "Haqıyqattan da \"{{name}}\" foydalanuvchisini óshiriwdi qáleysizbe? Bul háreketti qaytarıw múmkin emes.",
-    "deleteError": "Foydalanuvchini óshiriwda xatolik yuz berdi"
+    "deleteTitle": "Paydalanıwshını Óshiriw",
+    "deleteConfirmation": "Haqıyqattan da \"{{username}}\" paydalanıwshısın óshiriwdi qáleysizbe? Bul háreketti qaytarıw múmkin emes.",
+    "deleteSuccess": "Paydalanıwshı tabıslı óshirildi",
+    "createSuccess": "Paydalanıwshı tabıslı jaratıldı",
+    "updateSuccess": "Paydalanıwshı tabıslı jańalandı",
+    "errorMessage": "Paydalanıwshını saqlawda qátelik júz berdi"
   },
   "c": {
     "title": "Ótinishti Ózgertiw",
@@ -748,6 +766,12 @@
     "noTransactions": "Tranzaksiyalar tabılmadı"
   },
   "transaction": {
+    "success":{
+      "title": "Tólem Jaratildi",
+      "message": "Tólem muvaffaqiyatli jaratıldı"
+    },
+
+
     "title": "Tólem Jaratıw",
     "fullName": "Tolıq Atı",
     "phoneNumber": "Telefon Nomeri",

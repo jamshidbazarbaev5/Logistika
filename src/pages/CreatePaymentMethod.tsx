@@ -97,7 +97,7 @@ export default function CreatePaymentMethod() {
             hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
             dark:focus:ring-offset-gray-800 transition-all duration-200"
           >
-            {t('createPaymentMethod.submit', 'Create Payment Method')}
+            {t('createPaymentMethod.submit',)}
           </button>
         </div>
       </form>

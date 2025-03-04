@@ -124,7 +124,7 @@ export default function Login() {
 
         <div className="text-center text-sm text-gray-500">
           <p>
-            Created by{' '}
+            Создатель{' '}
             <a 
               href="https://softium.uz" 
               target="_blank" 
