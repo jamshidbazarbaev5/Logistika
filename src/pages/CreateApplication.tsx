@@ -149,10 +149,7 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) 
   };
 
   const handleNext = () => {
-    if (!formData.firm_id) {
-      setError('Please select a firm in the Basic Info tab first');
-      return;
-    }
+    // Remove the firm_id check since photos are optional
     if (onSuccess) {
       onSuccess();
     }
@@ -1500,6 +1497,7 @@ export default function CreateApplication() {
       formDataObj.append('upload_products', 
         JSON.stringify(formData.upload_products));
 
+      // Make photos optional by only appending if they exist
       if (formData.upload_photos?.length) {
         formData.upload_photos.forEach(photo => {
           formDataObj.append('upload_photos', photo);
@@ -1774,7 +1772,7 @@ export default function CreateApplication() {
                   </div>
                   <div>
                     <label htmlFor="number_of_application" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-                      {t('createApplication.applicationNumber', 'Application Number')}
+                      {t('createApplication.numberOfApplication')}
                     </label>
                     <input
                       type="text"

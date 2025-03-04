@@ -144,6 +144,7 @@
     const [errorMessage, setErrorMessage] = useState('');
     const [expandedTransactions, setExpandedTransactions] = useState<number[]>([]);
     const [, setUnpaidAmount] = useState<number>(0);
+    const [showSuccessNotification, setShowSuccessNotification] = useState(false);
 
     useEffect(() => {
       const fetchData = async () => {
@@ -417,6 +418,15 @@
         );
         setPayments(filteredPayments);
         
+        // Check if total_price is now 0 (fully paid)
+        if (appResponse.data.total_price === 0) {
+          setShowSuccessNotification(true);
+          // Auto-hide notification after 5 seconds
+          setTimeout(() => {
+            setShowSuccessNotification(false);
+          }, 5000);
+        }
+        
         // Reset form
         setNewPayment({
           payment_method: 1,
@@ -617,7 +627,7 @@
                     className="mt-6 w-full bg-[#6C5DD3] text-white px-4 py-2 rounded-lg
                       hover:bg-[#5c4eb3] disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? t('common.calculating', 'Calculating...') : t('calculateServices.calculate')}
+                    {loading ? t('common.calculating') : t('calculateServices.calculate')}
                   </button>
                 </div>
               </div>
@@ -755,7 +765,7 @@
                         />
                         <div>
                           <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">
-                            {t('transaction.transactionId', 'Transaction')} #{transaction.id}
+                            {t('transaction.transactionId',)} #{transaction.id}
                           </h3>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
                             {transaction.full_name} • {transaction.car_number}
@@ -957,7 +967,7 @@
                       comment: e.target.value
                     }))}
                     className="rounded-md border p-2"
-                    placeholder={t('calculateServices.comment',)}
+                    placeholder={t('calculateServices.comment', 'Comment (optional)')}
                   />
                 </div>
                 <button
@@ -996,6 +1006,47 @@
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Success Notification */}
+        {showSuccessNotification && (
+          <div className="fixed bottom-4 right-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 shadow-lg max-w-md animate-slide-up">
+            <div className="flex items-center space-x-3">
+              <svg 
+                className="h-6 w-6 text-green-400" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                stroke="currentColor"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" 
+                />
+              </svg>
+              <div>
+                <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                  {t('calculateServices.paymentSuccess')}
+                </p>
+                <p className="text-sm text-green-700 dark:text-green-300">
+                  {t('calculateServices.fullyPaidMessage',)}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowSuccessNotification(false)}
+                className="text-green-500 hover:text-green-600 dark:text-green-400 dark:hover:text-green-300"
+              >
+                <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path 
+                    fillRule="evenodd" 
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" 
+                    clipRule="evenodd" 
+                  />
+                </svg>
+              </button>
             </div>
           </div>
         )}

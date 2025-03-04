@@ -67,6 +67,18 @@ const ServicesTab: React.FC<ServicesTabProps> = ({
         ...formData,
         upload_working_services_quantity: []
       });
+    } else {
+      // Filter out any services with quantity 0 from the initial state
+      const filteredServices = formData.upload_working_services_quantity.filter(
+        (service: WorkingServiceQuantity) => service.quantity > 0
+      );
+      
+      if (filteredServices.length !== formData.upload_working_services_quantity.length) {
+        setFormData({
+          ...formData,
+          upload_working_services_quantity: filteredServices
+        });
+      }
     }
   }, []);
 
@@ -147,45 +159,40 @@ const ServicesTab: React.FC<ServicesTabProps> = ({
   const handleWorkingServiceChange = (serviceId: number, quantity: number) => {
     const currentServices = formData.upload_working_services_quantity || [];
     
-    // If quantity is 0 or invalid, filter out the service entirely
-    if (quantity <= 0) {
-      const updatedServices = currentServices.filter(
-        (s: WorkingServiceQuantity) => s.service_id !== serviceId
+    // Only add/update services with valid quantities (greater than 0)
+    if (quantity > 0) {
+      const existingIndex = currentServices.findIndex(
+        (s: WorkingServiceQuantity) => s.service_id === serviceId
       );
+
+      let updatedServices = [...currentServices];
+      if (existingIndex >= 0) {
+        updatedServices[existingIndex] = { 
+          service_id: serviceId, 
+          quantity: quantity 
+        };
+      } else {
+        updatedServices.push({ 
+          service_id: serviceId, 
+          quantity: quantity 
+        });
+      }
+
       setFormData({
         ...formData,
         upload_working_services_quantity: updatedServices
       });
-      return;
-    }
-
-    // Handle adding/updating service
-    const existingIndex = currentServices.findIndex(
-      (s: WorkingServiceQuantity) => s.service_id === serviceId
-    );
-
-    let updatedServices = [...currentServices];
-    if (existingIndex >= 0) {
-      updatedServices[existingIndex] = { 
-        service_id: serviceId, 
-        quantity: quantity 
-      };
     } else {
-      updatedServices.push({ 
-        service_id: serviceId, 
-        quantity: quantity 
+      // If quantity is 0 or invalid, remove the service from the array
+      const updatedServices = currentServices.filter(
+        (s: WorkingServiceQuantity) => s.service_id !== serviceId
+      );
+      
+      setFormData({
+        ...formData,
+        upload_working_services_quantity: updatedServices
       });
     }
-
-    // Filter out any empty objects before updating state
-    updatedServices = updatedServices.filter(
-      service => service.service_id && service.quantity
-    );
-
-    setFormData({
-      ...formData,
-      upload_working_services_quantity: updatedServices
-    });
   };
 
   if (isLoading) {

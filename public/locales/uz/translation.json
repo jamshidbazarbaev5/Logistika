@@ -28,10 +28,13 @@
     "submit": "Firma Yaratish"
   },
   "createApplication": {
+    "exportToExcel":"Excelga eksport qilish",
+    "numberOfApplication": "Ariza Raqami",
     "currentDeclorationFile": "Deklaratsiya Fayli",
     "title": "Ariza Yaratish",
     "base": "Asosiy",
     
+    "units": "Birliklar",
     "extra": "Qo'shimcha",
     "year": "Yil",
     "tariff": "Tarif",
@@ -113,6 +116,7 @@
     "selectedTransport": "Tanlangan transport",
     "selectedServices": "Tanlangan xizmatlar",
     "storageServices": "Ombor xizmatlari",
+    "laborServices": "Ish xizmatlari",
     "workingServices": "Ish xizmatlari",
     "declorationNumber": "Deklaratsiya raqami",
     "declorationDate": "Deklaratsiya sanasi",
@@ -135,25 +139,51 @@
     "submit": "Rasm Yuklash",
     "successMessage": "Rasm muvaffaqiyatli yuklandi!"
   },
+  "userManagement":{
+    "addUser":"Foydalanuvchini Yaratish",
+    "title":"Foydalanuvchilar",
+    "createUser":"Foydalanuvchini Yaratish",
+    "editUser":"Foydalanuvchini Tahrirlash",
+    "cancel":"Bekor qilish",
+    "email":"Elektron pochta",
+    "firstName":"Ism",
+    "lastName":"Familiya",
+    "username":"Foydalanuvchi nomi",
+    "password":"Parol"
+  },
   "createKeepingService": {
-    "name": "Xizmat Nomi",
-    "baseDay": "Asosiy Kunlar",
+    "baseDays":"Asosiy kunlar",
+    "title": "Saqlash Xizmatini Yaratish",
+    "subtitle": "Xizmat uchun narxlarni qo'shish",
+    "subtitleWithName": "{{name}} uchun narxlarni qo'shish",
+    "serviceName": "Xizmat Nomi",
+    "searchOrCreate": "Xizmatni qidirish yoki yangi yaratish",
+    "createNewWithName": "+ \"{{name}}\" ni yaratish",
+    "createNewService": "Yangi Xizmat Yaratish",
+    "enterServiceName": "Xizmat nomini kiriting",
+    "year": "Yil",
+    "baseDay": "Asosiy Kun",
     "basePrice": "Asosiy Narx",
     "extraPrice": "Qo'shimcha Narx",
-    "title": "Saqlash Xizmatini Yaratish",
-    "subtitle": "Yangi saqlash xizmatini qo'shish",
-    "serviceInfo": {
-      "name": "Xizmat Nomi",
-      "baseDay": "Asosiy Kunlar",
-      "basePrice": "Asosiy Narx",
-      "extraPrice": "Qo'shimcha Narx"
-    },
-    "submit": "Xizmat Yaratish",
-    "successMessage": "Saqlash xizmati muvaffaqiyatli yaratildi!"
+    "submit": "Xizmatni Yaratish",
+    "successMessage": "Xizmat muvaffaqiyatli yaratildi!",
+    "errorMessage": "Xizmatni yaratishda xatolik yuz berdi. Iltimos, qaytadan urinib ko'ring.",
+    "errorCreatingName": "Xizmat nomini yaratishda xatolik yuz berdi",
+    "noResults": "Xizmatlar topilmadi"
   },
   "createWorkingService": {
-    "title": "Ish Xizmatini Yaratish",
-    "subtitle": "Yangi ish xizmatini qo'shish",
+    "selectService":"Xizmatni tanlash",
+    "createNewService":"Yangi Xizmat Yaratish",
+    "serviceName":"Xizmat Atı",
+    "year":"Yil",
+    "editTitle":"Ish Xızmetini Tahrirlash", 
+    "editSubtitle":"Ish xızmatini tahrirlash",
+    "basePrice":"Asosiy Narx",
+    "units":"O'lchov Birliklari",
+    "extraPrice":"Qo'shimcha Narx",
+    "createNewName": "Yangi nomni yaratish",
+    "title": "Ish Xızmetlari",
+    "subtitle": "Yangi ish xızmatin qo'sısh",
     "serviceInfo": {
       "name": "Xizmat Nomi",
       "price": "Narx",
@@ -224,6 +254,7 @@
   "common": {
     "success": "Muvaffaqiyatli!",
     "ok": "OK",
+    "calculating": "Hisoblanmoqda...",
     "error": "Xatolik!",
     "create": "Yaratish",
     "update": "Yangilash",
@@ -254,6 +285,8 @@
     "search":{
       "title":"Ariza izlash"
     },
+    "viewDetails":"Batafsil ko'rish",
+
     "downloadExcel": "Excel yuklash",
     "calculate": "Hisoblash",
     "next": "Keyingi",
@@ -485,8 +518,12 @@
     "year": "Yil"
 
   },
+
   "calculateServices": {
+    "fullyPaid":"To'liq to'landi",
     "title": "Hisoblash Xizmatlari",
+    "paymentSuccess":"Muvaffaqiyatli",
+    "fullyPaidMessage":"To'liq to'landi",
     "noResults": "Xizmatlar topilmadi",
     "noServicesAvailable": "Xizmatlar mavjud emas",
     "unpaidAmount": "To'lanmagan Summa",
@@ -521,6 +558,7 @@
   },
 "transaction":{
   "title": "To'lov Yaratish",
+  "transactionID":"Tranzaksiya",
   "fullName": "To'liq Ismi",
   "phoneNumber": "Telefon Raqami",
   "carNumber": "Mashina Raqami",
@@ -544,6 +582,7 @@
 },
   "workingService": {
     "title": "Ish Xizmatlari",
+    "year":"Yil",
     "create": "Ish Xizmatini Yaratish",
     "edit": "Ish Xizmatini Tahrirlash",
     "serviceName": "Xizmat Nomi",
@@ -592,7 +631,9 @@
   "editApplication": {
     "status": "Status",
     "amount":"Qiymati",
-
+    "clickToUpload":"Yuklash uchun bosing",
+    "applicationNumber":"Ariza Raqami",
+    "drag":"",
     "numberOfApplication":"Ariza Raqami",
     "basePrice":"Asosiy Narx",
     "extraPrice":"Qoshimcha Narx",
@@ -663,5 +704,20 @@
     "active": "Faol",
     "unpaid": "To'lanmagan",
     "completed": "Yakunlangan"
+  },
+  "updateUser": {
+    "title": "Foydalanuvchi Profilini Yangilash",
+    "message": {
+      "success": "Foydalanuvchi muvaffaqiyatli yangilandi!",
+      "errorFetching": "Foydalanuvchi ma'lumotlarini olishda xatolik yuz berdi",
+      "errorUpdating": "Foydalanuvchini yangilashda xatolik yuz berdi"
+    },
+    "form": {
+      "username": "Foydalanuvchi Nomi",
+      "email": "Elektron Pochta",
+      "firstName": "Ism",
+      "lastName": "Familiya",
+      "submit": "Profilni Yangilash"
+    }
   }
 } 

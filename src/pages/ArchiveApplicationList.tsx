@@ -587,7 +587,7 @@ export default function ArchiveApplicationList() {
                       className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-[#6C5DD3] hover:bg-[#5b4eb3] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6C5DD3]"
                     >
                       <Eye className="w-4 h-4 mr-1" />
-                      {t("applicationList.viewDetails", "View Details")}
+                      {t("applicationList.viewDetails",)}
                     </button>
                   </td>
                 </tr>

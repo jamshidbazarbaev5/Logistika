@@ -170,6 +170,13 @@ export default function Transaction() {
       try {
         const response = await api.get(`/application/${applicationId}/`);
         
+        // Pre-fill form data with firm info
+        setFormData({
+          full_name: response.data.firm_info?.director_name || '',
+          phone_number:response.data.firm_info?.phone_number || '',
+          car_number: '',
+        });
+
         // First fetch the available products to get their correct IDs
         const productsResponse = await api.get('/items/product/');
         const availableProductsMap = productsResponse.data.results.reduce((acc: any, product: any) => {
@@ -220,12 +227,6 @@ export default function Transaction() {
     e.preventDefault();
     setLoading(true);
     console.log('Starting transaction submission...');
-    console.log('Initial state:', {
-      calculatedServices,
-      workingServices,
-      totalPrice,
-      applicationId
-    });
 
     try {
       const servicesToSubmit = calculatedServices
@@ -244,42 +245,48 @@ export default function Transaction() {
           }))
         : [];
       
-      console.log('Services to submit:', servicesToSubmit);
-      console.log('Working services to submit:', workingServicesToSubmit);
-      
+      // Only validate services
       if (servicesToSubmit.length === 0 && workingServicesToSubmit.length === 0) {
         throw new Error('At least one service is required');
       }
 
-      console.log('Current payments:', payments);
-      // if (payments.length === 0) {
-      //   throw new Error('At least one payment method is required');
-      // }
-
-      const invalidPayment = payments.find(payment => payment.amount <= 0);
-      if (invalidPayment) {
-        throw new Error('All payments must have an amount greater than 0');
+      // Only validate payment amounts if payments exist
+      if (payments.length > 0) {
+        const invalidPayment = payments.find(payment => payment.amount <= 0);
+        if (invalidPayment) {
+          throw new Error('All payments must have an amount greater than 0');
+        }
       }
 
+      // Create payload with optional fields
       const payload = {
-        ...formData,
-        total_price: totalPrice,
         application_id: applicationId,
+        total_price: totalPrice,
         keeping_services: servicesToSubmit,
         working_services: workingServicesToSubmit,
-        products: products.map(product => ({
-          product_id: product.product_id,
-          storage_id: product.storage_id,
-          quantity: product.quantity
-        })),
-        payments: payments.map(payment => ({
-          payment_method: payment.payment_method,
-          amount: payment.amount,
-          comment: payment.comment || ''
-        })),
+        // Only include form data fields if they have values
+        ...(formData.full_name && { full_name: formData.full_name }),
+        ...(formData.phone_number && { phone_number: formData.phone_number }),
+        ...(formData.car_number && { car_number: formData.car_number }),
+        // Only include products if there are any
+        ...(products.length > 0 && {
+          products: products.map(product => ({
+            product_id: product.product_id,
+            storage_id: product.storage_id,
+            quantity: product.quantity
+          }))
+        }),
+        // Only include payments if there are any
+        ...(payments.length > 0 && {
+          payments: payments.map(payment => ({
+            payment_method: payment.payment_method,
+            amount: payment.amount,
+            comment: payment.comment || ''
+          }))
+        })
       };
-      console.log('Final payload:', payload);
 
+      console.log('Final payload:', payload);
       const response = await api.post('/transactions/', payload);
       console.log('Transaction created successfully:', response.data);
       
@@ -340,7 +347,6 @@ export default function Transaction() {
                 onChange={handleInputChange}
                 placeholder={t('transaction.fullNamePlaceholder')}
                 className="w-full rounded-md border p-2"
-                required
               />
             </div>
             <div>
@@ -354,7 +360,6 @@ export default function Transaction() {
                 onChange={handleInputChange}
                 placeholder={t('transaction.phoneNumberPlaceholder')}
                 className="w-full rounded-md border p-2"
-                required
               />
             </div>
             <div>
@@ -368,7 +373,6 @@ export default function Transaction() {
                 onChange={handleInputChange}
                 placeholder={t('transaction.carNumberPlaceholder')}
                 className="w-full rounded-md border p-2"
-                required
               />
             </div>
           </div>
@@ -498,7 +502,7 @@ export default function Transaction() {
                   value={payment.comment}
                   onChange={(e) => handlePaymentChange(index, 'comment', e.target.value)}
                   placeholder={t('transaction.commentPlaceholder')}
-                  className="rounded-md border p-2"
+                  className="w-full rounded-md border p-2"
                 />
               </div>
             ))}

@@ -156,7 +156,7 @@ export default function Users() {
           className="bg-[#6C5DD3] text-white px-4 py-2 rounded-md flex items-center gap-2 hover:bg-[#5c4eb8] dark:bg-[#8679E3] dark:hover:bg-[#7563E2]"
         >
           <Plus size={20} />
-          Add User
+          {t('userManagement.addUser')}
         </button>
       </div>
 

@@ -142,8 +142,8 @@ export default function CreateWorkingService() {
 
   return (
     <FormLayout
-      title={id ? t('createWorkingService.editTitle', 'Edit Working Service') : t('createWorkingService.title', 'Create Working Service')}
-      subtitle={id ? t('createWorkingService.editSubtitle', 'Edit details for the working service') : t('createWorkingService.subtitle', 'Add details for the working service')}
+      title={id ? t('createWorkingService.editTitle', ) : t('createWorkingService.title', )}
+      subtitle={id ? t('createWorkingService.editSubtitle',) : t('createWorkingService.subtitle', )}
     >
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto px-4 sm:px-6">
         <div className="dark:bg-gray-800 p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm">
@@ -151,16 +151,16 @@ export default function CreateWorkingService() {
             {/* Service Name Selection */}
             <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-600 dark:text-white mb-1">
-                {t('createWorkingService.serviceName', 'Service Name')}
+                {t('createWorkingService.serviceName', )}
               </label>
               <div className="relative">
                 <select
                   value={formData.service}
                   onChange={(e) => setFormData({ ...formData, service: Number(e.target.value) })}
-                  className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
+                  className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
                   required
                 >
-                  <option value="">{t('createWorkingService.selectService', 'Select a service')}</option>
+                  <option value="">{t('createWorkingService.selectService',)}</option>
                   {serviceNames.map((name) => (
                     <option key={name.id} value={name.id}>
                       {name.service_name}
@@ -172,7 +172,7 @@ export default function CreateWorkingService() {
                   onClick={() => setShowCreateNameModal(true)}
                   className="mt-2 text-[#6C5DD3] hover:text-[#5c4eb3] text-sm font-medium"
                 >
-                  {t('createWorkingService.createNewName', '+ Create new service name')}
+                  {t('createWorkingService.createNewName',)}
                 </button>
               </div>
             </div>
@@ -180,12 +180,12 @@ export default function CreateWorkingService() {
             {/* Year */}
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-white mb-1">
-                {t('createWorkingService.year', 'Year')}
+                {t('createWorkingService.year', )}
               </label>
               <select
                 value={formData.year}
                 onChange={(e) => setFormData({ ...formData, year: Number(e.target.value) })}
-                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
+                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
                 required
               >
                 {availableYears.map((year) => (
@@ -199,13 +199,13 @@ export default function CreateWorkingService() {
             {/* Base Price */}
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-white mb-1">
-                {t('createWorkingService.basePrice', 'Base Price')}
+                {t('createWorkingService.basePrice',)}
               </label>
               <input
                 type="text"
                 value={formData.base_price}
                 onChange={(e) => setFormData({ ...formData, base_price: e.target.value })}
-                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
+                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
                 required
               />
             </div>
@@ -213,16 +213,16 @@ export default function CreateWorkingService() {
             {/* Units */}
             <div>
               <label className="block text-sm font-medium text-gray-600 dark:text-white mb-1">
-                {t('createWorkingService.units', 'Units')}
+                {t('createWorkingService.serviceInfo.units', )}
               </label>
               <select
                 value={formData.units}
                 onChange={(e) => setFormData({ ...formData, units: e.target.value })}
-                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
+                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
                 required
               >
-                <option value="sht">{t('createWorkingService.sht', 'sht')}</option>
-                <option value="hour">{t('createWorkingService.hour', 'hour')}</option>
+                <option value="sht">{t('createWorkingService.serviceInfo.unitsSelect.piece', )}</option>
+                <option value="hour">{t('createWorkingService.serviceInfo.unitsSelect.hour', )}</option>
               </select>
             </div>
           </div>
@@ -249,7 +249,7 @@ export default function CreateWorkingService() {
         <div className="fixed inset-0 flex items-center justify-center p-4">
           <Dialog.Panel className="mx-auto w-full max-w-md rounded-lg bg-white dark:bg-gray-800 p-6">
             <Dialog.Title className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              {t('createWorkingService.createNewService', 'Create New Service')}
+              {t('createWorkingService.createNewService',)}
             </Dialog.Title>
 
             <form onSubmit={handleCreateNewName}>
@@ -257,8 +257,8 @@ export default function CreateWorkingService() {
                 type="text"
                 value={newServiceName}
                 onChange={(e) => setNewServiceName(e.target.value)}
-                className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
-                placeholder={t('createWorkingService.enterServiceName', 'Enter service name')}
+                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3] sm:text-sm"
+                placeholder={t('createWorkingService.createNewService', )}
                 required
               />
               

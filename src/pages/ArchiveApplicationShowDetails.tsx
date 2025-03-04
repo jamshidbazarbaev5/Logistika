@@ -290,7 +290,7 @@
                 onClick={handleExport}
                 className="px-4 py-2 bg-[#6C5DD3] text-white rounded-lg hover:bg-[#5c4eb3] transition-colors"
             >
-                {t('exportToExcel', 'Export to Excel')}
+                {t('applicationList.exportToExcel')}
             </button>
             </div>
 

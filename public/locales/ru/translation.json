@@ -29,6 +29,7 @@
   },
   "createApplication": {
     "title": "Создать Заявку",
+    "numberOfApplication": "Номер Заявки",
     "storage": "Склад",
     "product": "Товар",
     "units": "Единицы",
@@ -137,27 +138,33 @@
     "successMessage": "Фото успешно загружено!"
   },
   "createKeepingService": {
-    "name": "Название Услуги",
-    "baseDay": "Базовые Дни",
+    "title": "Создать Услугу Хранения",
+    "baseDays": "Базовые дни",
+    "subtitle": "Добавить ценовые детали для услуги",
+    "subtitleWithName": "Добавить ценовые детали для {{name}}",
+    "serviceName": "Название Услуги",
+    "searchOrCreate": "Поиск или создание новой услуги",
+    "createNewWithName": "+ Создать \"{{name}}\"",
+    "createNewService": "Создать Новую Услугу",
+    "enterServiceName": "Введите название услуги",
+    "year": "Год",
+    "baseDay": "Базовый День",
     "basePrice": "Базовая Цена",
     "extraPrice": "Дополнительная Цена",
-    "title": "Создать Услугу Хранения",
-    "subtitle": "Добавить новую услугу хранения",
-    "serviceInfo": {
-      "name": "Название Услуги",
-      "baseDay": "Базовые Дни",
-      "basePrice": "Базовая Цена",
-      "extraPrice": "Дополнительная Цена"
-    },
     "submit": "Создать Услугу",
-    "successMessage": "Услуга хранения успешно создана!",
-    "deleteTitle": "Удалить Услугу Хранения",
-    "deleteConfirmation": "Вы уверены, что хотите удалить услугу хранения \"{{name}}\"? Это действие нельзя отменить.",
-    "deleteSuccess": "Услуга хранения успешно удалена",
-    "updateSuccess": "Услуга хранения успешно обновлена",
-    "createSuccess": "Услуга хранения успешно создана"
+    "successMessage": "Услуга успешно создана!",
+    "errorMessage": "Не удалось создать услугу. Пожалуйста, попробуйте снова.",
+    "errorCreatingName": "Ошибка при создании названия услуги",
+    "noResults": "Услуги не найдены"
   },
   "createWorkingService": {
+    "selectService":"Выберите услугу",
+    "serviceName":"Название Услуги",
+    "basePrice":"Базовая Цена",
+    "year":"Год",
+    "editTitle":"Изменить Рабочую Услугу",
+    "editSubtitle":"Изменить рабочую услугу",
+    "createNewName": "+ Создать новое название услуги",
     "title": "Создать Рабочую Услугу",
     "subtitle": "Добавить новую рабочую услугу",
     "serviceInfo": {
@@ -168,15 +175,17 @@
       "extraPrice": "Дополнительная Цена",
       "units": "Единицы Измерения",
       "unitsSelect": {
-        "day": "День",
         "hour": "Час",
-        "piece": "Штука"
+        "piece": "Штук"
       }
     },
     "submit": "Создать Услугу",
-    "successMessage": "Рабочая услуга успешно создана!"
+    "successMessage": "Рабочая услуга успешно создана!",
+    "createNewService":"Создать Новую Услугу"
+
   },
   "workingService":{
+    "year":"Год",
     "title": "Рабочие Услуги",
     "edit": "Изменить Рабочую Услугу",
     "create": "Создать Рабочую Услугу",
@@ -248,6 +257,7 @@
   "common": {
     "success": "Успешно!",
     "ok": "OK",
+    "calculating": "Рассчитывается...",
     "actions": "Действия",
     "select": "Выбрать",
     "cancel": "Отмена",
@@ -276,6 +286,8 @@
   "applicationList": {
     "previous": "Предыдущий",
     "next": "Следующий",
+    "viewDetails":"Посмореть полностью",
+    "exportToExcel":"Экспорт в Excel",
     "STATUS":"Статус",
     "status":{
       "active": "Активный",
@@ -546,6 +558,7 @@
     "submit": "Создать Тип Транспорта"
   },
   "userManagement": {
+      
     "title": "Пользователи",
     "addUser": "Добавить Пользователя",
     "editUser": "Редактировать Пользователя",
@@ -568,6 +581,8 @@
   "editApplication": {
     "numberOfApplication":"Номер Заявки",
     "title": "Редактирование Заявки",
+    "clickToUpload":"Нажмите чтобы Загрузить фото",
+    "applicationNumber":"Номер Заявки",
     "status": "Статус",
     "subtitle": "Изменение данных заявки",
     "firm": "Организация",
@@ -633,11 +648,14 @@
     "successMessage": "Продукт успешно создан!",
     "errorMessage": "Не удалось создать продукт. Пожалуйста, попробуйте снова."
   },
+
   "calculateServices": {
+    "fullyPaid":"Полностью оплачено",
     "title": "Расчет Услуг",
     "noResults": "Услуги не найдены",
     "noHistory": "История транзакций не найдена",
-    "fullyPaid": "Полностью оплачено",
+    "paymentSuccess":"Успешно ",
+    "fullyPaidMessage": "Полностью оплачено",
     "noServicesAvailable": "Услуги не найдены",
     "unpaid": "Не оплачено",
     "goToPayments": "Перейти к Платежам",
@@ -661,7 +679,6 @@
     "amountPlaceholder": "Введите сумму",
     "comment": "Комментарий",
     "commentPlaceholder": "Введите комментарий",
-    "transactionId": "Транзакция",
     "fullName": "ФИО",
     "phoneNumber": "Номер телефона",
     "carNumber": "Номер машины",
@@ -692,11 +709,27 @@
     "keepingServices": "Услуги Хранения",
     "workingServices": "Рабочие Услуги",
     "amount": "Сумма",
-    "comment": "Комментарий"
+    "comment": "Комментарий",
+    "transactionId":"Транзакция"
   },
   "status": {
     "active": "Активный",
     "unpaid": "Неоплаченный",
     "completed": "Завершенный"
+  },
+  "updateUser": {
+    "title": "Обновление Профиля Пользователя",
+    "message": {
+      "success": "Профиль пользователя успешно обновлен!",
+      "errorFetching": "Ошибка при получении данных пользователя",
+      "errorUpdating": "Ошибка при обновлении пользователя"
+    },
+    "form": {
+      "username": "Имя Пользователя",
+      "email": "Электронная Почта",
+      "firstName": "Имя",
+      "lastName": "Фамилия",
+      "submit": "Обновить Профиль"
+    }
   }
 }

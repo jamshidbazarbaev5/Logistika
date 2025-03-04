@@ -29,6 +29,7 @@
   },
   "createApplication": {
     "title": "Ótinish Jaratıw",
+    "numberOfApplication": "Ótinish Nomeri",
     "vipApplication": "VIP Ariza",
     "storage": "Ombor",
     "product": "Ónim",
@@ -136,22 +137,30 @@
     "successMessage": "Súwret tabıslı júklendi!"
   },
   "createKeepingService": {
-    "title": "Saqlaw Xızmetleri",
-    "create": "Saqlaw Xızmetin Jaratıw",
-    "edit": "Saqlaw Xızmetin Ózgertiw",
-    "name": "Xızmet Atı",
+    "title": "Saqlaw Xızmetin Jaratıw",
+    "subtitle": "Xızmet ushın narqlardı qosıw",
+    "subtitleWithName": "{{name}} ushın narqlardı qosıw",
+    "serviceName": "Xızmet Atı",
+    "searchOrCreate": "Xızmetti izlew yamasa jańa jaratıw",
+    "createNewWithName": "+ \"{{name}}\" dı jaratıw",
+    "baseDays": "Tiykarǵı Kúnler",
+
+    "createNewService": "Jańa Xızmet Jaratıw",
+    "enterServiceName": "Xızmet atın kiritiń",
+    "year": "Jıl",
     "baseDay": "Tiykarǵı Kún",
     "basePrice": "Tiykarǵı Narq",
     "extraPrice": "Qosımsha Narq",
-    "deleteTitle": "Saqlaw Xızmetin Óshiriw",
-    "deleteConfirmation": "Haqıyqattan da \"{{name}}\" saqlaw xızmetin óshiriwdi qáleysizbe? Bul háreketti qaytarıw múmkin emes.",
-    "deleteSuccess": "Saqlaw xızmeti tabıslı óshirildi",
-    "updateSuccess": "Saqlaw xızmeti tabıslı jańalandı",
-    "createSuccess": "Saqlaw xızmeti tabıslı jaratıldı"
+    "submit": "Xızmetti Jaratıw",
+    "successMessage": "Xızmet tabıslı jaratıldı!",
+    "errorMessage": "Xızmetti jaratıwda qátelik júz berdi. Iltimas, qaytadan urınıp kóriń.",
+    "errorCreatingName": "Xızmet atın jaratıwda qátelik júz berdi",
+    "noResults": "Xızmetler tabılmadı"
   },
   "workingService": {
     "title": "Jumıs Xızmetleri",
     "subtitle": "Jańa jumıs xızmetin qosıw",
+    "year":"Jıl",
     "edit": "Jumıs Xızmetin Ózgertiw",
     "create": "Jumıs Xızmetin Jaratıw",
     "serviceName": "Xızmet Atı",
@@ -178,8 +187,16 @@
   
     
   "createWorkingService": {
+    "selectService":"Xızmetni tanlash",
+    "createNewService":"Jańa Xızmet Jaratıw",
+    "serviceName":"Xızmet Atı",
     "title": "Jumıs Xızmetleri",
+    "editTitle":"Jumıs Xızmetin Ózgertiw",
+    "editSubtitle":"Jumıs xızmatini tahrirlash",
+    "createNewName": "+ Jumıs Xızmetin Atın Jaratıw",
     "subtitle": "Jańa jumıs xızmetin qosıw",
+    "year":"Jıl",
+    "basePrice":"Tiykarg'ı Baha",
     "serviceInfo": {
       "name": "Xızmet Atı",
       "price": "Baha",
@@ -249,6 +266,7 @@
     "successMessage": "Rejim tabıslı jaratıldı!"
   },
   "common": {
+    "calculating": "Esablanıw...",
     "success": "Tabıslı!",
     "ok": "OK",
     "error": "Qátelik!",
@@ -288,6 +306,8 @@
       "unpaid": "Tólenbegen",
       "completed": "Tamamlanǵan"
     },
+    "viewDetails":"Ótinish toliq  kóriw",
+    "exportToExcel":"Excelga eksport qilish",
     "next": "Keyingi",
     "downloadExcel": "Excel yuklash",
     "numberOfApplication": "Ótinish Nomeri",
@@ -552,7 +572,7 @@
     "placeholder": "Transport turini kiriting"
   },
   "userManagement": {
-
+    "addUser": "Foydalanuvchini Yaratish",
     "title": "Foydalanuvchilar",
     "createUser": "Foydalanuvchini Yaratish",
     "editUser": "Foydalanuvchini Jańalaw",
@@ -619,6 +639,7 @@
   "editApplication": {
     "numberOfApplication":"Ariza Raqami",
     "selectPhotos": "Foto tanlash",
+    "applicationNumber":"Ótinish Nomeri",
     "uploadPhotos": "Foto yuklash",
     "photos": "Foto",
     "amount":"Mug'dar",
@@ -685,8 +706,14 @@
     "successMessage": "Ónim tabıslı jaratıldı!",
     "errorMessage": "Ónim jaratıwda qátelik júz berdi. Iltimas, qaytadan urınıp kóriń."
   },
+ 
+  
   "calculateServices": {
+    "fullyPaid":"Toliq to'lendi",
+
     "noResults": " xizmetler joq",
+    "paymentSuccess":"Muvaffaqiyatli",
+    "fullyPaidMessage":"Toliq to'lendi",
     "title": "Xızmetlerdi Esaplaw",
     "noServicesAvailable": "Xizmatlar mavjud emas",
     "unpaidAmount": "To'lanmagan Summa",
@@ -746,5 +773,20 @@
     "active": "Aktiv",
     "unpaid": "Tólenbegen",
     "completed": "Tamamlanǵan"
+  },
+  "updateUser": {
+    "title": "Paydalanıwshı Profilin Jańalaw",
+    "message": {
+      "success": "Paydalanıwshı tabıslı jańalandı!",
+      "errorFetching": "Paydalanıwshı mag'lıwmatların alıwda qátelik júz berdi",
+      "errorUpdating": "Paydalanıwshını jańalawda qátelik júz berdi"
+    },
+    "form": {
+      "username": "Paydalanıwshı Atı",
+      "email": "Elektron Pochta",
+      "firstName": "Atı",
+      "lastName": "Familiyası",
+      "submit": "Profildi Jańalaw"
+    }
   }
 }

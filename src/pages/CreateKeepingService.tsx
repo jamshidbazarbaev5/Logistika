@@ -182,28 +182,19 @@ export default function CreateKeepingService() {
                 {t('createKeepingService.serviceName', 'Service Name')}
               </label>
               <div className="relative service-select">
-                <div
-                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onClick={() => setIsDropdownOpen(true)}
                   className="block w-full rounded-md border border-gray-300 dark:border-gray-600 
                     bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
-                    px-3 py-2 text-sm md:text-base cursor-pointer
+                    px-3 py-2 text-sm md:text-base
                     focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
-                >
-                  {serviceNames.find(s => s.id === formData.keeping_services_id)?.name || 
-                   t('createKeepingService.selectService', 'Select a service')}
-                </div>
+                  placeholder={t('createKeepingService.searchOrCreate', 'Search or create new service')}
+                />
                 {isDropdownOpen && (
                   <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 rounded-md shadow-lg max-h-60 overflow-auto">
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="block w-full px-3 py-2 text-sm border-b border-gray-300 dark:border-gray-600
-                        bg-white dark:bg-gray-700 text-gray-900 dark:text-white
-                        focus:outline-none"
-                      placeholder={t('createKeepingService.searchNames', 'Search service names...')}
-                      onClick={(e) => e.stopPropagation()}
-                    />
                     {filteredNames.map((service) => (
                       <div
                         key={service.id}
@@ -214,29 +205,24 @@ export default function CreateKeepingService() {
                             ...prev,
                             keeping_services_id: service.id
                           }));
+                          setSearchQuery(service.name);
                           setIsDropdownOpen(false);
-                          setSearchQuery('');
                         }}
                       >
                         {service.name}
                       </div>
                     ))}
-                    {filteredNames.length === 0 && (
+                    {searchQuery && filteredNames.length === 0 && (
                       <div className="px-4 py-2">
-                        <p className="text-gray-500 dark:text-gray-400">
-                          {t('createKeepingService.noResults', 'No services found')}
-                        </p>
                         <button
                           type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
+                          onClick={() => {
                             setNewServiceName(searchQuery);
                             setShowCreateNameModal(true);
-                            setIsDropdownOpen(false);
                           }}
                           className="text-[#6C5DD3] hover:text-[#5c4eb3] font-medium"
                         >
-                          {t('createKeepingService.createNew', '+ Create new service')}
+                          {t('createKeepingService.createNewWithName', '+ Create "{{name}}"', { name: searchQuery })}
                         </button>
                       </div>
                     )}
@@ -271,7 +257,7 @@ export default function CreateKeepingService() {
                 htmlFor="base_day" 
                 className="block text-sm font-medium text-gray-600 dark:text-white mb-1"
               >
-                {t('createKeepingService.baseDays', 'Base Days')}
+                {t('createKeepingService.baseDays', )}
               </label>
               <input
                 type="number"
