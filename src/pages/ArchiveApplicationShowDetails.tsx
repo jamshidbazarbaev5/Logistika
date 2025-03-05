@@ -102,12 +102,10 @@
 
             const applicationData = applicationRes.data;
             
-            // Make sure status is set with a default value if it's not provided
             if (!applicationData.status) {
             applicationData.status = 'active';
             }
 
-            // Transform dates
             if (applicationData.coming_date) {
             const [day, month, year] = applicationData.coming_date.split('.');
             applicationData.coming_date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
@@ -117,19 +115,16 @@
             applicationData.decloration_date = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
             }
 
-            // Transform keeping services
             applicationData.upload_keeping_services_quantity = applicationData.keeping_services.map((service: any) => ({
             service_type_id: service.service_type_id,
             amount: service.amount
             }));
 
-            // Transform working services
             applicationData.upload_working_services_quantity = applicationData.working_services.map((service: any) => ({
             service_id: service.service_id,
             quantity: service.quantity
             }));
 
-            // Transform modes
             if (applicationData.modes && Array.isArray(applicationData.modes)) {
             applicationData.modes = applicationData.modes.map((mode: any) => ({
                 mode_id: mode.mode_id || mode.id
@@ -263,7 +258,6 @@
 
     const handleModesSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
-        // In read-only mode, this is just a no-op
         return Promise.resolve();
     };
 

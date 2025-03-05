@@ -102,7 +102,6 @@ export default function EditApplication() {
 
         const applicationData = applicationRes.data;
         
-        // Make sure status is set with a default value if it's not provided
         if (!applicationData.status) {
           applicationData.status = 'active';
         }
@@ -167,8 +166,7 @@ export default function EditApplication() {
     try {
       const formDataToSend = new FormData();
 
-      // Get the auth token from wherever you store it (localStorage, context, etc.)
-      const token = localStorage.getItem('accessToken'); // or however you store your token
+      const token = localStorage.getItem('accessToken'); 
 
       if (!token) {
         setModalMessage(t('common.unauthorized'));
@@ -214,7 +212,7 @@ export default function EditApplication() {
       const response = await api.put(`/application/${id}/`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`, // Add the auth token
+          'Authorization': `Bearer ${token}`, 
         },
       });
       
@@ -228,7 +226,6 @@ export default function EditApplication() {
     } catch (error: any) {
       console.error('Error updating application:', error);
       if (error.response?.status === 401) {
-        // Handle unauthorized error
         setModalMessage(t('common.sessionExpired'));
         setShowSuccessModal(true);
         setTimeout(() => {
@@ -237,7 +234,6 @@ export default function EditApplication() {
         return;
       }
       
-      // Handle other errors as before
       let errorMessages = '';
       if (error.response?.data) {
         errorMessages = Object.entries(error.response.data)
@@ -249,26 +245,21 @@ export default function EditApplication() {
     }
   };
 
-  // Add this helper function
   const formatDateForAPI = (dateString: string): string => {
-    // If the date is already in YYYY-MM-DD format, return it
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
       return dateString;
     }
 
-    // If it's in DD.MM.YYYY format, convert it
     if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateString)) {
       const [day, month, year] = dateString.split('.');
       return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     }
 
-    // Try to create a valid date object and format it
     const date = new Date(dateString);
     if (!isNaN(date.getTime())) {
       return date.toISOString().split('T')[0];
     }
 
-    // If all else fails, return null or the original string
     return dateString;
   };
 
@@ -456,7 +447,6 @@ export default function EditApplication() {
     );
   };
 
-  // Add this helper function at the top of your component
   const truncateFileName = (url: string, maxLength: number = 30) => {
     const fileName = url.split('/').pop() || '';
     if (fileName.length <= maxLength) return fileName;
@@ -464,29 +454,24 @@ export default function EditApplication() {
     const extension = fileName.split('.').pop() || '';
     const nameWithoutExt = fileName.slice(0, fileName.lastIndexOf('.'));
     
-    const truncatedName = nameWithoutExt.slice(0, maxLength - extension.length - 4) + '...'; // -4 for '...' and '.'
+    const truncatedName = nameWithoutExt.slice(0, maxLength - extension.length - 4) + '...'; 
     return `${truncatedName}.${extension}`;
   };
 
-  // Add this helper function if it doesn't exist
   const formatDateString = (dateStr: string | null | undefined): string => {
     if (!dateStr) return '';
 
-    // Handle DD/MM/YY format
     if (dateStr.includes('/')) {
       const [day, month, year] = dateStr.split('/');
-      // Convert 2-digit year to 4-digit year
       const fullYear = year.length === 2 ? `20${year}` : year;
       return `${fullYear}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     }
 
-    // Handle DD.MM.YYYY format
     if (dateStr.includes('.')) {
       const [day, month, year] = dateStr.split('.');
       return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
     }
 
-    // If it's already in YYYY-MM-DD format, return as is
     if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
       return dateStr;
     }

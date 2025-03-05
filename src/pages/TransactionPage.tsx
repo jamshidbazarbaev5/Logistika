@@ -52,6 +52,10 @@ interface WorkingService {
   quantity?: number;
 }
 
+const formatNumber = (num: number) => {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+};
+
 export default function Transaction() {
   const { t } = useTranslation();
   const { calculatedServices = [], workingServices = [], totalPrice = 0, applicationId } = useSelector((state: any) => state.transaction);
@@ -170,31 +174,28 @@ export default function Transaction() {
       try {
         const response = await api.get(`/application/${applicationId}/`);
         
-        // Pre-fill form data with firm info
         setFormData({
           full_name: response.data.firm_info?.director_name || '',
           phone_number:response.data.firm_info?.phone_number || '',
           car_number: '',
         });
 
-        // First fetch the available products to get their correct IDs
         const productsResponse = await api.get('/items/product/');
         const availableProductsMap = productsResponse.data.results.reduce((acc: any, product: any) => {
           acc[product.name] = product;
           return acc;
         }, {});
         
-        // Map products using the correct IDs from available products
         const productsWithDetails = response.data.products.map((product: any) => {
           const matchingProduct = availableProductsMap[product.product_name];
           return {
-            product_id: matchingProduct?.id, // Use the ID from available products
+            product_id: matchingProduct?.id, 
             quantity: product.quantity,
             storage_id: product.storage_name === "Склад 1" ? 1 : 2,
             selected: false,
             name: product.product_name
           };
-        }).filter((product: any) => product.product_id); // Only include products with valid IDs
+        }).filter((product: any) => product.product_id);
         
         setAvailableProducts(productsWithDetails);
       } catch (error) {
@@ -208,13 +209,7 @@ export default function Transaction() {
   }, [applicationId]);
 
   useEffect(() => {
-    console.log('calculatedServices:', calculatedServices);
-    console.log('workingServices detail:', {
-      length: workingServices?.length,
-      data: workingServices,
-      isEmpty: !workingServices?.length
-    });
-    console.log('totalPrice:', totalPrice);
+    
     
     if (!calculatedServices?.length || !applicationId) {
       console.log('Navigating to application-list due to missing data');
@@ -245,12 +240,10 @@ export default function Transaction() {
           }))
         : [];
       
-      // Only validate services
       if (servicesToSubmit.length === 0 && workingServicesToSubmit.length === 0) {
         throw new Error('At least one service is required');
       }
 
-      // Only validate payment amounts if payments exist
       if (payments.length > 0) {
         const invalidPayment = payments.find(payment => payment.amount <= 0);
         if (invalidPayment) {
@@ -258,17 +251,14 @@ export default function Transaction() {
         }
       }
 
-      // Create payload with optional fields
       const payload = {
         application_id: applicationId,
         total_price: totalPrice,
         keeping_services: servicesToSubmit,
         working_services: workingServicesToSubmit,
-        // Only include form data fields if they have values
         ...(formData.full_name && { full_name: formData.full_name }),
         ...(formData.phone_number && { phone_number: formData.phone_number }),
         ...(formData.car_number && { car_number: formData.car_number }),
-        // Only include products if there are any
         ...(products.length > 0 && {
           products: products.map(product => ({
             product_id: product.product_id,
@@ -276,7 +266,6 @@ export default function Transaction() {
             quantity: product.quantity
           }))
         }),
-        // Only include payments if there are any
         ...(payments.length > 0 && {
           payments: payments.map(payment => ({
             payment_method: payment.payment_method,
@@ -286,7 +275,6 @@ export default function Transaction() {
         })
       };
 
-      console.log('Final payload:', payload);
       const response = await api.post('/transactions/', payload);
       console.log('Transaction created successfully:', response.data);
       
@@ -295,15 +283,12 @@ export default function Transaction() {
     } catch (error: any) {
       console.error('Error creating transaction:', error);
       
-      // Enhanced error handling
       let errorMsg = 'Error creating transaction';
       
       if (error.response?.data) {
-        // Handle array or string error messages
         if (Array.isArray(error.response.data)) {
           errorMsg = error.response.data.join(', ');
         } else if (typeof error.response.data === 'object') {
-          // Convert object of errors into readable format
           errorMsg = Object.entries(error.response.data)
             .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
             .join('\n');
@@ -392,7 +377,7 @@ export default function Transaction() {
                   <span>
                     {service.service_name} × {service.requested_amount}
                   </span>
-                  <span>{service.price} сум</span>
+                  <span>{formatNumber(service.price)} сум</span>
                 </div>
               ))}
             
@@ -403,12 +388,12 @@ export default function Transaction() {
                 <span>
                   {service.service_name} × {service.amount}
                 </span>
-                <span>{service.price} сум</span>
+                <span>{formatNumber(service.price)} сум</span>
               </div>
             ))}
             
             <div className="font-bold pt-4 border-t">
-              {t('transaction.totalPrice', 'Total Price')}: {totalPrice} сум
+              {t('transaction.totalPrice', 'Total Price')}: {formatNumber(totalPrice)} сум
             </div>
           </div>
         </div>
@@ -447,7 +432,7 @@ export default function Transaction() {
                         onChange={(e) => handleProductQuantityChange(product.product_id, parseInt(e.target.value))}
                         className="w-20 rounded-md border p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                       />
-                      <span className="text-sm text-gray-500">units</span>
+                      {/* <span className="text-sm text-gray-500">units</span> */}
                     </div>
                   )}
                 </div>

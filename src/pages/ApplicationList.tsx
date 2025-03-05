@@ -112,33 +112,27 @@ interface FirmResponse {
   firm_name: string;
 }
 
-// Update the interface to include name_mode and code_mode
 interface Mode {
   id: number;
   name_mode: string;
   code_mode: string;
 }
 
-// Update the interface for the modes API response
 interface ModesResponse {
   results: Mode[];
 }
 
-// Add interface for Product API response
 interface ProductResponse {
   id: number;
   name: string;
-  // add other fields if needed
 }
 
 interface ProductApiResponse {
   results: ProductResponse[];
 }
 
-// Add this type definition near other interfaces
 type ApplicationStatus = 'active' | 'unpaid' | 'completed';
 
-// Update this helper function to get status color classes
 const getStatusClasses = (status: ApplicationStatus) => {
   switch (status) {
     case 'active':
@@ -152,9 +146,17 @@ const getStatusClasses = (status: ApplicationStatus) => {
   }
 };
 
-// Add this function before your component
 const isRelevantStatus = (status: string) => {
   return status === 'active' || status === 'unpaid';
+};
+
+const formatNumber = (num: number | string) => {
+  if (typeof num === 'string') {
+    num = parseFloat(num.replace(/[^\d.-]/g, ''));
+  }
+  if (isNaN(num)) return '0';
+  
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ", ");
 };
 
 export default function ApplicationList() {
@@ -179,11 +181,9 @@ export default function ApplicationList() {
     products: '',
   });
 
-  // Add pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Add these new state variables near the top with other state declarations
   const [isFormModalOpen] = useState(false);
   const [] = useState(false);
   
@@ -193,12 +193,9 @@ export default function ApplicationList() {
   const [, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
   const [, setStorages] = useState<Array<{ id: number; name: string }>>([]);
   const [productsList, setProductsList] = useState<ProductResponse[]>([]);
-  // const [, setAvailableModes] = useState<Array<{ id: number; name: string }>>([]);
 
-  // Add state for available modes
   const [availableModes, setAvailableModes] = useState<Mode[]>([]);
 
-  // Add useEffect to fetch products when component mounts
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -273,15 +270,12 @@ export default function ApplicationList() {
     try {
       const params = new URLSearchParams();
       
-      // Always append all parameters, even if empty
       Object.entries(searchParams).forEach(([key, value]) => {
-        params.append(key, value || ''); // Use empty string if value is falsy
+        params.append(key, value || '');
       });
       
-      // Add page parameter
       params.append('page', currentPage.toString());
 
-      // Make the API call with the params
       const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse] = await Promise.all([
         api.get<PaginatedResponse<Application>>(`/application/?${params.toString()}`),
         api.get<PaginatedResponse<FirmResponse>>('/firms/'),
@@ -289,7 +283,6 @@ export default function ApplicationList() {
         api.get<ModesResponse>('/modes/modes/')
       ]);
 
-      // Add type checking and error handling for firms data
       const firmsData = Array.isArray(firmsResponse.data?.results) ? firmsResponse.data.results : [];
       const firmMap = firmsData.reduce((acc: Record<number, string>, firm: FirmResponse) => {
         if (firm && typeof firm.id === 'number' && typeof firm.firm_name === 'string') {
@@ -298,7 +291,6 @@ export default function ApplicationList() {
         return acc;
       }, {});
 
-      // Add type checking and error handling for modes data
       const modesData = Array.isArray(modesResponse.data?.results) ? modesResponse.data.results : [];
       const modesMap = modesData.reduce((acc: Record<number, ApplicationMode[]>, mode: ApplicationMode) => {
         if (mode && mode.application_id) {
@@ -441,29 +433,25 @@ export default function ApplicationList() {
   const handleDownloadExcel = () => {
     const params = new URLSearchParams();
     
-    // Map the frontend date parameters to backend format
     const searchParamsForExport = {
       firm_name: searchParams.firm_name,
       decloration_number: searchParams.decloration_number,
       number_of_application: searchParams.number_of_application,
       firm_INN: searchParams.firm_INN,
-      coming_date_gte: searchParams.coming_date_gte, // Single underscore
-      coming_date_lte: searchParams.coming_date_lte, // Single underscore
+      coming_date_gte: searchParams.coming_date_gte,
+      coming_date_lte: searchParams.coming_date_lte,
       products: searchParams.products
     };
 
-    // Add all parameters, even if empty
     Object.entries(searchParamsForExport).forEach(([key, value]) => {
       console.log(`Adding parameter: ${key} = ${value}`); // Debug log
       params.append(key, value || '');
     });
 
-    // Use the exact URL from the backend
     const downloadUrl = `https://cargo-calc.uz/api/v1/export_excel/?${params.toString()}`;
     
     console.log('Download URL:', downloadUrl); // Debug log
 
-    // Create a temporary link element and trigger the download
     const link = document.createElement('a');
     link.href = downloadUrl;
     link.setAttribute('download', 'applications.xlsx');
@@ -472,7 +460,6 @@ export default function ApplicationList() {
     document.body.removeChild(link);
   };
 
-  // Inside your component, before rendering the table:
   const filteredApplications = applications.filter(app => isRelevantStatus(app.status));
 
   return (
@@ -513,7 +500,7 @@ export default function ApplicationList() {
             fields={searchFields}
             initialValues={searchParams}
             onSearch={(values) => {
-              console.log('Search values:', values); // Debug log
+              console.log('Search values:', values); 
               setSearchParams(values);
             }}
             className="grid grid-cols-12 gap-4"
@@ -583,7 +570,7 @@ export default function ApplicationList() {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {application.total_price } сум
+                    {formatNumber(application.total_price || 0)} сум
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     <div>{t("applicationList.comingDate", "Coming")}: {application.coming_date}</div>

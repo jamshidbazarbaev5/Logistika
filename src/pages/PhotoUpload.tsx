@@ -24,9 +24,7 @@ export default function PhotoUpload() {
     const fetchApplications = async () => {
       try {
         const response = await apiService.getApplications();
-        console.log('API Response:', response.data);
         
-        // Filter out applications without declaration numbers if needed
         const applicationsData = response.data.filter((app: Application) => app.decloration_number);
         setApplications(applicationsData);
       } catch (error) {

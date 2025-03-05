@@ -87,7 +87,6 @@ interface SearchParams extends Record<string, string> {
   products: string;
 }
 
-// Add interfaces for API responses
 interface PaginatedResponse<T> {
   links: {
     first: string | null;
@@ -107,23 +106,19 @@ interface FirmResponse {
   firm_name: string;
 }
 
-// Update the interface to include name_mode and code_mode
 interface Mode {
   id: number;
   name_mode: string;
   code_mode: string;
 }
 
-// Update the interface for the modes API response
 interface ModesResponse {
   results: Mode[];
 }
 
-// Add interface for Product API response
 interface ProductResponse {
   id: number;
   name: string;
-  // add other fields if needed
 }
 
 interface ProductApiResponse {
@@ -147,7 +142,10 @@ const STATUS_CONFIG = {
   }
 } as const;
 
-
+const formatNumber = (num: number | null): string => {
+  if (num === null) return '0';
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+};
 
 export default function ArchiveApplicationList() {
   const { t } = useTranslation();
@@ -166,7 +164,6 @@ export default function ArchiveApplicationList() {
     products: '',
   });
 
-  // Add pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -179,15 +176,11 @@ export default function ArchiveApplicationList() {
   const [, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
   const [, setStorages] = useState<Array<{ id: number; name: string }>>([]);
   const [productsList, setProductsList] = useState<ProductResponse[]>([]);
-  // const [, setAvailableModes] = useState<Array<{ id: number; name: string }>>([]);
 
-  // Add state for available modes
   const [availableModes, setAvailableModes] = useState<Mode[]>([]);
 
-  // Add navigation hook
   const navigate = useNavigate();
 
-  // Add useEffect to fetch products when component mounts
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -262,17 +255,14 @@ export default function ArchiveApplicationList() {
     try {
       const params = new URLSearchParams();
       
-      // Add all search parameters
       Object.entries(searchParams).forEach(([key, value]) => {
         if (value) {
           params.append(key, value);
         }
       });
       
-      // Add page parameter
       params.append('page', currentPage.toString());
 
-      // Make the API call with the params
       const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse] = await Promise.all([
         api.get<PaginatedResponse<Application>>(`/application/?${params.toString()}`),
         api.get<PaginatedResponse<FirmResponse>>('/firms/'),
@@ -280,12 +270,10 @@ export default function ArchiveApplicationList() {
         api.get<ModesResponse>('/modes/modes/')
       ]);
 
-      // Filter applications to only show completed ones
       const completedApplications = Array.isArray(applicationsResponse.data?.results) 
         ? applicationsResponse.data.results.filter(app => app.status === 'completed')
         : [];
 
-      // Add type checking and error handling for firms data
       const firmsData = Array.isArray(firmsResponse.data?.results) ? firmsResponse.data.results : [];
       const firmMap = firmsData.reduce((acc: Record<number, string>, firm: FirmResponse) => {
         if (firm && typeof firm.id === 'number' && typeof firm.firm_name === 'string') {
@@ -294,7 +282,6 @@ export default function ArchiveApplicationList() {
         return acc;
       }, {});
 
-      // Add type checking and error handling for modes data
       const modesData = Array.isArray(modesResponse.data?.results) ? modesResponse.data.results : [];
       const modesMap = modesData.reduce((acc: Record<number, ApplicationMode[]>, mode: ApplicationMode) => {
         if (mode && mode.application_id) {
@@ -316,7 +303,6 @@ export default function ArchiveApplicationList() {
       setApplications(completedApplications);
       setLoading(false);
 
-      // Update pagination based on filtered results
       setTotalPages(Math.ceil(completedApplications.length / applicationsResponse.data.page_size));
     } catch (err) {
       console.error('Error fetching data:', err);
@@ -364,7 +350,6 @@ export default function ArchiveApplicationList() {
     }
   }, [isFormModalOpen]);
 
-  // Add handler for viewing details
   const handleViewDetails = (applicationId: number) => {
     navigate(`/archive/${applicationId}`);
   };
@@ -389,23 +374,20 @@ export default function ArchiveApplicationList() {
       decloration_number: searchParams.decloration_number,
       number_of_application: searchParams.number_of_application,
       firm_INN: searchParams.firm_INN,
-      coming_date_gte: searchParams.coming_date_gte, // Single underscore
-      coming_date_lte: searchParams.coming_date_lte, // Single underscore
+      coming_date_gte: searchParams.coming_date_gte,
+      coming_date_lte: searchParams.coming_date_lte, 
       products: searchParams.products
     };
 
-    // Add all parameters, even if empty
     Object.entries(searchParamsForExport).forEach(([key, value]) => {
       console.log(`Adding parameter: ${key} = ${value}`); // Debug log
       params.append(key, value || '');
     });
 
-    // Use the exact URL from the backend
     const downloadUrl = `https://cargo-calc.uz/api/v1/export_excel/?${params.toString()}`;
     
-    console.log('Download URL:', downloadUrl); // Debug log
+    console.log('Download URL:', downloadUrl);
 
-    // Create a temporary link element and trigger the download
     const link = document.createElement('a');
     link.href = downloadUrl;
     link.setAttribute('download', 'applications.xlsx');
@@ -483,7 +465,7 @@ export default function ArchiveApplicationList() {
             fields={searchFields}
             initialValues={searchParams}
             onSearch={(values) => {
-              console.log('Search values:', values); // Debug log
+              console.log('Search values:', values);
               setSearchParams(values);
             }}
             className="grid grid-cols-12 gap-4"
@@ -553,7 +535,7 @@ export default function ArchiveApplicationList() {
                     )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {application.total_price } сум
+                    {formatNumber(application.total_price)} сум
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     <div>{t("applicationList.comingDate", "Coming")}: {application.coming_date}</div>

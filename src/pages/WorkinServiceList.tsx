@@ -12,10 +12,8 @@ interface WorkingService {
   base_price: string;
   units: string;
   service: number;
-  service_name?: string; // Added from the name endpoint
+  service_name?: string; 
 }
-
-
 
 export default function WorkingServiceList() {
   const { t } = useTranslation();
@@ -38,11 +36,14 @@ export default function WorkingServiceList() {
       const names = namesResponse.data.results || [];
       const services = servicesResponse.data || [];
 
-      const servicesWithNames = services.map((service: any) => ({
-        ...service,
-        service_name: names.find((name: any) => name.id === service.service)?.service_name,
-        units: normalizeUnits(service.units)
-      }));
+      const servicesWithNames = services
+        .map((service: any) => ({
+          ...service,
+          service_name: names.find((name: any) => name.id === service.service)?.service_name,
+          units: normalizeUnits(service.units)
+        }))
+        // Sort by ID to maintain consistent order
+        .sort((a: WorkingService, b: WorkingService) => a.id - b.id);
 
       const yearsFromServices = [...new Set(services.map((service: any) => service.year))];
       const uniqueYears:any = [...new Set([currentYear, ...yearsFromServices])];
@@ -64,6 +65,15 @@ export default function WorkingServiceList() {
       'шт': 'sht'
     };
     return unitMap[unit] || unit;
+  };
+
+  // Add this function to display units in Russian
+  const displayUnit = (unit: string): string => {
+    const unitDisplayMap: { [key: string]: string } = {
+      'hour': 'час',
+      'sht': 'шт'
+    };
+    return unitDisplayMap[unit] || unit;
   };
 
   useEffect(() => {
@@ -92,6 +102,16 @@ export default function WorkingServiceList() {
 
   const handleEdit = (service: WorkingService) => {
     navigate(`/working-services/edit/${service.id}`);
+  };
+
+  // Add the helper function
+  const formatNumber = (num: number | string) => {
+    if (typeof num === 'string') {
+      num = parseFloat(num.replace(/[^\d.-]/g, ''));
+    }
+    if (isNaN(num)) return '0';
+    
+    return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ", ");
   };
 
   if (loading) {
@@ -169,10 +189,10 @@ export default function WorkingServiceList() {
                     {service.service_name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {service.base_price}
+                    {formatNumber(service.base_price)} сум
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {service.units}
+                    {displayUnit(service.units)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {service.year}

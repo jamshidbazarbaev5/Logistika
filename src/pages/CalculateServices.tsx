@@ -25,6 +25,7 @@
       price: string;
       service_id: number;
       application_id: number;
+      service_name: string;
     }[];
   }
 
@@ -115,6 +116,7 @@
     price: string;
     service_id: number;
     application_id: number;
+    service_name: string;
   }
 
   export default function CalculateServices() {
@@ -144,7 +146,6 @@
     const [errorModalOpen, setErrorModalOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [expandedTransactions, setExpandedTransactions] = useState<number[]>([]);
-    const [, setUnpaidAmount] = useState<number>(0);
     const [showSuccessNotification, setShowSuccessNotification] = useState(false);
 
     useEffect(() => {
@@ -158,19 +159,17 @@
           setApplication(appResponse.data);
           setApplicationData(appResponse.data);
           setServiceTypes(servicesResponse.data.results);
-          setOriginalWorkingServices(appResponse.data.working_services);
+          setOriginalWorkingServices(appResponse.data.working_services as WorkingService[]);
 
-          // Initialize amounts with maximum values from keeping services
           const initialAmounts: Record<number, number> = {};
           appResponse.data.keeping_services.forEach((service: KeepingService) => {
-            initialAmounts[service.service_type_id] = service.amount; // Set to max amount
+            initialAmounts[service.service_type_id] = service.amount; 
           });
           setAmounts(initialAmounts);
 
-          // Initialize working amounts with maximum values from working services
           const initialWorkingAmounts: Record<number, number> = {};
           appResponse.data.working_services.forEach((service: WorkingService) => {
-            initialWorkingAmounts[service.service_id] = service.quantity; // Set to max quantity
+            initialWorkingAmounts[service.service_id] = service.quantity;
           });
           setWorkingAmounts(initialWorkingAmounts);
         } catch (error) {
@@ -280,19 +279,7 @@
       }
     }, [activeTab, applicationData]);
 
-    useEffect(() => {
-      const fetchUnpaidAmount = async () => {
-        try {
-          // Assuming there's an API endpoint for getting unpaid amount
-          const response = await api.get('/application/unpaid-amount/');
-          setUnpaidAmount(response.data.amount || 0);
-        } catch (error) {
-          console.error('Error fetching unpaid amount:', error);
-        }
-      };
-
-      fetchUnpaidAmount();
-    }, []);
+  
 
     const handleAmountChange = (serviceTypeId: number, amount: number) => {
       const originalService = application?.keeping_services.find(
@@ -321,15 +308,13 @@
 
       setLoading(true);
       try {
-        // Format keeping services
         const keepingServices = Object.entries(amounts).map(([serviceTypeId, amount]) => ({
           service_type_id: Number(serviceTypeId),
           amount
         }));
 
-        // Format working services, excluding those with amount 0
         const workingServices = Object.entries(workingAmounts)
-          .filter(([, amount]) => amount > 0) // Only include services with amount > 0
+          .filter(([, amount]) => amount > 0) 
           .map(([serviceId, amount]) => ({
             service_type_id: Number(serviceId),
             amount
@@ -340,18 +325,18 @@
           working_services: workingServices 
         });
 
-        console.log('API Response:', response.data);
-
         if (response.data) {
-          // Map the response to include only the working services that had non-zero amounts
           const mappedWorkingServices = response.data.working_services
             .filter((service: any) => workingAmounts[service.service_type_id] > 0)
             .map((service: any) => {
-              const originalAmount = workingAmounts[service.service_type_id];
+              const originalService = application.working_services.find(
+                ws => ws.service_id === service.service_type_id
+              );
               return {
                 ...service,
-                amount: originalAmount || 0,
-                requested_amount: originalAmount || 0,
+                service_name: originalService?.service_name || service.service_name,
+                amount: workingAmounts[service.service_type_id] || 0,
+                requested_amount: workingAmounts[service.service_type_id] || 0,
                 total_amount: service.total_amount
               };
             });
@@ -404,31 +389,25 @@
 
         await api.post('/application/pay/', payload);
         
-        // Fetch updated application data
-        const [appResponse, paymentsResponse] = await Promise.all([
+          const [appResponse, paymentsResponse] = await Promise.all([
           api.get(`/application/${id}/`),
           api.get(`/application/pay/?application=${id}`)
         ]);
 
-        // Update application data
         setApplicationData(appResponse.data);
         
-        // Update payments list
         const filteredPayments = paymentsResponse.data.results.filter(
           (payment: Payment) => payment.application === Number(id)
         );
         setPayments(filteredPayments);
         
-        // Check if total_price is now 0 (fully paid)
         if (appResponse.data.total_price === 0) {
           setShowSuccessNotification(true);
-          // Auto-hide notification after 5 seconds
           setTimeout(() => {
             setShowSuccessNotification(false);
           }, 5000);
         }
         
-        // Reset form
         setNewPayment({
           payment_method: 1,
           amount: "",
@@ -436,7 +415,6 @@
         });
       } catch (error: any) {
         console.error('Error submitting payment:', error);
-        // Handle array of error messages
         if (error.response?.data?.amount) {
           setErrorMessage(error.response.data.amount.join(' '));
           setErrorModalOpen(true);
@@ -540,7 +518,6 @@
                   </h2>
                   
                   <div className="max-h-[calc(100vh-300px)] overflow-y-auto pr-2">
-                    {/* Only render keeping services section if there are services with amount > 0 */}
                     {application?.keeping_services.some(service => service.amount > 0) && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {application.keeping_services
@@ -578,45 +555,41 @@
                       </div>
                     )}
 
-                    {/* Only render working services section if there are services with quantity > 0 */}
                     {application?.working_services.some(service => service.quantity > 0) && (
                       <div className="mt-6">
                         <h3 className="text-lg font-medium mb-4">
                           {t('calculateServices.workingServices', 'Working Services')}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          {application.working_services
+                          {(application.working_services as WorkingService[])
                             .filter(service => service.quantity > 0)
-                            .map((service) => {
-                              const serviceType = workingServiceTypes.find(st => st.id === service.service_id);
-                              return (
-                                <div 
-                                  key={service.id}
-                                  className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
-                                >
-                                  <div className="flex flex-col space-y-2">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                      {serviceType?.service_name || `Service ${service.service_id}`}
-                                    </label>
-                                    <div className="flex items-center justify-between space-x-4">
-                                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                                        {t('calculateServices.maxAmount', 'Max amount')}: {service.quantity}
-                                      </span>
-                                      <input
-                                        type="number"
-                                        min="0"
-                                        max={service.quantity}
-                                        value={workingAmounts[service.service_id] || 0}
-                                        onChange={(e) => handleWorkingAmountChange(service.service_id, parseInt(e.target.value) || 0)}
-                                        className="w-24 rounded-md border border-gray-300 dark:border-gray-600 
-                                          bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100
-                                          focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]"
-                                      />
-                                    </div>
+                            .map((service) => (
+                              <div 
+                                key={service.id}
+                                className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
+                              >
+                                <div className="flex flex-col space-y-2">
+                                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                    {service.service_name}
+                                  </label>
+                                  <div className="flex items-center justify-between space-x-4">
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                      {t('calculateServices.maxAmount', 'Max amount')}: {service.quantity}
+                                    </span>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      max={service.quantity}
+                                      value={workingAmounts[service.service_id] || 0}
+                                      onChange={(e) => handleWorkingAmountChange(service.service_id, parseInt(e.target.value) || 0)}
+                                      className="w-24 rounded-md border border-gray-300 dark:border-gray-600 
+                                        bg-white dark:bg-gray-700 px-3 py-2 text-sm text-gray-900 dark:text-gray-100
+                                        focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]"
+                                    />
                                   </div>
                                 </div>
-                              );
-                            })}
+                              </div>
+                            ))}
                         </div>
                       </div>
                     )}
@@ -683,11 +656,9 @@
                         .filter(service => service.total_amount > 0 || service.price > 0)
                         .map((service, index) => {
                           const requestedAmount = workingAmounts[service.service_type_id];
-                          // Log the service and available types to debug
                           console.log('Result service:', service);
                           console.log('Available types:', workingServiceTypes);
                           
-                          // Try to find the service type using both IDs
                           const serviceType = workingServiceTypes.find(st => 
                             st.id === service.service_type_id || 
                             st.id === originalWorkingServices.find(ows => ows.service_id === service.service_type_id)?.service_id
@@ -764,7 +735,6 @@
                   key={transaction.id}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden"
                 >
-                  {/* Header */}
                   <button
                     onClick={() => toggleTransaction(transaction.id)}
                     className="w-full text-left px-6 py-4 bg-gray-50 dark:bg-gray-800"
@@ -792,7 +762,6 @@
                     </div>
                   </button>
 
-                  {/* Expandable Content */}
                   {expandedTransactions.includes(transaction.id) && (
                     <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
                       {/* Customer Info */}

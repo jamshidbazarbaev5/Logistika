@@ -149,7 +149,6 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) 
   };
 
   const handleNext = () => {
-    // Remove the firm_id check since photos are optional
     if (onSuccess) {
       onSuccess();
     }
@@ -354,7 +353,6 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     const product = productDetails.get(productId);
     const storage = storages.find(s => s.id === storageId);
 
-    // If product details are not found, fetch them
     if (!product) {
       fetchProductDetails(productId);
     }
@@ -365,7 +363,6 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     };
   };
 
-  // Update the searchProducts function
   const searchProducts = async (searchTerm: string) => {
     try {
       if (!searchTerm.trim()) {
@@ -374,7 +371,6 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
         return;
       }
 
-      // If exact match exists in productDetails, don't search
       const existingProduct = Array.from(productDetails.values())
         .find(p => p.name.toLowerCase() === searchTerm.toLowerCase());
       
@@ -386,7 +382,6 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
       const response = await api.get(`/items/product/?product_name=${searchTerm}`);
       const results = response.data.results || [];
       
-      // If there's an exact match in results, select it automatically
       const exactMatch = results.find(
         (p: Product) => p.name.toLowerCase() === searchTerm.toLowerCase()
       );
@@ -404,7 +399,6 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     }
   };
 
-  // Add debounced search effect
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       searchProducts(productSearch);
@@ -431,10 +425,9 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
             onChange={(e) => {
               const value = e.target.value;
               setProductSearch(value);
-              setSelectedProduct(0); // Reset selected product when typing
+              setSelectedProduct(0); 
             }}
             onBlur={() => {
-              // Small delay to allow click events to fire on dropdown items
               setTimeout(() => {
                 setShowProductDropdown(false);
               }, 200);
@@ -546,7 +539,6 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
         {t('createApplication.addProduct')}
       </button>
 
-      {/* Display selected products */}
       <div className="mt-6">
         <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
           {t('createApplication.selectedProducts')}
@@ -767,24 +759,17 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
       const currentYear = new Date().getFullYear();
       
       try {
-        // Fetch working service names first
         const workingNamesRes = await api.get('/working_service/name/');
         const workingNames = workingNamesRes.data.results || [];
-        console.log('Working service names:', workingNames);
         
-        // Create a map of service names
         const namesMap = new Map();
         workingNames.forEach((service: { id: number, service_name: string }) => {
           namesMap.set(service.id, service.service_name);
         });
-        console.log('Names map:', Object.fromEntries(namesMap));
 
-        // Fetch working service tariffs for current year
         const workingTariffsRes = await api.get(`/working_service/tariff/?year=${currentYear}`);
         const workingTariffs = workingTariffsRes.data.results || [];
-        console.log('Working service tariffs:', workingTariffs);
 
-        // Combine names with tariffs
         const combinedWorkingServices = workingTariffs.map((tariff: any) => ({
           id: tariff.id,
           tariff_id: tariff.id,
@@ -794,17 +779,14 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           units: tariff.units,
           year: tariff.year
         }));
-        console.log('Combined working services:', combinedWorkingServices);
 
         setWorkingServices(combinedWorkingServices);
 
-        // Fetch keeping services for current year
         const keepingRes = await api.get(`/keeping_service/keeping_service_price/?year=${currentYear}`);
         if (keepingRes.data?.results) {
           setKeepingServices(keepingRes.data.results);
         }
 
-        // Fetch names for keeping services
         const keepingNamePromises = keepingRes.data?.results?.map((service: any) =>
           api.get(`/keeping_service/keeping_service_name/${service.keeping_services_id}/`)
         ) || [];
@@ -880,7 +862,6 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     }
   };
 
-  // New remove handlers
   const handleRemoveKeepingService = (serviceId: number) => {
     setFormData(prev => ({
       ...prev,
@@ -1521,7 +1502,6 @@ export default function CreateApplication() {
       let errorMsg = '';
       
       if (error.response?.data) {
-        // Format error messages from the API response
         const errorData = error.response.data;
         errorMsg = Object.entries(errorData)
           .map(([key, value]) => {
@@ -1536,7 +1516,6 @@ export default function CreateApplication() {
         errorMsg = 'An error occurred while creating the application.';
       }
 
-      // Set error message and open modal
       setErrorMessage(errorMsg);
       setErrorModalOpen(true);
     }
@@ -1603,7 +1582,6 @@ export default function CreateApplication() {
   }, [firmSearch]);
 
   const handleFirmSelect = (firm: Firm) => {
-    console.log('Selected firm:', firm);
     
     if (!firm.id) {
       console.error('Invalid firm selected - firm.id is falsy');

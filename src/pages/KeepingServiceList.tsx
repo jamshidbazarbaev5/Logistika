@@ -55,6 +55,15 @@ interface PaginatedResponse<T> {
   count: number;
 }
 
+const formatNumber = (num: number | string) => {
+  if (typeof num === 'string') {
+    num = parseFloat(num.replace(/[^\d.-]/g, ''));
+  }
+  if (isNaN(num)) return '0';
+  
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ", ");
+};
+
 export default function KeepingServiceList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -90,16 +99,12 @@ export default function KeepingServiceList() {
       const names = (namesResponse?.data as PaginatedResponse<KeepingServiceName>)?.results || [];
       const prices = (pricesResponse?.data as PaginatedResponse<KeepingServicePrice>)?.results || [];
 
-      // Fix the type issue by ensuring we're working with numbers
       const yearsFromServices = [...new Set(prices.map(price => price.year))] as number[];
       const uniqueYears = [...new Set([currentYear, ...yearsFromServices])];
       setAvailableYears(uniqueYears.sort((a, b) => b - a));
 
-      // If no year is selected, use the most recent year
       const currentSelectedYear = selectedYear || (yearsFromServices.length > 0 ? Math.max(...yearsFromServices) : currentYear);
       setSelectedYear(currentSelectedYear);
-
-      // Filter prices for selected year
       const yearPrices = prices.filter(price => price.year === currentSelectedYear);
 
       console.log('Names:', names);
@@ -329,7 +334,7 @@ export default function KeepingServiceList() {
                     {service.base_day}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {service.base_price}
+                    {formatNumber(service.base_price)} сум
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {service.extra_price}

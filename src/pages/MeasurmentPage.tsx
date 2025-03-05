@@ -26,7 +26,6 @@ export default function CreateMeasurement() {
           name: "",
         });
         setShowSuccessModal(true);
-        // Optionally navigate to measurement list after success
         navigate('/measurements');
       }
     } catch (error: any) {

@@ -1,7 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
 import transactionReducer from './slice';
 
-// Properly type the RootState
 export interface RootState {
   transaction: ReturnType<typeof transactionReducer>;
 }
@@ -9,7 +8,6 @@ export interface RootState {
 const store = configureStore({
   reducer: {
     transaction: transactionReducer,
-    // add other reducers here if you have them
   },
 });
 

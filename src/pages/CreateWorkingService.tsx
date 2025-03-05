@@ -44,17 +44,14 @@ export default function CreateWorkingService() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch service names
         const serviceResponse = await api.get('https://cargo-calc.uz/api/v1/working_service/name/');
         setServiceNames(serviceResponse.data.results || []);
 
-        // If we have an ID, fetch the existing service data
         if (id) {
           const [serviceData] = await Promise.all([
             api.get(`https://cargo-calc.uz/api/v1/working_service/tariff/${id}/`)
           ]);
 
-          // Validate year when editing
           const serviceYear = serviceData.data.year;
           if (!availableYears.includes(serviceYear)) {
             alert(t('createWorkingService.invalidYear', 'Cannot edit service from this year. Only current, previous, and next year are allowed.'));
@@ -62,17 +59,16 @@ export default function CreateWorkingService() {
             return;
           }
 
-          // Normalize the units value before setting form data
           const normalizedUnits = serviceData.data.units === 'час' ? 'hour' : 
                                 serviceData.data.units === 'шт' ? 'sht' : 
                                 serviceData.data.units;
 
-          // Update form with existing data and normalized units
+          // Updte form with existing data and normalized units
           setFormData({
             service: serviceData.data.service,
             year: serviceYear,
             base_price: serviceData.data.base_price,
-            units: normalizedUnits // Use the normalized value
+            units: normalizedUnits 
           });
         }
       } catch (error) {
@@ -85,7 +81,6 @@ export default function CreateWorkingService() {
     fetchData();
   }, [id, navigate, t]);
 
-  // Add loading state display
   if (loading) {
     return (
       <FormLayout
@@ -124,7 +119,7 @@ export default function CreateWorkingService() {
     try {
       const submitData = {
         ...formData,
-        units: formData.units // Make sure this is always 'sht' or 'hour'
+        units: formData.units
       };
 
       if (id) {

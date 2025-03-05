@@ -181,53 +181,53 @@ export default function CreateKeepingService() {
               <label className="block text-sm font-medium text-gray-600 dark:text-white mb-1">
                 {t('createKeepingService.serviceName', 'Service Name')}
               </label>
-              <div className="relative service-select">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onClick={() => setIsDropdownOpen(true)}
-                  className="block w-full rounded-md border border-gray-300 dark:border-gray-600 
-                    bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
-                    px-3 py-2 text-sm md:text-base
-                    focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
-                  placeholder={t('createKeepingService.searchOrCreate', 'Search or create new service')}
-                />
-                {isDropdownOpen && (
-                  <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 rounded-md shadow-lg max-h-60 overflow-auto">
-                    {filteredNames.map((service) => (
-                      <div
-                        key={service.id}
-                        className={`px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600
-                          ${service.id === formData.keeping_services_id ? 'bg-gray-100 dark:bg-gray-600' : ''}`}
-                        onClick={() => {
-                          setFormData(prev => ({
-                            ...prev,
-                            keeping_services_id: service.id
-                          }));
-                          setSearchQuery(service.name);
-                          setIsDropdownOpen(false);
-                        }}
-                      >
-                        {service.name}
-                      </div>
-                    ))}
-                    {searchQuery && filteredNames.length === 0 && (
-                      <div className="px-4 py-2">
-                        <button
-                          type="button"
+              <div className="space-y-2">
+                <div className="relative service-select">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onClick={() => setIsDropdownOpen(true)}
+                    className="block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                      bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
+                      px-3 py-2 text-sm md:text-base
+                      focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                    placeholder={t('createKeepingService.searchService', 'Search service')}
+                  />
+                  {isDropdownOpen && filteredNames.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-700 rounded-md shadow-lg max-h-60 overflow-auto">
+                      {filteredNames.map((service) => (
+                        <div
+                          key={service.id}
+                          className={`px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600
+                            ${service.id === formData.keeping_services_id ? 'bg-gray-100 dark:bg-gray-600' : ''}`}
                           onClick={() => {
-                            setNewServiceName(searchQuery);
-                            setShowCreateNameModal(true);
+                            setFormData(prev => ({
+                              ...prev,
+                              keeping_services_id: service.id
+                            }));
+                            setSearchQuery(service.name);
+                            setIsDropdownOpen(false);
                           }}
-                          className="text-[#6C5DD3] hover:text-[#5c4eb3] font-medium"
                         >
-                          {t('createKeepingService.createNewWithName', '+ Create "{{name}}"', { name: searchQuery })}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
+                          {service.name}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewServiceName(searchQuery);
+                    setShowCreateNameModal(true);
+                  }}
+                  className="w-full px-4 py-2 text-sm font-medium text-[#6C5DD3] bg-white 
+                    border border-[#6C5DD3] rounded-md hover:bg-[#6C5DD3] hover:text-white
+                    transition-colors duration-200 ease-in-out"
+                >
+                  {t('createKeepingService.createNewService', '+ Create New Service')}
+                </button>
               </div>
             </div>
 
