@@ -575,7 +575,12 @@
     "products": "Mahsulotlar",
     "quantity": "Miqdor",
     "total": "Jami",
-    "noTransactions": "Tranzaksiyalar topilmadi"
+    "noTransactions": "Tranzaksiyalar mavjud emas",
+    "dalolatnoma": "Dalolatnoma",
+    "download": "Yuklash",
+    "downloadError": "Faylda xatolik yuz berdi",
+    "dalolatnomaTitle": "Dalolatnoma",
+    "transactionID": "Tranzaksiya"
   },
 "transaction":{
   "success":{

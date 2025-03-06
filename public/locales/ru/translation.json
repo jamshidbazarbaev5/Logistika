@@ -312,7 +312,7 @@
     "deleteConfirmation": "Вы уверены, что хотите удалить заявку \"{{declarationNumber}}\"? Это действие нельзя отменить.",
     "delete": "Удалить",
     "deleteSuccess": "Заявка успешно удалена",
-    "unknownFirm": "Неизвестная Компания",
+    "unknownFirmcd": "Неизвестная Компания",
     "table": {
       "number": "№",
       "declarationNumber": "Номер Декларации",
@@ -704,7 +704,12 @@
     "products": "Товары",
     "quantity": "Количество",
     "total": "Итого",
-    "noTransactions": "Транзакции не найдены"
+    "noTransactions": "Транзакции не найдены",
+    "dalolatnoma": "Акт",
+    "download": "Скачать",
+    "downloadError": "Ошибка при скачивании файла",
+    "dalolatnomaTitle": "Акт",
+    "transactionId": "Транзакция"
   },
   "transaction": {
     "success":{

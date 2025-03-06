@@ -763,7 +763,11 @@
     "products": "Ónimler",
     "quantity": "Mug'dar",
     "total": "Ulıwma",
-    "noTransactions": "Tranzaksiyalar tabılmadı"
+    "noTransactions": "Tranzaksiyalar tabılmadı",
+    "dalolatnoma": "Dálolatnama",
+    "download": "Júklew",
+    "downloadError": "Fayldı júklewde qátelik júz berdi",
+    "dalolatnomaTitle": "Dálolatnama"
   },
   "transaction": {
     "success":{

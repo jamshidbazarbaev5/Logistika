@@ -56,9 +56,9 @@
     id: number;
     user: number;
     application_id: number;
-    full_name: string;
-    phone_number: string;
-    car_number: string;
+    full_name: string | null;
+    phone_number: string | null;
+    car_number: string | null;
     date_of_transaction: string;
     products: {
       quantity: number;
@@ -129,7 +129,7 @@
     const [amounts, setAmounts] = useState<Record<number, number>>({});
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [activeTab, setActiveTab] = useState<'calculate' | 'history' | 'payments'>('calculate');
+    const [activeTab, setActiveTab] = useState<'calculate' | 'history' | 'payments' | 'dalolatnoma'>('calculate');
     const [transactionHistory, setTransactionHistory] = useState<TransactionHistory[]>([]);
     const [ , setProducts] = useState<Record<number, Product>>({});
     const [payments, setPayments] = useState<Payment[]>([]);
@@ -433,7 +433,33 @@
       );
     };
 
-   
+    const handleDownloadExcel = async (transactionId: number) => {
+      try {
+        const response = await api.get(`/export_excel_transaction/${transactionId}/`, {
+          responseType: 'blob'
+        });
+        
+        const blob = new Blob([response.data], { 
+          type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+        });
+        
+        const url = window.URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `dalolatnoma_${transactionId}.xlsx`);
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        window.URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Error downloading Excel file:', error);
+        setErrorMessage(t('dalolatnoma.downloadError', 'Error downloading the file'));
+        setErrorModalOpen(true);
+      }
+    };
 
     return (
       <div className="p-6 bg-white dark:bg-gray-900">
@@ -460,7 +486,7 @@
               }`}
               onClick={() => setActiveTab('calculate')}
             >
-              {t('calculateServices.calculate', )}
+              {t('calculateServices.calculate')}
             </button>
             <button
               className={`py-2 px-4 ${
@@ -470,7 +496,7 @@
               }`}
               onClick={() => setActiveTab('history')}
             >
-              {t('calculateServices.history', 'Transaction History')}
+              {t('calculateServices.history')}
             </button>
             <button
               className={`py-2 px-4 ${
@@ -480,7 +506,17 @@
               }`}
               onClick={() => setActiveTab('payments')}
             >
-              {t('calculateServices.payments', 'Payments')}
+              {t('calculateServices.payments')}
+            </button>
+            <button
+              className={`py-2 px-4 ${
+                activeTab === 'dalolatnoma'
+                  ? 'border-b-2 border-[#6C5DD3] text-[#6C5DD3]'
+                  : 'text-gray-500'
+              }`}
+              onClick={() => setActiveTab('dalolatnoma')}
+            >
+              {t('calculateServices.dalolatnoma', 'Dalolatnoma')}
             </button>
           </div>
         </div>
@@ -875,7 +911,7 @@
               ))
             )}
           </div>
-        ) : (
+        ) : activeTab === 'payments' ? (
           <div className="space-y-6">
             {applicationData && (
               <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
@@ -995,6 +1031,55 @@
                 ))}
               </div>
             </div>
+          </div>
+        ) : (
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h2 className="text-lg font-medium mb-4">
+              {t('calculateServices.dalolatnomaTitle', )}
+            </h2>
+            
+            {transactionHistory.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                {t('calculateServices.noTransactions', )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {transactionHistory.map((transaction) => (
+                  <div 
+                    key={transaction.id}
+                    className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                  >
+                    <div>
+                      <div className="font-medium">
+                        {t('calculateServices.transactionId',)} #{transaction.id}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {new Date(transaction.date_of_transaction).toLocaleDateString()}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDownloadExcel(transaction.id)}
+                      className="inline-flex items-center space-x-2 bg-[#6C5DD3] text-white px-4 py-2 rounded-lg hover:bg-[#5c4eb3]"
+                    >
+                      <svg 
+                        className="w-5 h-5" 
+                        fill="none" 
+                        stroke="currentColor" 
+                        viewBox="0 0 24 24"
+                      >
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth={2} 
+                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" 
+                        />
+                      </svg>
+                      <span>{t('calculateServices.download',)}</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
