@@ -30,10 +30,15 @@
 
   "createApplication": {
     "title": "Ótinish Jaratıw",
+    "productName": "Ónim Atı",
+    "productNamePlaceholder": "Ónim atın kiritiń",
+    "tnvedCode": "TNVED Kod",
+    "tnvedCodePlaceholder": "TNVED kodini kiritiń",
     "numberOfApplication": "Ótinish Nomeri",
     "vipApplication": "VIP Ariza",
     "storage": "Ombor",
     "product": "Ónim",
+    "searchStorage": "Omborni izlew",
     "units": "Birlikler",
     "tariff": "Tarif",
     "year": "Jıl",
@@ -145,7 +150,8 @@
     "searchOrCreate": "Xızmetti izlew yamasa jańa jaratıw",
     "createNewWithName": "+ \"{{name}}\" dı jaratıw",
     "baseDays": "Tiykarǵı Kúnler",
-
+    "measurement": "O'lchov Birliklari",
+    "selectMeasurement": "O'lchov birlikini tanlang",
     "createNewService": "Jańa Xızmet Jaratıw",
     "enterServiceName": "Xızmet atın kiritiń",
     "year": "Jıl",
@@ -558,6 +564,8 @@
     "keepingServices": "Saqlaw Xızmetleri"
   },
   "productList": {
+    "tnvedCode": "TNVED Kod",
+    "tnvedCodePlaceholder": "TNVED kodini kiriting",
     "form":{
       "name":"Ónim Atı",
       "category":"Kategoriya",
@@ -658,6 +666,8 @@
     "numberOfApplication":"Ariza Raqami",
     "deportedDate":"Ketiw Sánesi",
     "selectPhotos": "Foto tanlash",
+    "tnvedCode":"TNVED Kod",
+    "tnvedCodePlaceholder":"TNVED kodini kiritiń",
     "applicationNumber":"Ótinish Nomeri",
     "uploadPhotos": "Foto yuklash",
     "photos": "Foto",
@@ -729,7 +739,7 @@
   
   "calculateServices": {
     "fullyPaid":"Toliq to'lendi",
-
+    "workingServices": "Jumıs Xızmetleri",
     "noResults": " xizmetler joq",
     "paymentSuccess":"Muvaffaqiyatli",
     "fullyPaidMessage":"Toliq to'lendi",

@@ -594,7 +594,7 @@
                     {application?.working_services.some(service => service.quantity > 0) && (
                       <div className="mt-6">
                         <h3 className="text-lg font-medium mb-4">
-                          {t('calculateServices.workingServices', 'Working Services')}
+                          {t('calculateServices.workingServices', )}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {(application.working_services as WorkingService[])

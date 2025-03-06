@@ -28,12 +28,16 @@
     "submit": "Firma Yaratish"
   },
   "createApplication": {
+    "searchStorage": "Omborni izlash",
     "exportToExcel":"Excelga eksport qilish",
     "numberOfApplication": "Ariza Raqami",
     "currentDeclorationFile": "Deklaratsiya Fayli",
     "title": "Ariza Yaratish",
     "base": "Asosiy",
-    
+    "productName": "Mahsulot Nomi",
+    "productNamePlaceholder": "Mahsulot nomini kiriting",
+    "tnvedCode": "TNVED Kod",
+    "tnvedCodePlaceholder": "TNVED kodini kiriting",
     "units": "Birliklar",
     "extra": "Qo'shimcha",
     "year": "Yil",
@@ -164,6 +168,8 @@
   "createKeepingService": {
     "baseDays":"Asosiy kunlar",
     "title": "Saqlash Xizmatini Yaratish",
+    "measurement": "O'lchov Birliklari",
+    "selectMeasurement": "O'lchov birlikini tanlang",
     "subtitle": "Xizmat uchun narxlarni qo'shish",
     "subtitleWithName": "{{name}} uchun narxlarni qo'shish",
     "serviceName": "Xizmat Nomi",
@@ -541,6 +547,7 @@
   },
 
   "calculateServices": {
+    "workingServices": "Ish Xizmatlari",
     "fullyPaid":"To'liq to'landi",
     "title": "Hisoblash Xizmatlari",
     "paymentSuccess":"Muvaffaqiyatli",
@@ -633,7 +640,8 @@
     "name": "Xizmat Nomi",
     "noServices": "Saqlash xizmatlari topilmadi",
     "baseDay": "Asosiy Kun",
-
+    "measurement": "O'lchov Birliklari",
+    "selectMeasurement": "O'lchov birlikini tanlang",
     "year": "Yil",
     "basePrice": "Asosiy Narx",
     "extraPrice": "Qo'shimcha Narx",
@@ -644,6 +652,8 @@
     "createSuccess": "Saqlash xizmati muvaffaqiyatli yaratildi"
   },
   "productList": {
+    "tnvedCode": "TNVED Kod",
+    "tnvedCodePlaceholder": "TNVED kodini kiriting",
     "editTitle": "Mahsulotni Tahrirlash",
     "title": "Mahsulotlar",
     "createProduct": "Mahsulot Yaratish",
@@ -667,6 +677,8 @@
   "editApplication": {
     "deportedDate":"Ketish sanasi",
     "status": "Status",
+    "tnvedCode":"TNVED Kod",
+    "tnvedCodePlaceholder":"TNVED kodini kiriting",
     "amount":"Qiymati",
     "clickToUpload":"Yuklash uchun bosing",
     "applicationNumber":"Ariza Raqami",

@@ -28,6 +28,8 @@ interface KeepingServicePrice {
   base_price: string;
   extra_price: string;
   keeping_services_id: number;
+  measurement: number;
+  measurement_name: string;
 }
 
 interface KeepingServiceWithPriceId {
@@ -38,6 +40,8 @@ interface KeepingServiceWithPriceId {
   extra_price: string;
   year: number;
   priceId: number;
+  measurement: number;
+  measurement_name: string;
 }
 
 interface PaginatedResponse<T> {
@@ -118,7 +122,9 @@ export default function KeepingServiceList() {
           base_price: price.base_price,
           extra_price: price.extra_price,
           year: price.year,
-          priceId: price.id
+          priceId: price.id,
+          measurement: price.measurement,
+          measurement_name: price.measurement_name
         }));
 
         setServices(servicesFromPrices);
@@ -135,7 +141,9 @@ export default function KeepingServiceList() {
               base_price: price.base_price,
               extra_price: price.extra_price,
               year: price.year,
-              priceId: price.id
+              priceId: price.id,
+              measurement: price.measurement,
+              measurement_name: price.measurement_name
             };
           })
           .filter((service): service is KeepingServiceWithPriceId => service !== null);
@@ -213,7 +221,9 @@ export default function KeepingServiceList() {
           base_day: formData.base_day,
           base_price: formData.base_price,
           extra_price: formData.extra_price,
-          keeping_services_id: serviceToDelete.id
+          keeping_services_id: serviceToDelete.id,
+          measurement: serviceToDelete.measurement,
+          measurement_name: serviceToDelete.measurement_name
         };
 
         if (serviceToDelete.priceId) {
@@ -307,6 +317,9 @@ export default function KeepingServiceList() {
                 {t("keepingService.name")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t("keepingService.measurement")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("keepingService.baseDay")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -329,6 +342,9 @@ export default function KeepingServiceList() {
                 <tr key={`service-${service.id}`}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {service.name}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    {service.measurement_name}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {service.base_day}

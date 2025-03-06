@@ -12,9 +12,15 @@ interface KeepingServiceFormData {
   base_price: string;
   extra_price: string;
   keeping_services_id: number;
+  measurement: number;
 }
 
 interface KeepingServiceName {
+  id: number;
+  name: string;
+}
+
+interface Measurement {
   id: number;
   name: string;
 }
@@ -33,6 +39,7 @@ export default function CreateKeepingService() {
     base_price: "",
     extra_price: "",
     keeping_services_id: serviceId,
+    measurement: 0,
   });
   const navigate = useNavigate();
   const [serviceNames, setServiceNames] = useState<KeepingServiceName[]>([]);
@@ -40,6 +47,7 @@ export default function CreateKeepingService() {
   const [showCreateNameModal, setShowCreateNameModal] = useState(false);
   const [newServiceName, setNewServiceName] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [measurements, setMeasurements] = useState<Measurement[]>([]);
 
   useEffect(() => {
     const fetchServiceNames = async () => {
@@ -76,7 +84,8 @@ export default function CreateKeepingService() {
             base_day: serviceData.base_day,
             base_price: serviceData.base_price,
             extra_price: serviceData.extra_price,
-            keeping_services_id: serviceData.keeping_services_id
+            keeping_services_id: serviceData.keeping_services_id,
+            measurement: serviceData.measurement,
           });
         }
       } catch (error) {
@@ -86,6 +95,18 @@ export default function CreateKeepingService() {
     };
     fetchData();
   }, [id, navigate]);
+
+  useEffect(() => {
+    const fetchMeasurements = async () => {
+      try {
+        const response = await api.get('/items/measurement/');
+        setMeasurements(response.data.results);
+      } catch (error) {
+        console.error('Error fetching measurements:', error);
+      }
+    };
+    fetchMeasurements();
+  }, []);
 
   const filteredNames = serviceNames.filter(service => 
     service.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -138,7 +159,8 @@ export default function CreateKeepingService() {
         base_day: formData.base_day,
         base_price: formData.base_price,
         extra_price: formData.extra_price,
-        keeping_services_id: formData.keeping_services_id
+        keeping_services_id: formData.keeping_services_id,
+        measurement: formData.measurement
       });
 
       setShowSuccessModal(true);
@@ -150,6 +172,7 @@ export default function CreateKeepingService() {
         base_price: "",
         extra_price: "",
         keeping_services_id: formData.keeping_services_id,
+        measurement: 0,
       });
       navigate('/keeping-services');
     
@@ -229,6 +252,31 @@ export default function CreateKeepingService() {
                   {t('createKeepingService.createNewService', '+ Create New Service')}
                 </button>
               </div>
+            </div>
+
+            <div className="col-span-1">
+              <label className="block text-sm font-medium text-gray-600 dark:text-white mb-1">
+                {t('createKeepingService.measurement')}
+              </label>
+              <select
+                value={formData.measurement}
+                onChange={(e) => setFormData(prev => ({
+                  ...prev,
+                  measurement: Number(e.target.value)
+                }))}
+                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
+                  px-3 py-2 text-sm md:text-base
+                  focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
+                required
+              >
+                <option value="">{t('createKeepingService.selectMeasurement',)}</option>
+                {measurements.map((measurement) => (
+                  <option key={measurement.id} value={measurement.id}>
+                    {measurement.name}
+                  </option>
+                ))}
+              </select>
             </div>
 
             <div className="col-span-1">

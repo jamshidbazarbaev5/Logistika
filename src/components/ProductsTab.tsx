@@ -9,6 +9,7 @@ interface CreateProductResponse {
   name: string;
   measurement_id: number;
   category_id: number;
+  tnved_code?: string;
 }
 
 interface Product {
@@ -32,6 +33,7 @@ interface ProductDisplay {
   name: string;
   measurement_id: number;
   category_id: number;
+  tnved_code?: string;
 }
 
 interface UploadProduct {
@@ -69,6 +71,9 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   const productDropdownRef = useRef<HTMLDivElement>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [products, setProducts] = useState<ProductDisplay[]>(initialProducts);
+  const [tnvedCodeSearch, setTnvedCodeSearch] = useState('');
+  const [showTnvedDropdown, setShowTnvedDropdown] = useState(false);
+  const tnvedDropdownRef = useRef<HTMLDivElement>(null);
 
   const getProductName = (productId: number | undefined) => {
     if (!productId) return 'Unknown Product';
@@ -82,11 +87,12 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
     return storage ? storage.storage_name : 'Unknown Storage';
   };
 
-  const searchProducts = async (searchTerm: string) => {
+  const searchProducts = async (searchTerm: string, searchType: 'name' | 'tnved' = 'name') => {
     try {
       if (!searchTerm.trim()) {
         setFilteredProducts([]);
         setShowProductDropdown(false);
+        setShowTnvedDropdown(false);
         return;
       }
 
@@ -94,10 +100,18 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
         return;
       }
 
-      const response = await api.get(`/items/product/?product_name=${searchTerm}`);
+      const queryParam = searchType === 'name' ? 'product_name' : 'tnved_code';
+      const response = await api.get(`/items/product/?${queryParam}=${searchTerm}`);
       const results = response.data.results || [];
       setFilteredProducts(results);
-      setShowProductDropdown(true);
+      
+      if (searchType === 'name') {
+        setShowProductDropdown(true);
+        setShowTnvedDropdown(false);
+      } else {
+        setShowTnvedDropdown(true);
+        setShowProductDropdown(false);
+      }
       
       const newProducts = [...products];
       results.forEach((newProduct: ProductDisplay) => {
@@ -114,11 +128,19 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      searchProducts(productSearch);
+      searchProducts(productSearch, 'name');
     }, 300);
 
     return () => clearTimeout(timeoutId);
   }, [productSearch]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      searchProducts(tnvedCodeSearch, 'tnved');
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [tnvedCodeSearch]);
 
   useEffect(() => {
     if (formData.products && formData.products.length > 0) {
@@ -164,7 +186,9 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   const handleProductSelect = (product: ProductDisplay) => {
     setSelectedProduct(product.id);
     setProductSearch(product.name);
+    setTnvedCodeSearch(product.tnved_code || '');
     setShowProductDropdown(false);
+    setShowTnvedDropdown(false);
   };
 
   const handleAddProduct = () => {
@@ -265,6 +289,12 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
     }
   };
 
+  const clearProductInputs = () => {
+    setProductSearch('');
+    setTnvedCodeSearch('');
+    setSelectedProduct(0);
+  };
+
   return (
     <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow-sm">
       <div className="grid grid-cols-1 gap-4 sm:gap-6">
@@ -276,7 +306,12 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
             <input
               type="text"
               value={productSearch}
-              onChange={(e) => setProductSearch(e.target.value)}
+              onChange={(e) => {
+                setProductSearch(e.target.value);
+                if (selectedProduct !== 0) {
+                  clearProductInputs();
+                }
+              }}
               onClick={handleInputClick}
               className={`w-full rounded-md border border-gray-300 dark:border-gray-600 
                 px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]
@@ -312,6 +347,65 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
             )}
           </div>
         </div>
+        <div className="space-y-2 sm:space-y-4">
+          <label className="block text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
+            {t('editApplication.tnvedCode')}
+          </label>
+          <div className="relative" ref={tnvedDropdownRef}>
+            <input
+              type="text"
+              value={tnvedCodeSearch}
+              onChange={(e) => {
+                setTnvedCodeSearch(e.target.value);
+                if (selectedProduct !== 0) {
+                  clearProductInputs();
+                }
+              }}
+              onClick={() => {
+                if (selectedProduct === 0) {
+                  setShowTnvedDropdown(true);
+                }
+              }}
+              className={`w-full rounded-md border border-gray-300 dark:border-gray-600 
+                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]
+                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ${readOnly ? 'cursor-not-allowed bg-gray-50' : ''}`}
+              placeholder={t('editApplication.tnvedCodePlaceholder')}
+              readOnly={readOnly}
+              disabled={readOnly}
+            />
+            {showTnvedDropdown && (
+              <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
+                border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
+                {filteredProducts.length > 0 ? (
+                  filteredProducts.map((product) => (
+                    <div
+                      key={product.id}
+                      onClick={() => handleProductSelect(product)}
+                      className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer
+                        text-gray-900 dark:text-gray-100"
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium">{product.name}</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          {t('editApplication.tnvedCode')}: {product.tnved_code}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div
+                    onClick={() => setShowCreateModal(true)}
+                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer
+                      text-gray-900 dark:text-gray-100"
+                  >
+                    {t('createProduct.createNew', 'Create new product')}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+
 
         <div className="space-y-2 sm:space-y-4">
           <label className="block text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
@@ -361,6 +455,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
           </div>
         </div>
 
+       
         <div className="space-y-3">
           {formData.products.map((product: Product, index: number) => (
             <div key={index} 
@@ -399,6 +494,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
         onClose={() => setShowCreateModal(false)}
         onSuccess={handleCreateProductSuccess}
         initialProductName={productSearch}
+        initialTnvedCode={tnvedCodeSearch}
       />
 
       {!readOnly && (

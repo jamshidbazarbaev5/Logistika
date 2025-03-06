@@ -8,6 +8,7 @@ interface CreateProductModalProps {
   onClose: () => void;
   onSuccess: (product: CreateProductResponse) => void;
   initialProductName: string;
+  initialTnvedCode: string;
 }
 
 interface CreateProductResponse {
@@ -15,6 +16,7 @@ interface CreateProductResponse {
   name: string;
   measurement_id: number;
   category_id: number;
+  tnved_code?: string;
 }
 
 interface Category {
@@ -31,14 +33,16 @@ export default function CreateProductModal({
   isOpen,
   onClose,
   onSuccess,
-  initialProductName
+  initialProductName,
+  initialTnvedCode
 }: CreateProductModalProps) {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: initialProductName,
     category_id: '',
     measurement_id: '',
-    description: ''
+    description: '',
+    tnved_code: initialTnvedCode
   });
   const [categories, setCategories] = useState<Category[]>([]);
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
@@ -180,6 +184,19 @@ export default function CreateProductModal({
                       value={formData.description}
                       onChange={handleChange}
                       rows={3}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">
+                      {t('createProduct.tnvedCode')}
+                    </label>
+                    <input
+                      type="text"
+                      name="tnved_code"
+                      value={formData.tnved_code}
+                      onChange={handleChange}
                       className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
                     />
                   </div>

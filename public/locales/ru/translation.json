@@ -33,8 +33,13 @@
     "storage": "Склад",
     "product": "Товар",
     "units": "Единицы",
+    "searchStorage": "Поиск Склада",
     "tariff": "Тариф",
     "year": "Год",
+    "productName": "Название Товара",
+    "productNamePlaceholder": "Введите название товара",
+    "tnvedCode": "TNVED Код",
+    "tnvedCodePlaceholder": "Введите TNVED код",
     "base": "Базовый",
     "vipApplication": "VIP Заявка",
     "extra": "Дополнительный",
@@ -138,6 +143,8 @@
     "successMessage": "Фото успешно загружено!"
   },
   "createKeepingService": {
+    "measurement": "Единица измерения",
+    "selectMeasurement": "Выберите единицу измерения",
     "title": "Создать Услугу Хранения",
     "baseDays": "Базовые дни",
     "subtitle": "Добавить ценовые детали для услуги",
@@ -549,6 +556,8 @@
       "measurement":"Единицы Измерения",
       "category":"Категория"
     },
+    "tnvedCode": "Код ТНВЭД",
+    "tnvedCodePlaceholder": "Введите код ТНВЭД",
     "title": "Товары",
     "createProduct": "Создать Продукт",
     "errorLoading": "Ошибка при загрузке продуктов",
@@ -598,6 +607,8 @@
   "editApplication": {
     "deportedDate":"Дата Отправки",
     "numberOfApplication":"Номер Заявки",
+    "tnvedCode":"Код ТНВЭД", 
+    "tnvedCodePlaceholder":"Введите код ТНВЭД",
     "title": "Редактирование Заявки",
     "clickToUpload":"Нажмите чтобы Загрузить фото",
     "applicationNumber":"Номер Заявки",
@@ -668,6 +679,7 @@
   },
 
   "calculateServices": {
+    "workingServices": "Рабочие Услуги",
     "fullyPaid":"Полностью оплачено",
     "title": "Расчет Услуг",
     "noResults": "Услуги не найдены",

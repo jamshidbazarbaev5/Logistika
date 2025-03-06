@@ -79,6 +79,7 @@ interface Product {
   name: string;
   measurement_id: number;
   category_id: number;
+  tnved_code: string;
 }
 
 interface TransportType {
@@ -269,12 +270,18 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const [storages, setStorages] = useState<any[]>([]);
   const [productSearch, setProductSearch] = useState('');
   const [storageSearch, setStorageSearch] = useState('');
-  const [showProductDropdown, setShowProductDropdown] = useState(false);
+  const [, setShowProductDropdown] = useState(false);
   const [showStorageDropdown, setShowStorageDropdown] = useState(false);
-  const productDropdownRef = useRef<HTMLDivElement>(null);
+  // const productDropdownRef = useRef<HTMLDivElement>(null);
   const storageDropdownRef = useRef<HTMLDivElement>(null);
   const {t} = useTranslation();
   const [showCreateProductModal, setShowCreateProductModal] = useState(false);
+  const [productNameSearch, setProductNameSearch] = useState('');
+  const [tnvedCodeSearch, setTnvedCodeSearch] = useState('');
+  const [showProductNameDropdown, setShowProductNameDropdown] = useState(false);
+  const [showTnvedDropdown, setShowTnvedDropdown] = useState(false);
+  const productNameDropdownRef = useRef<HTMLDivElement>(null);
+  const tnvedDropdownRef = useRef<HTMLDivElement>(null);
 
   const fetchProductDetails = async (productId: number) => {
     try {
@@ -308,13 +315,23 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   }, []);
 
   const handleProductSelect = (product: Product) => {
+    // Don't do anything if this product is already selected
+    if (selectedProduct === product.id) {
+      setShowProductNameDropdown(false);
+      setShowTnvedDropdown(false);
+      return;
+    }
+
     setSelectedProduct(product.id);
-    setProductSearch(product.name);
-    setShowProductDropdown(false);
+    setProductNameSearch(product.name);
+    setTnvedCodeSearch(product.tnved_code);
+    setShowProductNameDropdown(false);
+    setShowTnvedDropdown(false);
     setProductDetails(prev => new Map(prev).set(product.id, product));
   };
 
   const handleStorageSelect = (storage: any) => {
+    console.log('Selecting storage:', storage); // Debug log
     setSelectedStorage(storage.id);
     setStorageSearch(storage.storage_name);
     setShowStorageDropdown(false);
@@ -372,18 +389,24 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
       }
 
       const existingProduct = Array.from(productDetails.values())
-        .find(p => p.name.toLowerCase() === searchTerm.toLowerCase());
+        .find(p => 
+          p.name.toLowerCase() === searchTerm.toLowerCase() || 
+          p.tnved_code === searchTerm
+        );
       
       if (existingProduct) {
         setSelectedProduct(existingProduct.id);
         return;
       }
 
-      const response = await api.get(`/items/product/?product_name=${searchTerm}`);
+      // Search by both name and TNVED code
+      const response = await api.get(`/items/product/?product_name=${searchTerm}&tnved_code=${searchTerm}`);
       const results = response.data.results || [];
       
       const exactMatch = results.find(
-        (p: Product) => p.name.toLowerCase() === searchTerm.toLowerCase()
+        (p: Product) => 
+          p.name.toLowerCase() === searchTerm.toLowerCase() || 
+          p.tnved_code === searchTerm
       );
       
       if (exactMatch) {
@@ -407,74 +430,208 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     return () => clearTimeout(timeoutId);
   }, [productSearch]);
 
-  const handleProductCreated = (newProduct: Product) => {
+  const handleProductCreated = (productResponse: any) => {
+    // Convert CreateProductResponse to Product by adding required tnved_code
+    const newProduct: Product = {
+      ...productResponse,
+      tnved_code: productResponse.tnved_code || '', // Add default value if missing
+    };
+    
     setProducts(prevProducts => [...prevProducts, newProduct]);
     handleProductSelect(newProduct);
   };
 
+  const searchByProductName = async (searchTerm: string) => {
+    try {
+      if (!searchTerm.trim()) {
+        setProducts([]);
+        setShowProductNameDropdown(false);
+        return;
+      }
+
+      // If the search term exactly matches the currently selected product, don't search
+      const currentProduct = productDetails.get(selectedProduct);
+      if (currentProduct?.name.toLowerCase() === searchTerm.toLowerCase()) {
+        setProducts([]);
+        setShowProductNameDropdown(false);
+        return;
+      }
+
+      const response = await api.get(`/items/product/?product_name=${searchTerm}`);
+      const results = response.data.results || [];
+      setProducts(results);
+      setShowProductNameDropdown(true);
+    } catch (error) {
+      console.error('Error searching products by name:', error);
+      setProducts([]);
+    }
+  };
+
+  const searchByTnvedCode = async (searchTerm: string) => {
+    try {
+      if (!searchTerm.trim()) {
+        setProducts([]);
+        setShowTnvedDropdown(false);
+        return;
+      }
+
+      // If the search term exactly matches the currently selected product, don't search
+      const currentProduct = productDetails.get(selectedProduct);
+      if (currentProduct?.tnved_code === searchTerm) {
+        setProducts([]);
+        setShowTnvedDropdown(false);
+        return;
+      }
+
+      const response = await api.get(`/items/product/?tnved_code=${searchTerm}`);
+      const results = response.data.results || [];
+      setProducts(results);
+      setShowTnvedDropdown(true);
+    } catch (error) {
+      console.error('Error searching products by TNVED:', error);
+      setProducts([]);
+    }
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (productNameSearch) {
+        searchByProductName(productNameSearch);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [productNameSearch]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (tnvedCodeSearch) {
+        searchByTnvedCode(tnvedCodeSearch);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [tnvedCodeSearch]);
+
+  console.log('selectedProduct', selectedProduct);
+  console.log('productNameSearch', productNameSearch);
+  console.log('tnvedCodeSearch', tnvedCodeSearch);
+  console.log('storaga', selectedStorage);
+  console.log('quantity', quantity);
+
   return (
     <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="relative" ref={productDropdownRef}>
+        {/* Product Name Search */}
+        <div className="relative" ref={productNameDropdownRef}>
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-           {t('createApplication.product')}
+            {t('createApplication.productName')}
           </label>
           <input
             type="text"
-            value={productSearch}
+            value={productNameSearch}
             onChange={(e) => {
               const value = e.target.value;
-              setProductSearch(value);
-              setSelectedProduct(0); 
+              setProductNameSearch(value);
+              if (!value) {
+                setShowProductNameDropdown(false);
+                setProducts([]);
+                setSelectedProduct(0);
+                setTnvedCodeSearch('');
+              }
             }}
             onBlur={() => {
               setTimeout(() => {
-                setShowProductDropdown(false);
+                setShowProductNameDropdown(false);
               }, 200);
             }}
             className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
               px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
               focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
               dark:text-gray-100 transition-colors"
-            placeholder={t("createApplication.productSearchPlaceholder")}
+            placeholder={t("createApplication.productNamePlaceholder")}
           />
           
-          {showProductDropdown && (
+          {showProductNameDropdown && products.length > 0 && productNameSearch && (
             <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
               border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-              {products.length > 0 ? (
-                products.map((product) => (
-                  <div
-                    key={product.id}
-                    onClick={() => handleProductSelect(product)}
-                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
-                      cursor-pointer text-sm text-gray-900 dark:text-gray-100"
-                  >
-                    {product.name}
+              {products.map((product) => (
+                <div
+                  key={product.id}
+                  onClick={() => handleProductSelect(product)}
+                  className={`px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
+                    cursor-pointer text-sm text-gray-900 dark:text-gray-100
+                    ${selectedProduct === product.id ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium">{product.name}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {t('createApplication.tnvedCode')}: {product.tnved_code}
+                    </span>
                   </div>
-                ))
-              ) : (
-                <div className="p-4">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
-                    {t('createApplication.noProductsFound')}
-                  </p>
-                  <button
-                    onClick={() => setShowCreateProductModal(true)}
-                    className="w-full text-center bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
-                      hover:bg-[#5c4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
-                      dark:focus:ring-offset-gray-800"
-                  >
-                    {t('createApplication.createNewProduct')}
-                  </button>
                 </div>
-              )}
+              ))}
             </div>
           )}
         </div>
 
+        {/* TNVED Code Search */}
+        <div className="relative" ref={tnvedDropdownRef}>
+          <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+            {t('createApplication.tnvedCode')}
+          </label>
+          <input
+            type="text"
+            value={tnvedCodeSearch}
+            onChange={(e) => {
+              const value = e.target.value;
+              setTnvedCodeSearch(value);
+              if (!value) {
+                setShowTnvedDropdown(false);
+                setProducts([]);
+                setSelectedProduct(0);
+                setProductNameSearch('');
+              }
+            }}
+            onBlur={() => {
+              setTimeout(() => {
+                setShowTnvedDropdown(false);
+              }, 200);
+            }}
+            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+              px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
+              focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
+              dark:text-gray-100 transition-colors"
+            placeholder={t("createApplication.tnvedCodePlaceholder")}
+          />
+          
+          {showTnvedDropdown && products.length > 0 && tnvedCodeSearch && (
+            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
+              border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
+              {products.map((product) => (
+                <div
+                  key={product.id}
+                  onClick={() => handleProductSelect(product)}
+                  className={`px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
+                    cursor-pointer text-sm text-gray-900 dark:text-gray-100
+                    ${selectedProduct === product.id ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium">{product.name}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {t('createApplication.tnvedCode')}: {product.tnved_code}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Storage Selection - Add this block */}
         <div className="relative" ref={storageDropdownRef}>
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-           {t('createApplication.storage')}
+            {t('createApplication.storage')}
           </label>
           <input
             type="text"
@@ -484,34 +641,37 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
               setShowStorageDropdown(true);
             }}
             onFocus={() => setShowStorageDropdown(true)}
+            onBlur={() => {
+              setTimeout(() => {
+                setShowStorageDropdown(false);
+              }, 200);
+            }}
             className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
               px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
               focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
               dark:text-gray-100 transition-colors"
-            placeholder={t("createApplication.storageSearchPlaceholder")}
+            placeholder={t("createApplication.searchStorage")}
           />
           
-          {showStorageDropdown && (
+          {showStorageDropdown && storages.length > 0 && (
             <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
               border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-              {storages
-                .filter(storage => 
-                  storage.storage_name.toLowerCase().includes(storageSearch.toLowerCase())
-                )
-                .map((storage) => (
-                  <div
-                    key={storage.id}
-                    onClick={() => handleStorageSelect(storage)}
-                    className="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
-                      cursor-pointer text-sm text-gray-900 dark:text-gray-100"
-                  >
-                    {storage.storage_name}
-                  </div>
-                ))}
+              {storages.map((storage) => (
+                <div
+                  key={storage.id}
+                  onClick={() => handleStorageSelect(storage)}
+                  className={`px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
+                    cursor-pointer text-sm text-gray-900 dark:text-gray-100
+                    ${selectedStorage === storage.id ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+                >
+                  {storage.storage_name}
+                </div>
+              ))}
             </div>
           )}
         </div>
 
+        {/* Quantity input */}
         <div>
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
             {t('createApplication.quantity')}
@@ -588,6 +748,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
         onClose={() => setShowCreateProductModal(false)}
         onSuccess={handleProductCreated}
         initialProductName={productSearch}
+        initialTnvedCode={tnvedCodeSearch}
       />
     </div>
   );
@@ -1053,6 +1214,7 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
                       </div>
                     </div>
                   </div>
+
                 );
               })}
             </div>

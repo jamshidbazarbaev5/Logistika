@@ -15,6 +15,7 @@ interface Product {
   name: string;
   measurement_id: number;
   category_id: number;
+  tnved_code: string;
 }
 
 interface Measurement {
@@ -59,30 +60,39 @@ export default function ProductList() {
     name: "",
     measurement_id: 1,
     category_id: 1,
+    tnved_code: ""
   });
   const [searchParams, setSearchParams] = useState({
     name: "",
+    tnved_code: ""
   });
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [ordering] = useState("id");
 
   const searchFields: SearchField[] = [
     {
       name: 'name',
       label: t("productList.inputPlaceholder"),
       placeholder: t("productList.inputPlaceholder")
+    },
+    {
+      name: 'tnved_code',
+      label: t("productList.tnvedCode",),
+      placeholder: t("productList.tnvedCodePlaceholder",)
     }
   ];
 
   const handleSearch = (values: Record<string, string>) => {
-    setSearchParams(values as { name: string });
+    setSearchParams(values as { name: string, tnved_code: string });
   };
 
   const fetchProducts = async () => {
     try {
       const queryParams = new URLSearchParams();
       if (searchParams.name) queryParams.append("product_name", searchParams.name);
-      queryParams.append("ordering", "id");
+      if (searchParams.tnved_code) queryParams.append("tnved_code", searchParams.tnved_code);
+      queryParams.append("ordering", ordering);
       
       const response = await apiService.getProducts(queryParams.toString());
       setProducts(response.results);
@@ -109,7 +119,7 @@ export default function ProductList() {
   useEffect(() => {
     fetchProducts();
     fetchMeasurementsAndCategories();
-  }, [searchParams, t]);
+  }, [searchParams, ordering, t]);
 
   if (loading) {
     return (
@@ -151,6 +161,7 @@ export default function ProductList() {
       name: product.name,
       measurement_id: product.measurement_id,
       category_id: product.category_id,
+      tnved_code: product.tnved_code
     });
     setShowEditModal(true);
   };
@@ -160,11 +171,14 @@ export default function ProductList() {
     if (!editingProduct) return;
 
     try {
-      await apiService.updateProduct(editingProduct.id, {
+      const updateData: Omit<Product, "id"> = {
         name: editFormData.name,
         measurement_id: Number(editFormData.measurement_id),
         category_id: Number(editFormData.category_id),
-      });
+        tnved_code: editFormData.tnved_code
+      };
+
+      await apiService.updateProduct(editingProduct.id, updateData);
 
       setModalMessage(t("productList.editSuccess", "Product updated successfully"));
       setShowSuccessModal(true);
@@ -226,6 +240,9 @@ export default function ProductList() {
                 {t("productList.category", "productList.category")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t("productList.tnvedCode", "TNVED Code")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("productList.actions", "productList.actions")}
               </th>
             </tr>
@@ -244,6 +261,9 @@ export default function ProductList() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                   {categories.find(c => c.id === product.category_id)?.name || product.category_id}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                  {product.tnved_code}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                   <Menu as="div" className="relative inline-block text-left">
@@ -380,6 +400,19 @@ export default function ProductList() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                  {t("productList.form.tnvedCode", "TNVED Code")}
+                </label>
+                <input
+                  type="text"
+                  name="tnved_code"
+                  value={editFormData.tnved_code}
+                  onChange={handleInputChange}
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3] dark:bg-gray-700 dark:border-gray-600"
+                />
               </div>
 
               <div className="flex justify-end space-x-3 mt-6">

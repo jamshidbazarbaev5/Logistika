@@ -117,6 +117,13 @@ interface KeepingServicePriceCreate {
   keeping_services_id: number;
 }
 
+interface ProductUpdateRequest {
+  name: string;
+  measurement_id: number;
+  category_id: number;
+  tnved_code: string;
+}
+
 export const apiService = {
   // Transport  
   createTransport: (data: { 
@@ -210,7 +217,7 @@ export const apiService = {
   createProduct: (data: Omit<Product, 'id'>) => 
     api.post('/items/product/', data),
   
-  updateProduct: (id: number, data: Omit<Product, 'id'>) => {
+  updateProduct: (id: number, data: ProductUpdateRequest) => {
     if (!id) throw new Error('Product ID is required');
     return api.put(`/items/product/${id}/`, data);
   },

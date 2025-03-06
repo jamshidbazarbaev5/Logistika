@@ -22,6 +22,7 @@ interface ProductFormData {
   price: number | null;
   quantity: number | null;
   measurement_id: number | null;
+  tnved_code: string;
 }
 
 export default function CreateProduct() {
@@ -35,6 +36,7 @@ export default function CreateProduct() {
     price: null,
     quantity: null,
     measurement_id: null,
+    tnved_code: "",
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const navigate = useNavigate();
@@ -77,6 +79,7 @@ export default function CreateProduct() {
           price: null,
           quantity: null,
           measurement_id: null,
+          tnved_code: "",
         });
         setShowSuccessModal(true);
         navigate("/products-list");
@@ -195,8 +198,6 @@ export default function CreateProduct() {
               />
             </div>
 
-           
-
             <div className="col-span-1">
               <label 
                 htmlFor="measurement_id" 
@@ -224,7 +225,28 @@ export default function CreateProduct() {
               </select>
             </div>
 
-          
+            <div className="col-span-1">
+              <label 
+                htmlFor="tnved_code" 
+                className="block text-sm font-medium text-gray-600 dark:text-white mb-1"
+              >
+                {t('createProduct.tnvedCode', 'TNVED Code')}
+              </label>
+              <input
+                type="text"
+                name="tnved_code"
+                id="tnved_code"
+                value={formData.tnved_code}
+                onChange={handleChange}
+                className="block w-full rounded-md border border-gray-300 dark:border-gray-600 
+                  bg-white dark:bg-gray-700 text-gray-900 dark:text-white 
+                  px-3 py-2 text-sm md:text-base
+                  focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
+                  placeholder:text-sm md:placeholder:text-base"
+                placeholder={t('createProduct.tnvedCodePlaceholder', 'Enter TNVED code')}
+                required
+              />
+            </div>
           </div>
         </div>
         <div className="flex justify-end mt-6">
