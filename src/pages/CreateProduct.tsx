@@ -243,7 +243,7 @@ export default function CreateProduct() {
                   px-3 py-2 text-sm md:text-base
                   focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
                   placeholder:text-sm md:placeholder:text-base"
-                placeholder={t('createProduct.tnvedCodePlaceholder', 'Enter TNVED code')}
+                placeholder={t('createProduct.tnvedCodePlaceholder', )}
                 required
               />
             </div>

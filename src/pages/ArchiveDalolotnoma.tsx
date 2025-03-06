@@ -1,0 +1,180 @@
+import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
+import { api } from "../api/api";
+
+interface Transaction {
+  id: number;
+  date_of_transaction: string;
+  full_name: string;
+  phone_number: string | null;
+  car_number: string | null;
+  products: {
+    quantity: number;
+    product: {
+      id: number;
+      name: string;
+      measurement_id: number;
+      category_id: number;
+      tnved_code: string;
+    };
+    storage: {
+      id: number;
+      storage_name: string;
+      storage_location: string;
+    };
+  }[];
+  keeping_services: {
+    service_type: number;
+    amount: number;
+    price: string;
+  }[];
+  working_services: {
+    service_type: number;
+    quantity: number;
+    price: string;
+  }[];
+}
+
+export default function ArchiveDalolatnoma() {
+  const { t } = useTranslation();
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTransactions = async () => {
+      try {
+        const response = await api.get(`/transactions/history/${id}`);
+        if (response.data) {
+          setTransactions(response.data);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching transactions:', error);
+        setErrorMessage(t('dalolatnoma.fetchError', 'Error fetching transactions'));
+        setLoading(false);
+      }
+    };
+
+    fetchTransactions();
+  }, [id]);
+
+  const handleDownloadExcel = async (transactionId: number) => {
+    try {
+      const response = await api.get(`/export_excel_transaction/${transactionId}/`, {
+        responseType: 'blob'
+      });
+      
+      const blob = new Blob([response.data], { 
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+      });
+      
+      const url = window.URL.createObjectURL(blob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `dalolatnoma_${transactionId}.xlsx`);
+      
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading Excel file:', error);
+      setErrorMessage(t('dalolatnoma.downloadError', 'Error downloading the file'));
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-[400px]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6C5DD3]"></div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 bg-white dark:bg-gray-900">
+      <div className="flex items-center gap-4 mb-6">
+        <button
+          onClick={() => navigate(`/archive/${id}`)}
+          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors"
+          title={t('common.back')}
+        >
+          <ArrowLeft className="h-6 w-6 text-gray-600 dark:text-gray-300" />
+        </button>
+        <h1 className="text-2xl font-semibold">
+          {t('dalolatnoma.title', 'Dalolatnoma')}
+        </h1>
+      </div>
+
+      {error && (
+        <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
+          {error}
+        </div>
+      )}
+
+      <div className="space-y-4">
+        {transactions.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            {t('dalolatnoma.noTransactions', 'No transactions found')}
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {[...transactions]
+              .sort((a, b) => b.id - a.id)
+              .map((transaction) => (
+                <div 
+                  key={transaction.id}
+                  className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
+                >
+                  <div>
+                    <div className="font-medium">
+                      {t('dalolatnoma.transactionId')} #{transaction.id}
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {new Date(transaction.date_of_transaction).toLocaleDateString()}
+                    </div>
+                    {transaction.full_name && (
+                      <div className="text-sm text-gray-600">
+                        {transaction.full_name}
+                      </div>
+                    )}
+                    {transaction.car_number && (
+                      <div className="text-sm text-gray-600">
+                        {t('dalolatnoma.carNumber')}: {transaction.car_number}
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleDownloadExcel(transaction.id)}
+                    className="inline-flex items-center space-x-2 bg-[#6C5DD3] text-white px-4 py-2 rounded-lg hover:bg-[#5c4eb3]"
+                  >
+                    <svg 
+                      className="w-5 h-5" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth={2} 
+                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" 
+                      />
+                    </svg>
+                    <span>{t('dalolatnoma.download', 'Download')}</span>
+                  </button>
+                </div>
+              ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -663,6 +663,8 @@
     "back": "Назад"
   },
   "createProduct": {
+    "tnvedCode": "Код ТНВЭД",
+    "tnvedCodePlaceholder": "Введите код ТНВЭД",
     "title": "Создать Продукт",
     "subtitle": "Добавить новый продукт",
     "name": "Название Продукта",
@@ -720,8 +722,8 @@
     "dalolatnoma": "Акт",
     "download": "Скачать",
     "downloadError": "Ошибка при скачивании файла",
-    "dalolatnomaTitle": "Акт",
-    "transactionId": "Транзакция"
+    "transactionId": "Транзакция",
+    "partiallyPaid": "Частично оплачено"
   },
   "transaction": {
     "success":{
@@ -770,5 +772,14 @@
       "lastName": "Фамилия",
       "submit": "Обновить Профиль"
     }
+  },
+  "dalolatnoma": {
+    "title": "Акт",
+    "transactionId": "Транзакция",
+    "carNumber": "Номер Машины",
+    "download": "Скачать",
+    "noTransactions": "Транзакции не найдены",
+    "fetchError": "Ошибка при загрузке транзакций",
+    "downloadError": "Ошибка при скачивании файла"
   }
 }

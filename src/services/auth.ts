@@ -42,7 +42,8 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     } else {
-      window.location.href = '/login';
+      authService.logout();
+      throw new Error('No token found');
     }
     return config;
   },
@@ -91,6 +92,7 @@ export const authService = {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
     delete axiosInstance.defaults.headers.common['Authorization'];
+    window.location.href = '/login';
   },
 
   createTransport: async (data: { transport_type: string }) => {

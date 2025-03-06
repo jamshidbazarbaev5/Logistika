@@ -522,6 +522,58 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   return (
     <div className="p-6 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+         {/* TNVED Code Search */}
+         <div className="relative" ref={tnvedDropdownRef}>
+          <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+            {t('createApplication.tnvedCode')}
+          </label>
+          <input
+            type="text"
+            value={tnvedCodeSearch}
+            onChange={(e) => {
+              const value = e.target.value;
+              setTnvedCodeSearch(value);
+              if (!value) {
+                setShowTnvedDropdown(false);
+                setProducts([]);
+                setSelectedProduct(0);
+                setProductNameSearch('');
+              }
+            }}
+            onBlur={() => {
+              setTimeout(() => {
+                setShowTnvedDropdown(false);
+              }, 200);
+            }}
+            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
+              px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
+              focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
+              dark:text-gray-100 transition-colors"
+            placeholder={t("createApplication.tnvedCodePlaceholder")}
+          />
+          
+          {showTnvedDropdown && products.length > 0 && tnvedCodeSearch && (
+            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
+              border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
+              {products.map((product) => (
+                <div
+                  key={product.id}
+                  onClick={() => handleProductSelect(product)}
+                  className={`px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
+                    cursor-pointer text-sm text-gray-900 dark:text-gray-100
+                    ${selectedProduct === product.id ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+                >
+                  <div className="flex flex-col">
+                    <span className="font-medium">{product.name}</span>
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
+                      {t('createApplication.tnvedCode')}: {product.tnved_code}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         {/* Product Name Search */}
         <div className="relative" ref={productNameDropdownRef}>
           <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
@@ -575,58 +627,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           )}
         </div>
 
-        {/* TNVED Code Search */}
-        <div className="relative" ref={tnvedDropdownRef}>
-          <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
-            {t('createApplication.tnvedCode')}
-          </label>
-          <input
-            type="text"
-            value={tnvedCodeSearch}
-            onChange={(e) => {
-              const value = e.target.value;
-              setTnvedCodeSearch(value);
-              if (!value) {
-                setShowTnvedDropdown(false);
-                setProducts([]);
-                setSelectedProduct(0);
-                setProductNameSearch('');
-              }
-            }}
-            onBlur={() => {
-              setTimeout(() => {
-                setShowTnvedDropdown(false);
-              }, 200);
-            }}
-            className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
-              px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
-              focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
-              dark:text-gray-100 transition-colors"
-            placeholder={t("createApplication.tnvedCodePlaceholder")}
-          />
-          
-          {showTnvedDropdown && products.length > 0 && tnvedCodeSearch && (
-            <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
-              border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  onClick={() => handleProductSelect(product)}
-                  className={`px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
-                    cursor-pointer text-sm text-gray-900 dark:text-gray-100
-                    ${selectedProduct === product.id ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
-                >
-                  <div className="flex flex-col">
-                    <span className="font-medium">{product.name}</span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {t('createApplication.tnvedCode')}: {product.tnved_code}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+       
 
         {/* Storage Selection - Add this block */}
         <div className="relative" ref={storageDropdownRef}>

@@ -722,6 +722,8 @@
   },
   "createProduct": {
     "title": "Ónim Jaratıw",
+    "tnvedCode": "TNVED Kod",
+    "tnvedCodePlaceholder": "TNVED kodini kiritiń",
     "subtitle": "Jańa ónim qosıw",
     "name": "Ónim Atı",
     "namePlaceholder": "Ónim atın kiritiń",
@@ -738,7 +740,7 @@
  
   
   "calculateServices": {
-    "fullyPaid":"Toliq to'lendi",
+    "fullyPaid":"Толық төленген",
     "workingServices": "Jumıs Xızmetleri",
     "noResults": " xizmetler joq",
     "paymentSuccess":"Muvaffaqiyatli",
@@ -777,7 +779,9 @@
     "dalolatnoma": "Dálolatnama",
     "download": "Júklew",
     "downloadError": "Fayldı júklewde qátelik júz berdi",
-    "dalolatnomaTitle": "Dálolatnama"
+    "dalolatnomaTitle": "Dálolatnama",
+    "partiallyPaid": "Қисман төленген",
+    "unpaid": "Төlenbeген"
   },
   "transaction": {
     "success":{
@@ -827,5 +831,14 @@
       "lastName": "Familiyası",
       "submit": "Profildi Jańalaw"
     }
+  },
+  "dalolatnoma": {
+    "title": "Dálilnama",
+    "transactionId": "Tranzaksiya",
+    "carNumber": "Mashina Nomeri",
+    "download": "Júklew",
+    "noTransactions": "Tranzaksiyalar tabılmadı",
+    "fetchError": "Tranzaksiyalardı júklewde qátelik júz berdi",
+    "downloadError": "Fayldı júklewde qátelik júz berdi"
   }
 }

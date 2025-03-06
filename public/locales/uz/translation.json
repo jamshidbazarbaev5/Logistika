@@ -587,7 +587,8 @@
     "download": "Yuklash",
     "downloadError": "Faylda xatolik yuz berdi",
     "dalolatnomaTitle": "Dalolatnoma",
-    "transactionID": "Tranzaksiya"
+    "transactionID": "Tranzaksiya",
+    "partiallyPaid": "Qisman to'langan"
   },
 "transaction":{
   "success":{
@@ -737,6 +738,8 @@
   "createProduct": {
     "title": "Mahsulot Yaratish",
     "subtitle": "Yangi mahsulot qo'shish",
+    "tnvedCode": "TNVED Kod",
+    "tnvedCodePlaceholder": "TNVED kodini kiriting",
     "name": "Mahsulot Nomi",
     "namePlaceholder": "Mahsulot nomini kiriting",
     "category": "Kategoriya",
@@ -768,5 +771,14 @@
       "lastName": "Familiya",
       "submit": "Profilni Yangilash"
     }
+  },
+  "dalolatnoma": {
+    "title": "Dalolatnoma",
+    "transactionId": "Tranzaksiya",
+    "carNumber": "Mashina Raqami",
+    "download": "Yuklash",
+    "noTransactions": "Tranzaksiyalar topilmadi",
+    "fetchError": "Tranzaksiyalarni yuklashda xatolik yuz berdi",
+    "downloadError": "Faylni yuklashda xatolik yuz berdi"
   }
 } 

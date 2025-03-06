@@ -564,13 +564,22 @@ export default function ArchiveApplicationList() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    <button
-                      onClick={() => handleViewDetails(application.id)}
-                      className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-[#6C5DD3] hover:bg-[#5b4eb3] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6C5DD3]"
-                    >
-                      <Eye className="w-4 h-4 mr-1" />
-                      {t("applicationList.viewDetails",)}
-                    </button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => handleViewDetails(application.id)}
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-[#6C5DD3] hover:bg-[#5b4eb3] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6C5DD3]"
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        {t("applicationList.viewDetails")}
+                      </button>
+                      <button
+                        onClick={() => navigate(`/archive/${application.id}/dalolatnoma`)}
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600"
+                      >
+                        <Download className="w-4 h-4 mr-1" />
+                        {t("applicationList.dalolatnoma", "Dalolatnoma")}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );

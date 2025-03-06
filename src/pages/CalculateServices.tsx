@@ -461,6 +461,23 @@
       }
     };
 
+    const paymentStatus = () => {
+      if (!applicationData) return '';
+      
+      if (applicationData.total_price === 0) {
+        return t('calculateServices.fullyPaid', 'Полностью оплачено');
+      }
+      
+      // Check if there are any payments
+      const hasPartialPayment = payments.length > 0;
+      
+      if (hasPartialPayment) {
+        return t('calculateServices.partiallyPaid', 'Частично оплачено');
+      }
+      
+      return t('calculateServices.unpaid', 'Не оплачено');
+    };
+
     return (
       <div className="p-6 bg-white dark:bg-gray-900">
         <div className="flex items-center gap-4 mb-6">
@@ -930,11 +947,13 @@
                 <div className="mt-2 text-sm">
                   <span className="font-medium">{t('payments.status', 'Status')}:</span>
                   <span className={`ml-2 ${
-                    applicationData.total_price === 0 ? 'text-green-500' : 'text-red-500'
+                    applicationData.total_price === 0 
+                      ? 'text-green-500' 
+                      : payments.length > 0 
+                        ? 'text-yellow-500'  // Yellow color for partially paid
+                        : 'text-red-500'
                   }`}>
-                    {applicationData.total_price === 0 
-                      ? t('calculateServices.fullyPaid', )
-                      : t('calculateServices.unpaid')}
+                    {paymentStatus()}
                   </span>
                 </div>
               </div>
@@ -1035,49 +1054,51 @@
         ) : (
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
             <h2 className="text-lg font-medium mb-4">
-              {t('calculateServices.dalolatnomaTitle', )}
+              {t('calculateServices.dalolatnomaTitle')}
             </h2>
             
             {transactionHistory.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
-                {t('calculateServices.noTransactions', )}
+                {t('calculateServices.noTransactions')}
               </div>
             ) : (
               <div className="space-y-4">
-                {transactionHistory.map((transaction) => (
-                  <div 
-                    key={transaction.id}
-                    className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
-                  >
-                    <div>
-                      <div className="font-medium">
-                        {t('calculateServices.transactionId',)} #{transaction.id}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {new Date(transaction.date_of_transaction).toLocaleDateString()}
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => handleDownloadExcel(transaction.id)}
-                      className="inline-flex items-center space-x-2 bg-[#6C5DD3] text-white px-4 py-2 rounded-lg hover:bg-[#5c4eb3]"
+                {[...transactionHistory]
+                  .sort((a, b) => b.id - a.id)
+                  .map((transaction) => (
+                    <div 
+                      key={transaction.id}
+                      className="flex justify-between items-center p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
                     >
-                      <svg 
-                        className="w-5 h-5" 
-                        fill="none" 
-                        stroke="currentColor" 
-                        viewBox="0 0 24 24"
+                      <div>
+                        <div className="font-medium">
+                          {t('calculateServices.transactionId')} #{transaction.id}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {new Date(transaction.date_of_transaction).toLocaleDateString()}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => handleDownloadExcel(transaction.id)}
+                        className="inline-flex items-center space-x-2 bg-[#6C5DD3] text-white px-4 py-2 rounded-lg hover:bg-[#5c4eb3]"
                       >
-                        <path 
-                          strokeLinecap="round" 
-                          strokeLinejoin="round" 
-                          strokeWidth={2} 
-                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" 
-                        />
-                      </svg>
-                      <span>{t('calculateServices.download',)}</span>
-                    </button>
-                  </div>
-                ))}
+                        <svg 
+                          className="w-5 h-5" 
+                          fill="none" 
+                          stroke="currentColor" 
+                          viewBox="0 0 24 24"
+                        >
+                          <path 
+                            strokeLinecap="round" 
+                            strokeLinejoin="round" 
+                            strokeWidth={2} 
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" 
+                          />
+                        </svg>
+                        <span>{t('calculateServices.download')}</span>
+                      </button>
+                    </div>
+                  ))}
               </div>
             )}
           </div>

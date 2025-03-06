@@ -16,6 +16,7 @@ import {
   RiLogoutBoxRFill,
   RiServiceFill
 } from 'react-icons/ri';
+import { authService } from '../services/auth';
 
 const mainMenuItems = [
 
@@ -92,7 +93,7 @@ export default function Layout() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    authService.logout();
     navigate("/login");
   };
 
