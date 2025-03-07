@@ -368,30 +368,15 @@
     const canProceedToTransaction = () => {
       if (!application) return false;
       
-      // If application has declaration info or is VIP, allow proceeding
-      if (application.vip_application || 
-          (application.decloration_number && application.decloration_date)) {
-        return true;
-      }
-      
-      // If no declaration info and not VIP, prevent proceeding
-      return false;
+      // Both VIP and non-VIP applications require declaration info
+      return Boolean(application.decloration_number && application.decloration_date);
     };
 
     const canMakePayment = () => {
       if (!application) return false;
       
-      // If VIP application, allow payment
-      if (application.vip_application) {
-        return true;
-      }
-      
-      // If no declaration info and not VIP, prevent payment
-      if (!application.decloration_number || !application.decloration_date) {
-        return false;
-      }
-      
-      return true;
+      // Both VIP and non-VIP applications require declaration info
+      return Boolean(application.decloration_number && application.decloration_date);
     };
 
     const handleProceedToTransaction = () => {

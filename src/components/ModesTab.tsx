@@ -71,9 +71,9 @@ const ModesTab: React.FC<ModesTabProps> = ({
   );
 
   // Determine if status can be set to completed
-  const canBeCompleted = 
-    formData.vip_application || // VIP applications can always be completed
-    (formData.total_price === 0 && hasDeclarationInfo); // Non-VIP needs total_price = 0 and declaration info
+  const canBeCompleted = formData.vip_application
+    ? hasDeclarationInfo // VIP applications need declaration info
+    : (hasDeclarationInfo && formData.total_price === 0); // Non-VIP needs both declaration info and total_price = 0
 
   return (
     <div className="bg-white dark:bg-gray-900 p-3 sm:p-6 rounded-lg shadow-sm">
@@ -105,6 +105,16 @@ const ModesTab: React.FC<ModesTabProps> = ({
         {/* Status requirements helper text */}
         {!canBeCompleted && (
           <div className="mt-3 space-y-2">
+            {!hasDeclarationInfo && (
+              <div className="flex items-center space-x-2 text-red-500">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span className="text-sm">
+                  {t('editApplication.completedDisabledDeclaration', 'Declaration information is required to mark as completed')}
+                </span>
+              </div>
+            )}
             {!formData.vip_application && formData.total_price !== 0 && (
               <div className="flex items-center space-x-2 text-red-500">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -112,16 +122,6 @@ const ModesTab: React.FC<ModesTabProps> = ({
                 </svg>
                 <span className="text-sm">
                   {t('editApplication.completedDisabledPrice', 'Total price must be 0 to mark as completed')}
-                </span>
-              </div>
-            )}
-            {!formData.vip_application && !hasDeclarationInfo && (
-              <div className="flex items-center space-x-2 text-red-500">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className="text-sm">
-                  {t('editApplication.completedDisabledDeclaration', 'Declaration information is required to mark as completed')}
                 </span>
               </div>
             )}
