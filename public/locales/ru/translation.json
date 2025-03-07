@@ -605,6 +605,9 @@
     "errorMessage": "Ошибка при сохранении пользователя"
   },
   "editApplication": {
+    "successMessage":"Заявка успешно обновлена",
+    "completedDisabledPrice":"Для завершения заявки необходимо, чтобы общая сумма была равна 0",
+    "completedDisabledDeclaration":"Для завершения заявки необходимо, чтобы была заполнена информация о декларации",
     "deportedDate":"Дата Отправки",
     "numberOfApplication":"Номер Заявки",
     "tnvedCode":"Код ТНВЭД", 
@@ -679,9 +682,15 @@
     "successMessage": "Продукт успешно создан!",
     "errorMessage": "Не удалось создать продукт. Пожалуйста, попробуйте снова."
   },
+  
+  "errorModal":{
+    "close":"Закрыть"
+  },
 
   "calculateServices": {
+    "declarationRequiredForPayment":"Для оплаты необходимо заполнить информацию о декларации",
     "workingServices": "Рабочие Услуги",
+    "dalolatnomaTitle":"Акт",
     "fullyPaid":"Полностью оплачено",
     "title": "Расчет Услуг",
     "noResults": "Услуги не найдены",

@@ -664,8 +664,11 @@
   },
   "editApplication": {
     "numberOfApplication":"Ariza Raqami",
+    "successMessage":"Ariza muvaffaqiyatli o'zgardi",
     "deportedDate":"Ketiw Sánesi",
     "selectPhotos": "Foto tanlash",
+    "completedDisabledPrice":"Ariza yakunlash uchun umumiy summa 0 ga teng bo'lishi kerak",
+    "completedDisabledDeclaration":"Ariza yakunlash uchun deklaratsiya ma'lumotlari to'ldirilishi kerak",
     "tnvedCode":"TNVED Kod",
     "tnvedCodePlaceholder":"TNVED kodini kiritiń",
     "applicationNumber":"Ótinish Nomeri",
@@ -781,7 +784,8 @@
     "downloadError": "Fayldı júklewde qátelik júz berdi",
     "dalolatnomaTitle": "Dálolatnama",
     "partiallyPaid": "Қисман төленген",
-    "unpaid": "Төlenbeген"
+    "unpaid": "Төlenbeген",
+    "declarationRequiredForPayment":"Deklaratsiya ma'lumotlari bilan to'lovni amalga oshirish uchun talab etiladi"
   },
   "transaction": {
     "success":{
@@ -840,5 +844,8 @@
     "noTransactions": "Tranzaksiyalar tabılmadı",
     "fetchError": "Tranzaksiyalardı júklewde qátelik júz berdi",
     "downloadError": "Fayldı júklewde qátelik júz berdi"
+  },
+  "errorModal": {
+    "close": "Jabıw"
   }
 }

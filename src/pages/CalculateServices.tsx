@@ -19,6 +19,8 @@
   interface Application {
     id: number;
     keeping_services: KeepingService[];
+    
+
     working_services: {
       id: number;
       quantity: number;
@@ -27,6 +29,10 @@
       application_id: number;
       service_name: string;
     }[];
+    decloration_number?: string;
+    decloration_date?: string;
+    vip_application?: boolean;
+    total_price?: number;
   }
 
   interface ServiceType {
@@ -359,14 +365,43 @@
       }
     };
 
+    const canProceedToTransaction = () => {
+      if (!application) return false;
+      
+      // If application has declaration info or is VIP, allow proceeding
+      if (application.vip_application || 
+          (application.decloration_number && application.decloration_date)) {
+        return true;
+      }
+      
+      // If no declaration info and not VIP, prevent proceeding
+      return false;
+    };
+
+    const canMakePayment = () => {
+      if (!application) return false;
+      
+      // If VIP application, allow payment
+      if (application.vip_application) {
+        return true;
+      }
+      
+      // If no declaration info and not VIP, prevent payment
+      if (!application.decloration_number || !application.decloration_date) {
+        return false;
+      }
+      
+      return true;
+    };
+
     const handleProceedToTransaction = () => {
+      if (!canProceedToTransaction()) {
+        setErrorMessage(t('calculateServices.declarationRequiredForPayment', ))
+        setErrorModalOpen(true);
+        return;
+      }
+
       if (calculationResult) {
-        console.log('Proceeding to transaction with:', {
-          keeping_services: calculationResult.keeping_services,
-          working_services: calculationResult.working_services,
-          total_price: calculationResult.total_price
-        });
-        
         dispatch(setCalculatedServices({
           services: calculationResult.keeping_services,
           working_services: calculationResult.working_services,
@@ -379,6 +414,13 @@
 
     const handlePaymentSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
+      
+      if (!canMakePayment()) {
+        setErrorMessage(t('calculateServices.declarationRequiredForPayment',));
+        setErrorModalOpen(true);
+        return;
+      }
+
       try {
         const payload = {
           application: Number(id),
@@ -930,6 +972,19 @@
           </div>
         ) : activeTab === 'payments' ? (
           <div className="space-y-6">
+            {!canMakePayment() && (
+              <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                <div className="flex items-center space-x-2">
+                  <svg className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">
+                    {t('calculateServices.declarationRequiredForPayment')}
+                  </span>
+                </div>
+              </div>
+            )}
+
             {applicationData && (
               <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
                 <div className="flex justify-between items-center">
@@ -971,9 +1026,11 @@
                       ...prev,
                       payment_method: Number(e.target.value)
                     }))}
-                    className="rounded-md border border-gray-300 dark:border-gray-600 
+                    disabled={!canMakePayment()}
+                    className={`rounded-md border border-gray-300 dark:border-gray-600 
                       bg-white dark:bg-gray-700 p-2 text-gray-900 dark:text-gray-100
-                      focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]"
+                      focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]
+                      ${!canMakePayment() ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     {paymentMethods.map((method) => (
                       <option 
@@ -1015,9 +1072,11 @@
                 </div>
                 <button
                   type="submit"
-                  className="bg-[#6C5DD3] text-white px-4 py-2 rounded-lg hover:bg-[#5c4eb3]"
+                  disabled={!canMakePayment()}
+                  className={`bg-[#6C5DD3] text-white px-4 py-2 rounded-lg hover:bg-[#5c4eb3]
+                    ${!canMakePayment() ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
-                  {t('calculateServices.submit', )}
+                  {t('calculateServices.submit')}
                 </button>
               </form>
             </div>

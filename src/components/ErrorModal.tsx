@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { XCircleIcon } from '@heroicons/react/24/outline';
+import { useTranslation } from 'react-i18next';
 
 interface ErrorModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface ErrorModalProps {
 }
 
 export default function ErrorModal({ isOpen, onClose, message }: ErrorModalProps) {
+  const { t } = useTranslation();
   return (
     <Transition.Root show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={onClose}>
@@ -57,7 +59,7 @@ export default function ErrorModal({ isOpen, onClose, message }: ErrorModalProps
                     className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
                     onClick={onClose}
                   >
-                    Close
+                    {t('errorModal.close')}
                   </button>
                 </div>
               </Dialog.Panel>

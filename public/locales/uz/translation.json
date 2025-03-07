@@ -588,7 +588,11 @@
     "downloadError": "Faylda xatolik yuz berdi",
     "dalolatnomaTitle": "Dalolatnoma",
     "transactionID": "Tranzaksiya",
-    "partiallyPaid": "Qisman to'langan"
+    "partiallyPaid": "Qisman to'langan",
+    "declarationRequiredForPayment":"Deklaratsiya ma'lumotlari bilan to'lovni amalga oshirish uchun talab etiladi"
+  },
+  "errorModal":{
+    "close":"Yopish"
   },
 "transaction":{
   "success":{
@@ -677,7 +681,10 @@
   },
   "editApplication": {
     "deportedDate":"Ketish sanasi",
+    "successMessage":"Ariza muvaffaqiyatli o'zgardi",
     "status": "Status",
+    "completedDisabledPrice":"Ariza yakunlash uchun umumiy summa 0 ga teng bo'lishi kerak",
+    "completedDisabledDeclaration":"Ariza yakunlash uchun deklaratsiya ma'lumotlari to'ldirilishi kerak",
     "tnvedCode":"TNVED Kod",
     "tnvedCodePlaceholder":"TNVED kodini kiriting",
     "amount":"Qiymati",
