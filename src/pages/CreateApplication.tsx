@@ -552,25 +552,41 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
             placeholder={t("createApplication.tnvedCodePlaceholder")}
           />
           
-          {showTnvedDropdown && products.length > 0 && tnvedCodeSearch && (
+          {showTnvedDropdown && tnvedCodeSearch && (
             <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
               border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  onClick={() => handleProductSelect(product)}
-                  className={`px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
-                    cursor-pointer text-sm text-gray-900 dark:text-gray-100
-                    ${selectedProduct === product.id ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
-                >
-                  <div className="flex flex-col">
-                    <span className="font-medium">{product.name}</span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {t('createApplication.tnvedCode')}: {product.tnved_code}
-                    </span>
+              {products.length > 0 ? (
+                products.map((product) => (
+                  <div
+                    key={product.id}
+                    onClick={() => handleProductSelect(product)}
+                    className={`px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
+                      cursor-pointer text-sm text-gray-900 dark:text-gray-100
+                      ${selectedProduct === product.id ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-medium">{product.name}</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {t('createApplication.tnvedCode')}: {product.tnved_code}
+                      </span>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="p-4">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    {t('createApplication.noProductsFound')}
+                  </p>
+                  <button
+                    onClick={() => setShowCreateProductModal(true)}
+                    className="w-full text-center bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
+                      hover:bg-[#5b4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
+                      dark:focus:ring-offset-gray-800"
+                  >
+                    {t('createApplication.createNewProduct')}
+                  </button>
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>
@@ -604,25 +620,41 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
             placeholder={t("createApplication.productNamePlaceholder")}
           />
           
-          {showProductNameDropdown && products.length > 0 && productNameSearch && (
+          {showProductNameDropdown && productNameSearch && (
             <div className="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 rounded-md shadow-lg 
               border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
-              {products.map((product) => (
-                <div
-                  key={product.id}
-                  onClick={() => handleProductSelect(product)}
-                  className={`px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
-                    cursor-pointer text-sm text-gray-900 dark:text-gray-100
-                    ${selectedProduct === product.id ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
-                >
-                  <div className="flex flex-col">
-                    <span className="font-medium">{product.name}</span>
-                    <span className="text-sm text-gray-500 dark:text-gray-400">
-                      {t('createApplication.tnvedCode')}: {product.tnved_code}
-                    </span>
+              {products.length > 0 ? (
+                products.map((product) => (
+                  <div
+                    key={product.id}
+                    onClick={() => handleProductSelect(product)}
+                    className={`px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 
+                      cursor-pointer text-sm text-gray-900 dark:text-gray-100
+                      ${selectedProduct === product.id ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-medium">{product.name}</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {t('createApplication.tnvedCode')}: {product.tnved_code}
+                      </span>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="p-4">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    {t('createApplication.noProductsFound')}
+                  </p>
+                  <button
+                    onClick={() => setShowCreateProductModal(true)}
+                    className="w-full text-center bg-[#6C5DD3] text-white px-4 py-2 text-sm rounded-lg 
+                      hover:bg-[#5b4eb3] focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
+                      dark:focus:ring-offset-gray-800"
+                  >
+                    {t('createApplication.createNewProduct')}
+                  </button>
                 </div>
-              ))}
+              )}
             </div>
           )}
         </div>
@@ -1922,6 +1954,7 @@ export default function CreateApplication() {
                       value={formData.number_of_application || ''}
                       onChange={handleChange}
                       className={inputClassName}
+                      placeholder={t('createApplication.numberOfApplicationPlaceholder')}
                     />
                   </div>
                   <div className="relative" ref={dropdownRef}>

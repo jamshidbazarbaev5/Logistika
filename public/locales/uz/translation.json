@@ -31,6 +31,7 @@
     "searchStorage": "Omborni izlash",
     "exportToExcel":"Excelga eksport qilish",
     "numberOfApplication": "Ariza Raqami",
+    "numberOfApplicationPlaceholder": "Raqam avtomatik tarzda yaratiladi",
     "currentDeclorationFile": "Deklaratsiya Fayli",
     "title": "Ariza Yaratish",
     "base": "Asosiy",
@@ -272,6 +273,7 @@
   "common": {
     "success": "Muvaffaqiyatli!",
     "ok": "OK",
+    "saving": "Saqlanmoqda...",
     "calculating": "Hisoblanmoqda...",
     "error": "Xatolik!",
     "create": "Yaratish",

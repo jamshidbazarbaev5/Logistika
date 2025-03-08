@@ -30,6 +30,7 @@
   "createApplication": {
     "title": "Создать Заявку",
     "numberOfApplication": "Номер Заявки",
+    "numberOfApplicationPlaceholder": "Номер будет сгенерирован автоматически",
     "storage": "Склад",
     "product": "Товар",
     "units": "Единицы",
@@ -272,6 +273,7 @@
     "cancel": "Отмена",
     "update": "Обновить",
     "edit": "Изменить",
+    "saving": "Сохранение...",
     "save": "Сохранить",
     "delete": "Удалить",
     "create": "Создать"

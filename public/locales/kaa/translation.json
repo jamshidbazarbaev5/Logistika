@@ -35,6 +35,7 @@
     "tnvedCode": "TNVED Kod",
     "tnvedCodePlaceholder": "TNVED kodini kiritiń",
     "numberOfApplication": "Ótinish Nomeri",
+    "numberOfApplicationPlaceholder": "Nomer avtomatik jaratıladı",
     "vipApplication": "VIP Ariza",
     "storage": "Ombor",
     "product": "Ónim",
@@ -283,7 +284,8 @@
     "actions": "Háreketler",
     "edit": "Ózgertiw",
     "save": "Saqlaw",
-    "delete": "Óshiriw"
+    "delete": "Óshiriw",
+    "saving": "Saqlanıw..."
   },
   "login": {
     "title": "Esapqa kiriw",
