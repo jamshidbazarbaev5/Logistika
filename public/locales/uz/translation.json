@@ -784,10 +784,16 @@
   "dalolatnoma": {
     "title": "Dalolatnoma",
     "transactionId": "Tranzaksiya",
-    "carNumber": "Mashina Raqami",
+    "carNumber": "Mashina raqami",
     "download": "Yuklash",
     "noTransactions": "Tranzaksiyalar topilmadi",
     "fetchError": "Tranzaksiyalarni yuklashda xatolik yuz berdi",
-    "downloadError": "Faylni yuklashda xatolik yuz berdi"
+    "downloadError": "Faylni yuklashda xatolik yuz berdi",
+    "customerInfo": "Mijoz ma'lumotlari",
+    "products": "Mahsulotlar",
+    "services": "Xizmatlar",
+    "keepingService": "Saqlash xizmati",
+    "workingService": "Ish xizmati",
+    "quantity": "Miqdor"
   }
 } 

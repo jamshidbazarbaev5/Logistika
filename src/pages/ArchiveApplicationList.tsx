@@ -366,34 +366,39 @@ export default function ArchiveApplicationList() {
     return <div className="text-red-500 text-center p-4">{error}</div>;
   }
 
-  const handleDownloadExcel = () => {
-    const params = new URLSearchParams();
-    
-    const searchParamsForExport = {
-      firm_name: searchParams.firm_name,
-      decloration_number: searchParams.decloration_number,
-      number_of_application: searchParams.number_of_application,
-      firm_INN: searchParams.firm_INN,
-      coming_date_gte: searchParams.coming_date_gte,
-      coming_date_lte: searchParams.coming_date_lte, 
-      products: searchParams.products
-    };
+  const handleDownloadExcel = async () => {
+    try {
+      const params = new URLSearchParams();
+      
+      const searchParamsForExport = {
+        firm_name: searchParams.firm_name,
+        decloration_number: searchParams.decloration_number,
+        number_of_application: searchParams.number_of_application,
+        firm_INN: searchParams.firm_INN,
+        coming_date_gte: searchParams.coming_date_gte,
+        coming_date_lte: searchParams.coming_date_lte,
+        products: searchParams.products
+      };
 
-    Object.entries(searchParamsForExport).forEach(([key, value]) => {
-      console.log(`Adding parameter: ${key} = ${value}`); // Debug log
-      params.append(key, value || '');
-    });
+      Object.entries(searchParamsForExport).forEach(([key, value]) => {
+        params.append(key, value || '');
+      });
 
-    const downloadUrl = `https://cargo-calc.uz/api/v1/export_excel/?${params.toString()}`;
-    
-    console.log('Download URL:', downloadUrl);
+      const response = await api.get(`/export_excel/?${params.toString()}`, {
+        responseType: 'blob'
+      });
 
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.setAttribute('download', 'applications.xlsx');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'applications.xlsx');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading Excel file:', error);
+      }
   };
 
   const PaginationControls = () => {

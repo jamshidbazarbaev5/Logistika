@@ -785,8 +785,8 @@
     "download": "Júklew",
     "downloadError": "Fayldı júklewde qátelik júz berdi",
     "dalolatnomaTitle": "Dálolatnama",
-    "partiallyPaid": "Қисман төленген",
-    "unpaid": "Төlenbeген",
+    "partiallyPaid": "Қисман төlengen",
+    "unpaid": "Төlenbegen",
     "declarationRequiredForPayment":"Deklaratsiya ma'lumotlari bilan to'lovni amalga oshirish uchun talab etiladi"
   },
   "transaction": {
@@ -839,13 +839,21 @@
     }
   },
   "dalolatnoma": {
-    "title": "Dálilnama",
+    "title": "Dálolatnama",
     "transactionId": "Tranzaksiya",
     "carNumber": "Mashina Nomeri",
     "download": "Júklew",
     "noTransactions": "Tranzaksiyalar tabılmadı",
     "fetchError": "Tranzaksiyalardı júklewde qátelik júz berdi",
-    "downloadError": "Fayldı júklewde qátelik júz berdi"
+    "downloadError": "Fayldı júklewde qátelik júz berdi",
+    "customerInfo": "Klient mag'lıwmatları",
+    "products": "Ónimler",
+    "services": "Xızmetler",
+    "keepingService": "Saqlaw xızmeti",
+    "workingService": "Jumıs xızmeti",
+    "quantity": "Mug'dar",
+    "storage": "Qoyma",
+    "amount": "Summa"
   },
   "errorModal": {
     "close": "Jabıw"

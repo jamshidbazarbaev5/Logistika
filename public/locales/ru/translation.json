@@ -321,7 +321,7 @@
     "deleteConfirmation": "Вы уверены, что хотите удалить заявку \"{{declarationNumber}}\"? Это действие нельзя отменить.",
     "delete": "Удалить",
     "deleteSuccess": "Заявка успешно удалена",
-    "unknownFirmcd": "Неизвестная Компания",
+    "unknownFirm": "Неизвестная Компания",
     "table": {
       "number": "№",
       "declarationNumber": "Номер Декларации",
@@ -791,6 +791,14 @@
     "download": "Скачать",
     "noTransactions": "Транзакции не найдены",
     "fetchError": "Ошибка при загрузке транзакций",
-    "downloadError": "Ошибка при скачивании файла"
+    "downloadError": "Ошибка при скачивании файла",
+    "customerInfo": "Информация о клиенте",
+    "products": "Товары",
+    "services": "Услуги",
+    "keepingService": "Услуга хранения",
+    "workingService": "Рабочая услуга",
+    "quantity": "Количество",
+    "storage": "Склад",
+    "amount": "Сумма"
   }
 }
