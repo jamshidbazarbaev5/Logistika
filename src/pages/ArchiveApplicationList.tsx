@@ -381,10 +381,13 @@ export default function ArchiveApplicationList() {
       };
 
       Object.entries(searchParamsForExport).forEach(([key, value]) => {
-        params.append(key, value || '');
+        if (value) {
+          params.append(key, value);
+        }
       });
 
-      const response = await api.get(`/export_excel/?${params.toString()}`, {
+      const response = await api.get('/export_excel/', {
+        params: searchParamsForExport,
         responseType: 'blob'
       });
 
@@ -398,9 +401,8 @@ export default function ArchiveApplicationList() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Error downloading Excel file:', error);
-      }
+    }
   };
-
   const PaginationControls = () => {
     const pageNumbers = [];
     for (let i = 1; i <= totalPages; i++) {

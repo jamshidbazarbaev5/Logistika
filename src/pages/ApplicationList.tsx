@@ -445,10 +445,13 @@ export default function ApplicationList() {
       };
 
       Object.entries(searchParamsForExport).forEach(([key, value]) => {
-        params.append(key, value || '');
+        if (value) {
+          params.append(key, value);
+        }
       });
 
-      const response = await api.get(`/export_excel/?${params.toString()}`, {
+      const response = await api.get('/export_excel/', {
+        params: searchParamsForExport,
         responseType: 'blob'
       });
 
