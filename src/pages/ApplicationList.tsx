@@ -606,21 +606,16 @@ export default function ApplicationList() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    <div className="flex flex-col space-y-2">
-                      {application.transport.map((transport, idx) => {
-                        const transportTypeInfo = transportTypes.find(t => t.id === transport.transport_type);
-                        return (
-                          <div key={idx} className="flex items-center gap-2">
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
-                              {transportTypeInfo?.transport_type || 'Unknown'}
-                            </span>
-                            <span className="text-gray-600 dark:text-gray-400">
-                              {transport.transport_number}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                    {application.transport?.map((transport, idx) => (
+                      <div key={transport.id || idx} className="flex items-center space-x-1">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mr-2">
+                          {transportTypes[transport.transport_type] || t("applicationList.unknownTransport", "Unknown")}
+                        </span>
+                        <span className="text-gray-600">
+                          {transport.transport_number}
+                        </span>
+                      </div>
+                    ))}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {application.modes?.map((mode) => {
