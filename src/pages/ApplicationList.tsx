@@ -190,11 +190,13 @@ export default function ApplicationList() {
 
   const [, setKeepingServices] = useState<Array<{ id: number; name: string; base_price: number; extra_price: number }>>([]);
   const [, setWorkingServices] = useState<Array<{ id: number; service_name: string; base_price: number; extra_price: number; units: string }>>([]);
-  const [, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
+  // const [, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
   const [, setStorages] = useState<Array<{ id: number; name: string }>>([]);
   const [productsList, setProductsList] = useState<ProductResponse[]>([]);
 
   const [availableModes, setAvailableModes] = useState<Mode[]>([]);
+
+  const [transportTypes, setTransportTypes] = useState<Record<number, string>>({});
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -276,11 +278,12 @@ export default function ApplicationList() {
       
       params.append('page', currentPage.toString());
 
-      const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse] = await Promise.all([
+      const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse, transportTypesResponse] = await Promise.all([
         api.get<PaginatedResponse<Application>>(`/application/?${params.toString()}`),
         api.get<PaginatedResponse<FirmResponse>>('/firms/'),
         api.get<PaginatedResponse<ApplicationMode>>('/modes/application_modes/'),
-        api.get<ModesResponse>('/modes/modes/')
+        api.get<ModesResponse>('/modes/modes/'),
+        api.get('/transport/type/')
       ]);
 
       const firmsData = Array.isArray(firmsResponse.data?.results) ? firmsResponse.data.results : [];
@@ -303,6 +306,12 @@ export default function ApplicationList() {
         }
         return acc;
       }, {});
+
+      const transportTypesMap = transportTypesResponse.data.results.reduce((acc: Record<number, string>, type: { id: number; transport_type: string }) => {
+        acc[type.id] = type.transport_type;
+        return acc;
+      }, {});
+      setTransportTypes(transportTypesMap);
 
       setFirms(firmMap);
       setModes(modesMap);
@@ -545,6 +554,9 @@ export default function ApplicationList() {
                 {t("applicationList.table.status", "Status")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t("applicationList.table.transport", "Transport")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("applicationList.table.modes", "Modes")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -592,6 +604,23 @@ export default function ApplicationList() {
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusClasses(application.status as ApplicationStatus)}`}>
                       {t(`applicationList.status.${application.status}`, application.status)}
                     </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    <div className="flex flex-col space-y-2">
+                      {application.transport.map((transport, idx) => {
+                        const transportTypeInfo = transportTypes.find(t => t.id === transport.transport_type);
+                        return (
+                          <div key={idx} className="flex items-center gap-2">
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
+                              {transportTypeInfo?.transport_type || 'Unknown'}
+                            </span>
+                            <span className="text-gray-600 dark:text-gray-400">
+                              {transport.transport_number}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {application.modes?.map((mode) => {

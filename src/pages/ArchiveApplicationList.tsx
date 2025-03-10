@@ -147,6 +147,11 @@ const formatNumber = (num: number | null): string => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 };
 
+interface TransportType {
+  id: number;
+  transport_type: string;
+}
+
 export default function ArchiveApplicationList() {
   const { t } = useTranslation();
   const [applications, setApplications] = useState<Application[]>([]);
@@ -173,7 +178,7 @@ export default function ArchiveApplicationList() {
 
   const [, setKeepingServices] = useState<Array<{ id: number; name: string; base_price: number; extra_price: number }>>([]);
   const [, setWorkingServices] = useState<Array<{ id: number; service_name: string; base_price: number; extra_price: number; units: string }>>([]);
-  const [, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
+  const [transportTypes, setTransportTypes] = useState<TransportType[]>([]);
   const [, setStorages] = useState<Array<{ id: number; name: string }>>([]);
   const [productsList, setProductsList] = useState<ProductResponse[]>([]);
 
@@ -263,11 +268,12 @@ export default function ArchiveApplicationList() {
       
       params.append('page', currentPage.toString());
 
-      const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse] = await Promise.all([
+      const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse, transportTypesResponse] = await Promise.all([
         api.get<PaginatedResponse<Application>>(`/application/?${params.toString()}`),
         api.get<PaginatedResponse<FirmResponse>>('/firms/'),
         api.get<PaginatedResponse<ApplicationMode>>('/modes/application_modes/'),
-        api.get<ModesResponse>('/modes/modes/')
+        api.get<ModesResponse>('/modes/modes/'),
+        api.get('/transport/type/')
       ]);
 
       const completedApplications = Array.isArray(applicationsResponse.data?.results) 
@@ -300,6 +306,7 @@ export default function ArchiveApplicationList() {
       setAvailableModes(Array.isArray(availableModesResponse.data.results) 
         ? availableModesResponse.data.results 
         : []);
+      setTransportTypes(transportTypesResponse.data.results);
       setApplications(completedApplications);
       setLoading(false);
 
@@ -507,6 +514,9 @@ export default function ArchiveApplicationList() {
                 {t("applicationList.table.modes", "Modes")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                {t("applicationList.table.transport", "Transport")}
+              </th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("applicationList.table.status", "Status")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -564,6 +574,26 @@ export default function ArchiveApplicationList() {
                         </span>
                       );
                     })}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                    <div className="flex flex-col gap-1">
+                      {application.transport.map((transport, idx) => {
+                        const transportTypeInfo = transportTypes.find(t => t.id === transport.transport_type);
+                        return (
+                          <div 
+                            key={idx} 
+                            className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
+                          >
+                            <span className="font-semibold text-gray-700 dark:text-gray-300">
+                              {transportTypeInfo?.transport_type}:
+                            </span>
+                            <span className="ml-1 text-gray-600 dark:text-gray-400">
+                              {transport.transport_number}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${STATUS_CONFIG[application.status].color}`}>
