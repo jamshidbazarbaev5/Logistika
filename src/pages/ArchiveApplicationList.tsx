@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { SearchBar, SearchField } from "../components/SearchBar";
-import { Crown, User, Download, Eye } from "lucide-react";
+import { Crown, User, Download, Eye, MoreVertical, Trash } from "lucide-react";
 import { api } from "../api/api";
 import { useNavigate } from "react-router-dom";
+import ConfirmModal from '../components/ConfirmModal';
+import SuccessModal from '../components/SuccessModal';
 
 interface ApplicationMode {
   id: number;
@@ -173,7 +175,11 @@ export default function ArchiveApplicationList() {
   const [totalPages, setTotalPages] = useState(1);
 
   const [isFormModalOpen] = useState(false);
-  const [] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState<any>(null);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [showActionMenu, setShowActionMenu] = useState<number | null>(null);
   
 
   const [, setKeepingServices] = useState<Array<{ id: number; name: string; base_price: number; extra_price: number }>>([]);
@@ -359,6 +365,18 @@ export default function ArchiveApplicationList() {
 
   const handleViewDetails = (applicationId: number) => {
     navigate(`/archive/${applicationId}`);
+  };
+
+  const handleDelete = async (applicationId: number) => {
+    try {
+      await api.delete(`/application/${applicationId}/`);
+      setSuccessMessage(t('applicationList.deleteSuccess'));
+      setShowSuccessModal(true);
+      fetchApplications(); // Refresh the list
+    } catch (error) {
+      console.error('Error deleting application:', error);
+      // Handle error appropriately
+    }
   };
 
   if (loading) {
@@ -601,21 +619,53 @@ export default function ArchiveApplicationList() {
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    <div className="flex space-x-2">
+                    <div className="flex items-center justify-end relative">
                       <button
-                        onClick={() => handleViewDetails(application.id)}
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-[#6C5DD3] hover:bg-[#5b4eb3] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6C5DD3]"
+                        onClick={() => setShowActionMenu(showActionMenu === application.id ? null : application.id)}
+                        className="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
                       >
-                        <Eye className="w-4 h-4 mr-1" />
-                        {t("applicationList.viewDetails")}
+                        <MoreVertical className="w-5 h-5" />
                       </button>
-                      <button
-                        onClick={() => navigate(`/archive/${application.id}/dalolatnoma`)}
-                        className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-600"
-                      >
-                        <Download className="w-4 h-4 mr-1" />
-                        {t("applicationList.dalolatnoma", "Dalolatnoma")}
-                      </button>
+                      
+                      {showActionMenu === application.id && (
+                        <div className="absolute right-0 top-8 z-10 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
+                          <div className="py-1">
+                            <button
+                              onClick={() => {
+                                handleViewDetails(application.id);
+                                setShowActionMenu(null);
+                              }}
+                              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            >
+                              <Eye className="w-4 h-4 mr-2" />
+                              {t("applicationList.viewDetails")}
+                            </button>
+                            
+                            <button
+                              onClick={() => {
+                                navigate(`/archive/${application.id}/dalolatnoma`);
+                                setShowActionMenu(null);
+                              }}
+                              className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            >
+                              <Download className="w-4 h-4 mr-2" />
+                              {t("applicationList.dalolatnoma")}
+                            </button>
+                            
+                            <button
+                              onClick={() => {
+                                setSelectedApplication(application);
+                                setIsDeleteModalOpen(true);
+                                setShowActionMenu(null);
+                              }}
+                              className="flex items-center w-full px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                            >
+                              <Trash className="w-4 h-4 mr-2" />
+                              {t("common.delete")}
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -626,6 +676,29 @@ export default function ArchiveApplicationList() {
       </div>
 
       <PaginationControls />
+
+      <ConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
+          if (selectedApplication) {
+            handleDelete(selectedApplication.id);
+          }
+          setIsDeleteModalOpen(false);
+        }}
+        title={t('applicationList.deleteTitle')}
+        message={t('applicationList.deleteConfirmation', {
+          declarationNumber: selectedApplication?.decloration_number
+        })}
+        confirmText={t('common.delete')}
+        cancelText={t('common.cancel')}
+      />
+
+      <SuccessModal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        message={successMessage}
+      />
     </div>
   );
 }

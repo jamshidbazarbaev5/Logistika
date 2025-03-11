@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { clearTransaction } from '../storage/slice';
 import SuccessModal from '../components/SuccessModal';
 import ErrorModal from '../components/ErrorModal';
+import { authService } from '../services/auth'
 
 interface Payment {
   payment_method: number;
@@ -123,29 +124,40 @@ export default function Transaction() {
   };
 
   const handleProductSelect = (productId: number) => {
-    setAvailableProducts(prev => prev.map(product => ({
-      ...product,
-      selected: product.product_id === productId 
-        ? !product.selected 
-        : product.selected
-    })));
+    console.log('Selecting product with ID:', productId);
+    
+    setAvailableProducts(prev => {
+      const updated = prev.map(product => ({
+        ...product,
+        selected: product.product_id === productId 
+          ? !product.selected 
+          : product.selected
+      }));
+      console.log('Updated available products:', updated);
+      return updated;
+    });
 
     setProducts(prev => {
       const selectedProduct = availableProducts.find(p => p.product_id === productId);
+      console.log('Selected product details:', selectedProduct);
+
       if (!selectedProduct) return prev;
 
       const existingIndex = prev.findIndex(p => p.product_id === productId);
       
+      let newProducts;
       if (existingIndex >= 0) {
-        return prev.filter(p => p.product_id !== productId);
+        newProducts = prev.filter(p => p.product_id !== productId);
       } else {
-        return [...prev, {
+        newProducts = [...prev, {
           product_id: selectedProduct.product_id,
           quantity: selectedProduct.quantity || 1,
           storage_id: selectedProduct.storage_id,
           name: selectedProduct.name
         }];
       }
+      console.log('Updated products list:', newProducts);
+      return newProducts;
     });
   };
 
@@ -160,53 +172,140 @@ export default function Transaction() {
   useEffect(() => {
     const fetchPaymentMethods = async () => {
       try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          console.log('No access token found');
+          navigate('/login');
+          return;
+        }
+
         const response = await api.get('/payment_method/');
+        console.log('Payment methods fetched:', response.data);
         setPaymentMethods(response.data.results);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching payment methods:', error);
+        if (error.response?.status === 401) {
+          try {
+            const newToken = await authService.refreshToken();
+            if (newToken) {
+              const response = await api.get('/payment_method/');
+              setPaymentMethods(response.data.results);
+            } else {
+              navigate('/login');
+            }
+          } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError);
+            navigate('/login');
+          }
+        }
       }
     };
     fetchPaymentMethods();
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     const fetchApplicationData = async () => {
       try {
+        const token = localStorage.getItem('accessToken');
+        if (!token) {
+          console.log('No access token found');
+          navigate('/login');
+          return;
+        }
+
+        // Get application data
         const response = await api.get(`/application/${applicationId}/`);
+        console.log('Application data:', response.data);
         
         setFormData({
           full_name: response.data.firm_info?.director_name || '',
-          phone_number:response.data.firm_info?.phone_number || '',
+          phone_number: response.data.firm_info?.phone_number || '',
           car_number: '',
         });
 
+        // Get storage data first
+        const storageResponse = await api.get('/storage/');
+        console.log('Storage response:', storageResponse.data);
+
+        // Modified storage mapping to use storage_name as key
+        const storageMap = storageResponse.data.results.reduce((acc: any, storage: any) => {
+          // Convert storage names to lowercase for case-insensitive comparison
+          acc[storage.storage_name.toLowerCase()] = storage.id;
+          console.log(`Mapping storage: ${storage.storage_name.toLowerCase()} -> ${storage.id}`);
+          return acc;
+        }, {});
+        console.log('Complete storage mapping:', storageMap);
+
+        // Get products data
         const productsResponse = await api.get('/items/product/');
+        console.log('Products response:', productsResponse.data);
+        
         const availableProductsMap = productsResponse.data.results.reduce((acc: any, product: any) => {
           acc[product.name] = product;
           return acc;
         }, {});
         
-        const productsWithDetails = response.data.products.map((product: any) => {
-          const matchingProduct = availableProductsMap[product.product_name];
-          return {
-            product_id: matchingProduct?.id, 
-            quantity: product.quantity,
-            storage_id: product.storage_name === "Склад 1" ? 1 : 2,
-            selected: false,
-            name: product.product_name
-          };
-        }).filter((product: any) => product.product_id);
+        console.log('Products from application:', response.data.products);
         
+        const productsWithDetails = response.data.products
+          .map((product: any) => {
+            const matchingProduct = availableProductsMap[product.product_name];
+            // Convert storage name to lowercase for lookup
+            const storageId = storageMap[product.storage_name.toLowerCase()];
+            
+            console.log('Processing product:', {
+              product_name: product.product_name,
+              storage_name: product.storage_name,
+              storage_name_lower: product.storage_name.toLowerCase(),
+              matchingProduct: matchingProduct?.id,
+              storageId: storageId,
+              availableStorageIds: Object.values(storageMap)
+            });
+
+            if (!matchingProduct || !storageId) {
+              console.log(`Skipping product ${product.product_name} - missing product or storage info`, {
+                hasMatchingProduct: !!matchingProduct,
+                hasStorageId: !!storageId,
+                availableStorageNames: Object.keys(storageMap),
+                requestedStorageName: product.storage_name.toLowerCase()
+              });
+              return null;
+            }
+
+            return {
+              product_id: matchingProduct.id,
+              quantity: product.quantity,
+              storage_id: storageId,
+              selected: false,
+              name: product.product_name
+            };
+          })
+          .filter((product: any) => product !== null);
+        
+        console.log('Final products with details:', productsWithDetails);
         setAvailableProducts(productsWithDetails);
-      } catch (error) {
+      } catch (error: any) {
         console.error('Error fetching application data:', error);
+        if (error.response?.status === 401) {
+          try {
+            const newToken = await authService.refreshToken();
+            if (newToken) {
+              fetchApplicationData();
+            } else {
+              navigate('/login');
+            }
+          } catch (refreshError) {
+            console.error('Token refresh failed:', refreshError);
+            navigate('/login');
+          }
+        }
       }
     };
 
     if (applicationId) {
       fetchApplicationData();
     }
-  }, [applicationId]);
+  }, [applicationId, navigate]);
 
   useEffect(() => {
     
@@ -222,6 +321,8 @@ export default function Transaction() {
     e.preventDefault();
     setLoading(true);
     console.log('Starting transaction submission...');
+    console.log('Current products state:', products);
+    console.log('Current available products state:', availableProducts);
 
     try {
       const servicesToSubmit = calculatedServices
@@ -231,6 +332,7 @@ export default function Transaction() {
           amount: service.requested_amount,
           price: service.price
         }));
+      console.log('Services to submit:', servicesToSubmit);
 
       const workingServicesToSubmit = workingServices && workingServices.length > 0 
         ? workingServices.map((service: WorkingService) => ({
@@ -239,17 +341,26 @@ export default function Transaction() {
             price: service.price
           }))
         : [];
+      console.log('Working services to submit:', workingServicesToSubmit);
       
       if (servicesToSubmit.length === 0 && workingServicesToSubmit.length === 0) {
         throw new Error('At least one service is required');
       }
 
-      if (payments.length > 0) {
-        const invalidPayment = payments.find(payment => payment.amount <= 0);
-        if (invalidPayment) {
-          throw new Error('All payments must have an amount greater than 0');
-        }
-      }
+      const productsPayload = products.map(product => {
+        const availableProduct = availableProducts.find(p => p.product_id === product.product_id);
+        console.log('Processing product for payload:', {
+          product,
+          availableProduct,
+          matchingStorageId: availableProduct?.storage_id
+        });
+        return {
+          product_id: product.product_id,
+          storage_id: availableProduct?.storage_id, // Use the storage_id from availableProducts
+          quantity: product.quantity
+        };
+      });
+      console.log('Products payload:', productsPayload);
 
       const payload = {
         application_id: applicationId,
@@ -259,13 +370,7 @@ export default function Transaction() {
         ...(formData.full_name && { full_name: formData.full_name }),
         ...(formData.phone_number && { phone_number: formData.phone_number }),
         ...(formData.car_number && { car_number: formData.car_number }),
-        ...(products.length > 0 && {
-          products: products.map(product => ({
-            product_id: product.product_id,
-            storage_id: product.storage_id,
-            quantity: product.quantity
-          }))
-        }),
+        ...(products.length > 0 && { products: productsPayload }),
         ...(payments.length > 0 && {
           payments: payments.map(payment => ({
             payment_method: payment.payment_method,
@@ -275,6 +380,9 @@ export default function Transaction() {
         })
       };
 
+      console.log('Final payload:', payload);
+      console.log('Making API request to /transactions/...');
+
       const response = await api.post('/transactions/', payload);
       console.log('Transaction created successfully:', response.data);
       
@@ -282,6 +390,8 @@ export default function Transaction() {
       
     } catch (error: any) {
       console.error('Error creating transaction:', error);
+      console.error('Error response data:', error.response?.data);
+      console.error('Error response status:', error.response?.status);
       
       let errorMsg = 'Error creating transaction';
       
@@ -311,7 +421,7 @@ export default function Transaction() {
     dispatch(clearTransaction());
     navigate('/application-list');
   };
-
+  console.log('Available products:', availableProducts);
   return (
     <div className="p-6">
       <h1 className="text-2xl font-semibold mb-6">
@@ -404,6 +514,7 @@ export default function Transaction() {
             {t('transaction.products', 'Products')}
           </h2>
           <div className="space-y-4">
+            
             {availableProducts
               .filter(product => product.quantity > 0)
               .map((product) => (
@@ -422,6 +533,7 @@ export default function Transaction() {
                       </span>
                     </div>
                   </div>
+
                   {product.selected && (
                     <div className="flex items-center space-x-2">
                       <input

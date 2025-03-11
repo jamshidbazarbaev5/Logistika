@@ -78,6 +78,7 @@ export interface ApplicationFormData {
   upload_working_services_quantity: Array<{
     service_id: number;
     quantity: number;
+    service_name?: string;
   }>;
   photo_report: Array<{
     id?: number;

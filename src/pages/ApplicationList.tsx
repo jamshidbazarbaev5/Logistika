@@ -166,7 +166,7 @@ export default function ApplicationList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [applicationToDelete] = useState<Application | null>(null);
+  const [applicationToDelete, setApplicationToDelete] = useState<Application | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [firms, setFirms] = useState<Record<number, string>>({});
@@ -382,18 +382,26 @@ export default function ApplicationList() {
     return <div className="text-red-500 text-center p-4">{error}</div>;
   }
 
+  const handleDeleteClick = (application: Application) => {
+    setApplicationToDelete(application);
+    setShowDeleteModal(true);
+  };
+
   const confirmDelete = async () => {
     if (!applicationToDelete) return;
 
     try {
       await api.delete(`/application/${applicationToDelete.id}/`);
-      setModalMessage(t("applicationList.deleteSuccess", "Application deleted successfully"));
+      setModalMessage(t("applicationList.deleteSuccess", "Ariza muvaffaqiyatli o'chirildi"));
       setShowSuccessModal(true);
       fetchApplications();
     } catch (error) {
       console.error("Error deleting application:", error);
+      setModalMessage(t("applicationList.deleteError", "Arizani o'chirishda xatolik yuz berdi"));
+      setShowSuccessModal(true);
     }
     setShowDeleteModal(false);
+    setApplicationToDelete(null);
   };
 
   const PaginationControls = () => {
@@ -646,7 +654,7 @@ export default function ApplicationList() {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                       >
-                        <Menu.Items className="absolute right-0 z-50  w-36 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none mt-[-70px]">
+                        <Menu.Items className="absolute right-0 z-50 w-36 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none mt-[-70px]">
                           <div className="py-1">
                             <Menu.Item>
                               {({ active }) => (
@@ -673,6 +681,18 @@ export default function ApplicationList() {
                                 </button>
                               )}
                             </Menu.Item>
+                            <Menu.Item>
+                              {({ active }) => (
+                                <button
+                                  onClick={() => handleDeleteClick(application)}
+                                  className={`${
+                                    active ? "bg-gray-100 dark:bg-gray-700" : ""
+                                  } flex w-full items-center px-4 py-2 text-sm text-red-600 dark:text-red-400`}
+                                >
+                                  {t("applicationList.delete", "Delete")}
+                                </button>
+                              )}
+                            </Menu.Item>
                           </div>
                         </Menu.Items>
                       </Transition>
@@ -691,13 +711,13 @@ export default function ApplicationList() {
         isOpen={showDeleteModal}
         onClose={() => setShowDeleteModal(false)}
         onConfirm={confirmDelete}
-        title={t("applicationList.deleteTitle", "Delete Application")}
+        title={t("applicationList.deleteTitle", "Arizani o'chirish")}
         message={t(
           "applicationList.deleteConfirmation",
-          `Are you sure you want to delete application "${applicationToDelete?.decloration_number}"? This action cannot be undone.`
+          `"${applicationToDelete?.number_of_application}" arizasini o'chirmoqchimisiz? Bu amalni qaytarib bo'lmaydi.`
         )}
-        confirmText={t("applicationList.delete", "Delete")}
-        cancelText={t("common.cancel", "Cancel")}
+        confirmText={t("applicationList.delete", "O'chirish")}
+        cancelText={t("common.cancel", "Bekor qilish")}
       />
 
       <SuccessModal
@@ -706,7 +726,7 @@ export default function ApplicationList() {
           setShowSuccessModal(false);
           setModalMessage('');
         }}
-        title={modalMessage.includes('error') || modalMessage.includes('Error') ? 'Error' : 'Success'}
+        title={modalMessage.includes('xatolik') ? 'Xatolik' : 'Muvaffaqiyat'}
         message={modalMessage}
       />
     </div>

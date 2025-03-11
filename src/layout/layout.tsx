@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { Menu, Moon, Sun, Truck, ChevronDown, ChevronUp } from "lucide-react";
+import { Menu, Moon, Sun, Truck, ChevronDown, ChevronRight } from "lucide-react";
 import {
   RiBuilding2Fill,
   RiStore2Fill,
@@ -13,67 +13,56 @@ import {
   RiTBoxFill,
   RiBarChartFill,
   RiUserFill,
-  RiLogoutBoxRFill,
-  RiServiceFill
+  RiServiceFill,
+  RiLogoutBoxRFill
 } from 'react-icons/ri';
 import { authService } from '../services/auth';
 
-const mainMenuItems = [
+// Organize menu items into sections
+const menuSections = {
+  main: [
+    // { name: "Photo Report", icon: RiCameraFill, href: "/photo-report" },
+    { name: "menu.createApplication", icon: RiFileAddFill, href: "/application-list" },
+    { name: "menu.archiveApplication", icon: RiFileAddFill, href: "/archive-application-list" },
+  ],
+  services: [
+    { name: "menu.workingServices", icon: RiServiceFill, href: "/working-services" },
+    { name: "menu.keepingServices", icon: RiUserFill, href: "/keeping-services" },
+  ],
+  settings: [
+    { name: "menu.createProduct", icon: RiTBoxFill, href: "/products-list" },
+    { name: "menu.createCategory", icon: RiBarChartFill, href: "/category" },
+    { name: "menu.measurement", icon: RiBarChartFill, href: "/measurements" },
+    { name: "menu.firm", icon: RiBuilding2Fill, href: "/firm-list" },
+    { name: "menu.storage", icon: RiStore2Fill, href: "/storage-list" },
+    { name: "menu.transport", icon: RiTruckFill, href: "/transport-list" },
+    { name: "menu.payment", icon: RiBankCardFill, href: "/payment-list" },
+    { name: "menu.createMode", icon: RiSettings4Fill, href: "/modes" },
+    { name: "menu.createUser", icon: RiUserFill, href: "/user-list" }
+  ]
+};
 
-  // { name: "Photo Report", icon: RiCameraFill, href: "/photo-report" },
-  { name: "menu.createApplication", icon: RiFileAddFill, href: "/application-list" },
-  { name: "menu.archiveApplication", icon: RiFileAddFill, href: "/archive-application-list" },
-];
 
-const generalItems = [
-  {
-    name: "menu.services",
-    icon: RiUserFill,
-    href: "#",
-    subItems: [
-      { name: "menu.workingServices", icon: RiServiceFill, href: "/working-services" },
-      { name: "menu.keepingServices", icon: RiUserFill, href: "/keeping-services" },
-    ]
-  },
-];
-
-const otherItems = [
- 
-  { 
-    name: "menu.settings", 
-    icon: RiSettings4Fill, 
-    href: "#",
-    subItems: [
-      { name: "menu.createProduct", icon: RiTBoxFill, href: "/products-list" },
-      { name: "menu.createCategory", icon: RiBarChartFill, href: "/category" },
-      { name: "menu.measurement", icon: RiBarChartFill, href: "/measurements" },
-      { name: "menu.firm", icon: RiBuilding2Fill, href: "/firm-list" },
-      { name: "menu.storage", icon: RiStore2Fill, href: "/storage-list" },
-      { name: "menu.transport", icon: RiTruckFill, href: "/transport-list" },
-      { name: "menu.payment", icon: RiBankCardFill, href: "/payment-list" },
-      { name: "menu.createMode", icon: RiSettings4Fill, href: "/modes" },
-      {name:"menu.createUser", icon:RiUserFill, href:"/user-list  "}
-    ]
-  },
-  
-  { name: "menu.logout", icon: RiLogoutBoxRFill, href: "#" },
-];
 
 export default function Layout() {
-  const [isOpen] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const [openSections, setOpenSections] = useState<string[]>(['main']);
   const { i18n, t } = useTranslation();
   const navigate = useNavigate();
   const [isDarkMode, setIsDarkMode] = useState(false);
-  const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
 
-  useEffect(() => {
-    const isDark = localStorage.getItem('darkMode') === 'true';
-    setIsDarkMode(isDark);
-    if (isDark) {
-        document.documentElement.classList.add('dark');
-    }
-  }, []);
+  const toggleSection = (section: string) => {
+    setOpenSections(prev => 
+      prev.includes(section) 
+        ? prev.filter(s => s !== section)
+        : [...prev, section]
+    );
+  };
+
+  const handleLogout = () => {
+    authService.logout();
+    navigate("/login");
+  };
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -88,42 +77,37 @@ export default function Layout() {
     { code: "kaa", name: "Қарақалпақша" },
   ];
 
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-  };
-
-  const handleLogout = () => {
-    authService.logout();
-    navigate("/login");
-  };
-
-  const toggleSubmenu = (menuName: string) => {
-    setOpenSubmenu(openSubmenu === menuName ? null : menuName);
-  };
-
   return (
-    <div className="flex min-h-screen bg-white dark:bg-gray-900 transition-colors duration-300">
-      {/* Update the language and theme selectors header - hide when mobile menu is open */}
-      <div className={`${isMobileMenuOpen ? 'hidden' : 'fixed'} 
-        top-0  p-4 z-50 flex righ-1 items-center gap-2
-        lg:right-8`}>
-        <button
-          onClick={toggleDarkMode}
-          className="p-2 rounded-md text-gray-600 ml-10 dark:text-gray-400 hover:text-gray-900 
-            dark:hover:text-gray-200 bg-white  dark:bg-gray-800"
+    <div className="flex h-screen bg-white dark:bg-gray-900">
+      {/* Header with Burger Menu and Logo - adjusted top padding from top-0 to top-4 */}
+      <div className="fixed top-4 left-0 z-50 flex items-center gap-3">
+        <button 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="p-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
         >
-          {isDarkMode ? <Sun className="h-5 w-5 md:h-6 md:w-6" /> : <Moon className="h-5 w-5 md:h-6 md:w-6" />}
-        </button>   
+          <Menu className="h-6 w-6 text-gray-600 dark:text-gray-200" />
+        </button>
         
+        {isMenuOpen && (
+          <div className="flex items-center gap-3">
+            <div className="bg-[#6C5DD3] p-2 rounded-lg">
+              <Truck className="h-6 w-6 text-white" />
+            </div>
+            <h1 className="text-xl font-bold text-gray-900 dark:text-white">
+              Cargo-Calc  
+            </h1>
+          </div>
+        )}
+      </div>
+
+      {/* Top Right Controls */}
+      <div className="fixed top-0 right-0 p-4 z-50 flex items-center gap-4">
         <select
-          onChange={(e) => changeLanguage(e.target.value)}
+          onChange={(e) => i18n.changeLanguage(e.target.value)}
           value={i18n.language}
           className="rounded-md border border-gray-300 dark:border-gray-600 
-            px-1.5 py-1 text-xs
-            md:px-2 md:py-1.5 md:text-sm
-            lg:px-3 lg:py-2 ml-10
-            focus:border-[#6C5DD3] focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]
-            bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200"
+            px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200
+            focus:outline-none focus:ring-1 focus:ring-[#6C5DD3]"
         >
           {languages.map((lang) => (
             <option key={lang.code} value={lang.code}>
@@ -131,204 +115,89 @@ export default function Layout() {
             </option>
           ))}
         </select>
-      </div>
 
         <button
-        className="fixed right-4 top-4 z-50 lg:hidden"
-        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-      >
-        <Menu className="h-5 w-5 md:h-6 md:w-6 text-gray-600 dark:text-gray-200 mr-12 mt-2" />
-      </button>
+          onClick={toggleDarkMode}
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+        >
+          {isDarkMode ? 
+            <Sun className="h-5 w-5 text-gray-600 dark:text-gray-200" /> : 
+            <Moon className="h-5 w-5 text-gray-600 dark:text-gray-200" />
+          }
+        </button>
 
-      {/* Mobile menu overlay */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 dark:bg-opacity-70 z-20 lg:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
+        <button
+          onClick={handleLogout}
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-red-600 dark:text-red-400"
+          title={t('menu.logout')}
+        >
+          <RiLogoutBoxRFill className="h-5 w-5" />
+        </button>
+      </div>
 
       {/* Sidebar */}
-      <div
-        className={`${
-          isOpen ? "w-64" : "w-[245px] md:w-70"
-        } h-screen bg-white dark:bg-gray-800 fixed left-0 top-0 transition-all duration-300 
-        border-r border-gray-200  dark:border-gray-700 z-30
-        ${isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"} 
-        lg:translate-x-0`}
-      >
-        {/* Logo */}
-        <div className="flex items-center p-4 border-b border-gray-200 dark:border-gray-700 min-w-[223px]">
-          <div className="flex items-center gap-3">
-            <div className="bg-[#6C5DD3] p-2 rounded-lg">
-              <Truck className="h-6 w-6 text-white" />
-            </div>
-            <span className="text-xl font-semibold text-gray-900 dark:text-white">
-              Cargo-Calc
-            </span>
-          </div>
-        </div>
+      <div className={`fixed left-0 top-0 h-full ${
+        isMenuOpen ? 'w-64' : 'w-16'
+      } transform transition-all duration-300 ease-in-out flex flex-col border-r 
+        border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 z-40`}>
+        <nav className="flex-1 space-y-2 p-4 pt-24 overflow-y-auto">
+          {Object.entries(menuSections).map(([section, items]) => (
+            <div key={section} className="space-y-1">
+              <button
+                onClick={() => toggleSection(section)}
+                className={`w-full flex items-center ${
+                  isMenuOpen ? 'gap-3 px-4' : 'justify-center'
+                } py-2 rounded-xl font-medium hover:bg-gray-100 dark:hover:bg-gray-700
+                text-gray-900 dark:text-gray-200`}
+              >
+                {isMenuOpen ? (
+                  <>
+                    {openSections.includes(section) ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                    <span className="capitalize">{t(`menu.${section}`)}</span>
+                  </>
+                ) : (
+                  <ChevronRight className="h-4 w-4" />
+                )}
+              </button>
 
-        {/* Navigation */}
-        <nav className="px-4 py-6">
-          <div className="space-y-6">
-            <div className="min-w-[223px]">
-              <p className="px-2 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                {t('menu.mainMenu')}
-              </p>
-              <div className="mt-4 space-y-1">
-                {mainMenuItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                    }}
-                    className={`flex items-center px-2 py-2 text-sm font-medium rounded-lg group whitespace-nowrap
-                      ${
-                        window.location.pathname === item.href
-                          ? "text-[#6C5DD3] bg-[#6C5DD3]/10 dark:bg-[#6C5DD3]/20"
-                          : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+              {openSections.includes(section) && (
+                <div className="space-y-1 ml-4">
+                  {items.map((item, index) => (
+                    <Link
+                      key={index}
+                      to={item.href}
+                      className={`w-full flex items-center ${
+                        isMenuOpen ? 'gap-3 px-4' : 'justify-center'
+                      } py-2 rounded-xl font-medium hover:bg-gray-100 dark:hover:bg-gray-700
+                      ${window.location.pathname === item.href
+                        ? "text-[#6C5DD3] bg-[#6C5DD3]/10 dark:bg-[#6C5DD3]/20"
+                        : "text-gray-600 dark:text-gray-300"
                       }`}
-                  >
-                    <item.icon className="h-5 w-5 flex-shrink-0" />
-                    <span className="ml-3">{t(item.name)}</span>
-                  </Link>
-                ))}
-              </div>
-            </div>
-
-            {/* General */}
-            <div className="min-w-[256px]">
-              <p className="px-2 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                {t('menu.general')}
-              </p>
-              <div className="mt-4 space-y-1">
-                {generalItems.map((item) => (
-                  <div key={item.name}>
-                    <Link
-                      to={item.href}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setIsMobileMenuOpen(false);
-                        if (item.subItems) {
-                          toggleSubmenu(item.name);
-                        } else {
-                          navigate(item.href);
-                        }
-                      }}
-                      className="flex items-center justify-between px-2 py-2 text-sm font-medium text-gray-600
-                        dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 whitespace-nowrap w-[220px]"
+                      title={!isMenuOpen ? t(item.name) : undefined}
                     >
-                      <div className="flex items-center">
-                        <item.icon className="h-5 w-5 flex-shrink-0" />
-                        <span className="ml-3">{t(item.name)}</span>
-                      </div>
-                      {item.subItems && (
-                        openSubmenu === item.name ? 
-                          <ChevronUp className="h-4 w-4 mr-[100px]" /> :
-                          <ChevronDown className="h-4 w-4 mr-[100px]" />
-                      )}
+                      <item.icon className="h-5 w-5" />
+                      {isMenuOpen && t(item.name)}
                     </Link>
-                    
-                    {item.subItems && openSubmenu === item.name && (
-                      <div className="ml-6 mt-1 space-y-1">
-                        {item.subItems.map((subItem) => (
-                          <Link
-                            key={subItem.name}
-                            to={subItem.href}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className={`flex items-center px-2 py-2 text-sm font-medium rounded-lg whitespace-nowrap ml-[-24px]
-                              ${
-                                window.location.pathname === subItem.href
-                                  ? "text-[#6C5DD3] bg-[#6C5DD3]/10 dark:bg-[#6C5DD3]/20 w-[150px]"
-                                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 w-[150px]"
-                              }`}
-                          >
-                            <subItem.icon className="h-5 w-5 flex-shrink-0" />
-                            <span className="ml-3">{t(subItem.name)}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </div>
-
-            {/* Others */}
-            <div className="min-w-[256px]">
-              <p className="px-2 text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider">
-                {t('menu.others')}
-              </p>
-              <div className="mt-4 space-y-1">
-                {otherItems.map((item) => (
-                  <div key={item.name}>
-                    <Link
-                      to={item.href}
-                      onClick={(e) => {
-                        e.preventDefault(); // Prevent navigation for items with submenus
-                        setIsMobileMenuOpen(false);
-                        if (item.name === "menu.logout") {
-                          handleLogout();
-                        } else if (item.subItems) {
-                          toggleSubmenu(item.name);
-                        } else {
-                          navigate(item.href);
-                        }
-                      }}
-                      className="flex items-center justify-between px-2 py-2 text-sm font-medium text-gray-600
-                        dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 whitespace-nowrap w-[220px]"
-                    >
-                      <div className="flex items-center">
-                        <item.icon className="h-5 w-5 flex-shrink-0" />
-                        <span className="ml-3">{t(item.name)}</span>
-                      </div>
-                      {item.subItems && (
-                        openSubmenu === item.name ? 
-                          <ChevronUp className="h-4 w-4 mr-[100px]" /> :
-                          <ChevronDown className="h-4 w-4 mr-[100px]"  />
-                      )}
-                    </Link>
-                    
-                    {item.subItems && openSubmenu === item.name && (
-                      <div className="ml-6 mt-1 space-y-1">
-                        {item.subItems.map((subItem) => (
-                          <Link
-                            key={subItem.name}
-                            to={subItem.href}
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className={`flex items-center px-2 py-2 text-sm font-medium rounded-lg whitespace-nowrap
-                              ${
-                                window.location.pathname === subItem.href
-                                  ? "text-[#6C5DD3] bg-[#6C5DD3]/10 dark:bg-[#6C5DD3]/20 w-[150px]"
-                                  : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 w-[150px]"
-                              }`}
-                          >
-                            <subItem.icon className="h-5 w-5 flex-shrink-0" />
-                            <span className="ml-3">{t(subItem.name)}</span>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          ))}
         </nav>
       </div>
 
-      {/* Main content - update to use Outlet */}
-      <main
-        className={`flex-1 transition-all duration-300
-          pt-16 px-4 md:px-6 lg:px-8
-          ${isOpen ? "lg:ml-64" : "lg:ml-[240px] xl:ml-70"}
-          mb-20 w-full
-          bg-white dark:bg-gray-900 dark:text-gray-100`}
-      >
-        <Outlet />
-      </main>
+      {/* Main Content Area */}
+      <div className={`flex-1 flex flex-col ${
+        isMenuOpen ? 'ml-64' : 'ml-16'
+      } transition-all duration-300 pt-16`}>
+        <div className="flex-1 overflow-auto p-6">
+          <Outlet />
+        </div>
+      </div>
     </div>
   );
 }

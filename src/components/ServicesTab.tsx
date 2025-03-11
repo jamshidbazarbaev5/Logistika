@@ -159,8 +159,10 @@ const ServicesTab: React.FC<ServicesTabProps> = ({
   const handleWorkingServiceChange = (serviceId: number, quantity: number) => {
     const currentServices = formData.upload_working_services_quantity || [];
     
-    // Only add/update services with valid quantities (greater than 0)
-    if (quantity > 0) {
+    // Find the service details from workingServices array
+    const serviceDetails = workingServices.find(s => s.id === serviceId);
+    
+    if (quantity > 0 && serviceDetails) {
       const existingIndex = currentServices.findIndex(
         (s: WorkingServiceQuantity) => s.service_id === serviceId
       );
@@ -169,12 +171,20 @@ const ServicesTab: React.FC<ServicesTabProps> = ({
       if (existingIndex >= 0) {
         updatedServices[existingIndex] = { 
           service_id: serviceId, 
-          quantity: quantity 
+          quantity: quantity,
+          // Store the service name along with the service
+          service_name: serviceDetails.service ? 
+            workingServiceNames.get(serviceDetails.service) : 
+            serviceDetails.service_name
         };
       } else {
         updatedServices.push({ 
           service_id: serviceId, 
-          quantity: quantity 
+          quantity: quantity,
+          // Store the service name along with the service
+          service_name: serviceDetails.service ? 
+            workingServiceNames.get(serviceDetails.service) : 
+            serviceDetails.service_name
         });
       }
 

@@ -147,7 +147,7 @@
     });
     const [workingAmounts, setWorkingAmounts] = useState<Record<number, number>>({});
     const [workingServiceTypes, setWorkingServiceTypes] = useState<WorkingServiceType[]>([]);
-    const [originalWorkingServices, setOriginalWorkingServices] = useState<WorkingService[]>([]);
+    const [, setOriginalWorkingServices] = useState<WorkingService[]>([]);
     const [applicationData, setApplicationData] = useState<any>(null);
     const [errorModalOpen, setErrorModalOpen] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
@@ -638,7 +638,7 @@
                     {application?.working_services.some(service => service.quantity > 0) && (
                       <div className="mt-6">
                         <h3 className="text-lg font-medium mb-4">
-                          {t('calculateServices.workingServices', )}
+                          {t('calculateServices.workingServices')}
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {(application.working_services as WorkingService[])
@@ -650,7 +650,7 @@
                               >
                                 <div className="flex flex-col space-y-2">
                                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                    {service.service_name}
+                                    {service.service_name || workingServiceTypes.find(st => st.id === service.service_id)?.service_name || `Service ${service.service_id}`}
                                   </label>
                                   <div className="flex items-center justify-between space-x-4">
                                     <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -736,12 +736,9 @@
                         .filter(service => service.total_amount > 0 || service.price > 0)
                         .map((service, index) => {
                           const requestedAmount = workingAmounts[service.service_type_id];
-                          console.log('Result service:', service);
-                          console.log('Available types:', workingServiceTypes);
                           
-                          const serviceType = workingServiceTypes.find(st => 
-                            st.id === service.service_type_id || 
-                            st.id === originalWorkingServices.find(ows => ows.service_id === service.service_type_id)?.service_id
+                          const originalService = application?.working_services.find(
+                            ws => ws.service_id === service.service_type_id
                           );
                           
                           return (
@@ -750,7 +747,10 @@
                               className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600"
                             >
                               <h3 className="font-medium text-[#6C5DD3] dark:text-[#8B7BE8] mb-2">
-                                {serviceType?.service_name || service.service_name || `Service ${service.service_type_id}`}
+                                {originalService?.service_name || 
+                                 workingServiceTypes.find(st => st.id === service.service_type_id)?.service_name || 
+                                 service.service_name || 
+                                 `Service ${service.service_type_id}`}
                               </h3>
                               <div className="space-y-2 text-sm">
                                 <div className="flex justify-between">

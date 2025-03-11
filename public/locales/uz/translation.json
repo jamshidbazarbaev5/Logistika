@@ -284,6 +284,7 @@
     "save": "Saqlash",
     "delete": "O'chirish"
   },
+  "main":"Asosiy",
   "login": {
     "title": "Hisobingizga kiring",
     "subtitle": "Hisobingizga kirish uchun ma'lumotlaringizni kiriting",
@@ -305,6 +306,7 @@
     "search":{
       "title":"Ariza izlash"
     },
+    "dalolatnoma": "Dalolatnoma",
     "viewDetails":"Batafsil ko'rish",
 
     "downloadExcel": "Excel yuklash",
@@ -526,6 +528,7 @@
   "menu": {
     "mainMenu": "ASOSIY MENYU",
     "general": "UMUMIY",
+    "main":"Asosiy",
     "archiveApplication": "Arxiv Arizalar",
     "others": "BOSHQALAR",
     "firm": "Organizatsiyalar",

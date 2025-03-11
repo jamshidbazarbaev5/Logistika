@@ -287,6 +287,8 @@
     "delete": "Óshiriw",
     "saving": "Saqlanıw..."
   },
+  "main":"Asosiy",
+ 
   "login": {
     "title": "Esapqa kiriw",
     "subtitle": "Esapqa kiriw ushın mag'lıwmatlarıńızdı kiritiń",
@@ -307,6 +309,7 @@
     "search":{
       "title":"O'tinishlerid izlew"
     },
+    "dalolatnoma": "Dalolatnoma",
     "previous": "Aldıńǵı",
     "calculate": "Esablaw",
     "STATUS":"Status",
@@ -546,6 +549,7 @@
   "menu": {
     "mainMenu": "BAS MENYU",
     "general": "ULÍWMA",
+    "main":"Asosiy",
     "archiveApplication": "Arxiv arızalar",
     "others": "BASQALAR",
     "firm": "Organizatsiyalar",

@@ -278,6 +278,7 @@
     "delete": "Удалить",
     "create": "Создать"
   },
+  "main":"Главная",
   "login": {
     "title": "Войти в аккаунт",
     "subtitle": "Введите свои учетные данные для входа",
@@ -295,6 +296,7 @@
     "cancelText": "Отмена"
   },
   "applicationList": {
+    "dalolatnoma": "Акт",
     "previous": "Предыдущий",
     "downloadExcel":"Экспорт в Excel",
     "next": "Следующий",
@@ -515,6 +517,7 @@
   "menu": {
     "mainMenu": "ГЛАВНОЕ МЕНЮ",
     "general": "ОБЩЕЕ",
+    "main":"Главная",
     "others": "ДРУГОЕ",
     "firm": "Организаций",
     "storage": "Склады",
