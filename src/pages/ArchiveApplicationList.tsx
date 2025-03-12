@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { SearchBar, SearchField } from "../components/SearchBar";
-import { Crown, User, Download, Eye, MoreVertical, Trash } from "lucide-react";
+import { Crown, User, Download, Eye, MoreVertical, Trash, FileText } from "lucide-react";
 import { api } from "../api/api";
 import { useNavigate } from "react-router-dom";
 import ConfirmModal from '../components/ConfirmModal';
@@ -637,7 +637,7 @@ export default function ArchiveApplicationList() {
                               }}
                               className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
-                              <Eye className="w-4 h-4 mr-2" />
+                              <FileText className="w-4 h-4 mr-2" />
                               {t("applicationList.viewDetails")}
                             </button>
                             
@@ -648,7 +648,7 @@ export default function ArchiveApplicationList() {
                               }}
                               className="flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                             >
-                              <Download className="w-4 h-4 mr-2" />
+                              <FileText className="w-4 h-4 mr-2" />
                               {t("applicationList.dalolatnoma")}
                             </button>
                             

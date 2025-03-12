@@ -7,9 +7,9 @@ import { api } from "../api/api";
 import ConfirmModal from "../components/ConfirmModal";
 import SuccessModal from "../components/SuccessModal";
 import { SearchBar, SearchField } from "../components/SearchBar";
-import { Crown, User, Download } from "lucide-react";
+import { Crown, User, Download, Edit, Calculator, FileDown, Trash2 } from "lucide-react";
 
-import { Calculator } from "lucide-react"; 
+import { Calculator as LucideCalculator } from "lucide-react"; 
 interface ApplicationMode {
   id: number;
   mode_id: number;
@@ -691,6 +691,7 @@ export default function ApplicationList() {
                                     active ? "bg-gray-100 dark:bg-gray-700" : ""
                                   } flex w-full items-center px-4 py-2 text-sm text-blue-600 dark:text-blue-400`}
                                 >
+                                  <Edit className="w-4 h-4 mr-2" />
                                   {t("applicationList.edit")}
                                 </button>
                               )}
@@ -716,6 +717,7 @@ export default function ApplicationList() {
                                     active ? "bg-gray-100 dark:bg-gray-700" : ""
                                   } flex w-full items-center px-4 py-2 text-sm text-green-600 dark:text-green-400`}
                                 >
+                                  <FileDown className="w-4 h-4 mr-2" />
                                   {t("dalolatnoma.download", "Dalolatnoma")}
                                 </button>
                               )}
@@ -728,6 +730,7 @@ export default function ApplicationList() {
                                     active ? "bg-gray-100 dark:bg-gray-700" : ""
                                   } flex w-full items-center px-4 py-2 text-sm text-red-600 dark:text-red-400`}
                                 >
+                                  <Trash2 className="w-4 h-4 mr-2" />
                                   {t("applicationList.delete", "Delete")}
                                 </button>
                               )}
