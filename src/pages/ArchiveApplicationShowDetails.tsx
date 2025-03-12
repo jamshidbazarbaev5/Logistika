@@ -5,9 +5,7 @@
     import SuccessModal from "../components/SuccessModal";
     import { Tab } from "@headlessui/react";
     import { FormContext } from '../context/FormContext';
-    import ServicesTab from '../components/ServicesTab';
     import PhotoReportTab from "../components/PhotoReportTab";
-    import ProductsTab from "../components/ProductsTab";
     import ModesTab from "../components/ModesTab";
     import { useFormContext } from "../context/FormContext";
     import type { ApplicationFormData } from '../context/FormContext';
@@ -280,12 +278,12 @@
         }}>
         <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
             <div className="flex justify-end mb-4">
-            <button
-                onClick={handleExport}
-                className="px-4 py-2 bg-[#6C5DD3] text-white rounded-lg hover:bg-[#5c4eb3] transition-colors"
-            >
-                {t('applicationList.exportToExcel')}
-            </button>
+            {/*<button*/}
+            {/*    onClick={handleExport}*/}
+            {/*    className="px-4 py-2 bg-[#6C5DD3] text-white rounded-lg hover:bg-[#5c4eb3] transition-colors"*/}
+            {/*>*/}
+            {/*    {t('applicationList.exportToExcel')}*/}
+            {/*</button>*/}
             </div>
 
             <Tab.Group selectedIndex={selectedTab} onChange={handleTabChange}>
@@ -335,37 +333,7 @@
                     )
                 }
                 >
-                {t('editApplication.services')}
-                </Tab>
-                <Tab
-                className={({ selected }) =>
-                    classNames(
-                    'whitespace-nowrap rounded-lg py-2 px-3 sm:py-2.5 sm:px-4 text-xs sm:text-sm font-medium leading-5',
-                    'min-w-[100px] sm:min-w-[120px] flex-shrink-0',
-                    'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
-                    'transition-all duration-200 ease-in-out',
-                    selected
-                        ? 'bg-white text-[#6C5DD3] shadow-sm'
-                        : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
-                    )
-                }
-                >
                 {t('editApplication.photoReport')}
-                </Tab>
-                <Tab
-                className={({ selected }) =>
-                    classNames(
-                    'whitespace-nowrap rounded-lg py-2 px-3 sm:py-2.5 sm:px-4 text-xs sm:text-sm font-medium leading-5',
-                    'min-w-[100px] sm:min-w-[120px] flex-shrink-0',
-                    'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
-                    'transition-all duration-200 ease-in-out',
-                    selected
-                        ? 'bg-white text-[#6C5DD3] shadow-sm'
-                        : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
-                    )
-                }
-                >
-                {t('editApplication.products')}
                 </Tab>
                 <Tab
                 className={({ selected }) =>
@@ -540,32 +508,11 @@
                 </Tab.Panel>
 
                 <Tab.Panel>
-                <ServicesTab 
-                    formData={formData as ApplicationFormData}
-                    keepingServices={keepingServices}
-                    workingServices={workingServices}
-                    setFormData={() => {}}
-                    onSuccess={() => {}}
-                />
-                </Tab.Panel>
-
-                <Tab.Panel>
                 <PhotoReportTab 
                     formData={formData as ApplicationFormData}
                     setFormData={() => {}}
                     onSuccess={() => {}}
                     setSelectedTab={(index) => handleTabChange(index)}
-                />
-                </Tab.Panel>
-
-                <Tab.Panel>
-                <ProductsTab 
-                    formData={formData as ApplicationFormData}
-                    setFormData={() => {}}
-                    products={products}
-                    storages={storages}
-                    readOnly={true}
-                    onSuccess={() => {}}
                 />
                 </Tab.Panel>
 
