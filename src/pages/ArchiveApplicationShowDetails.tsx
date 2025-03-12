@@ -55,8 +55,8 @@
     });
 
     const [firms, setFirms] = useState<Array<{ id: number; firm_name: string }>>([]);
-    const [keepingServices, setKeepingServices] = useState<Array<{ id: number; name: string; base_price: number }>>([]);
-    const [workingServices, setWorkingServices] = useState<Array<{
+    const [, setKeepingServices] = useState<Array<{ id: number; name: string; base_price: number }>>([]);
+    const [, setWorkingServices] = useState<Array<{
         id: number;
         year: number;
         base_price: string;
@@ -64,8 +64,8 @@
         service: number;
     }>>([]);
     const [transportTypes, setTransportTypes] = useState<Array<{ id: number; transport_type: string }>>([]);
-    const [storages, setStorages] = useState<Array<{ id: number; storage_name: string; storage_location: string }>>([]);
-    const [products, setProducts] = useState<Array<{
+    const [, setStorages] = useState<Array<{ id: number; storage_name: string; storage_location: string }>>([]);
+    const [, setProducts] = useState<Array<{
         id: number;
         name: string;
         measurement_id: number;
@@ -206,53 +206,53 @@
         );
     };
 
-    const handleExport = async () => {
-        try {
-        const token = localStorage.getItem('accessToken');
+    // const handleExport = async () => {
+    //     try {
+    //     const token = localStorage.getItem('accessToken');
         
-        const params = new URLSearchParams({
-            firm_name: formData.firm_name || '',
-            decloration_number: formData.decloration_number || '',
-            number_of_application: formData.number_of_application || '',
-            firm_INN: formData.firm_INN || '',
-            coming_date_gte: formData.coming_date_gte || '',
-            coming_date_lte: formData.coming_date_lte || '',
-            products: formData.products?.join(',') || ''
-        });
+    //     const params = new URLSearchParams({
+    //         firm_name: formData.firm_name || '',
+    //         decloration_number: formData.decloration_number || '',
+    //         number_of_application: formData.number_of_application || '',
+    //         firm_INN: formData.firm_INN || '',
+    //         coming_date_gte: formData.coming_date_gte || '',
+    //         coming_date_lte: formData.coming_date_lte || '',
+    //         products: formData.products?.join(',') || ''
+    //     });
 
-        const response = await fetch(`https://cargo-calc.uz/api/v1/export_excel/?${params.toString()}`, {
-            headers: {
-            'Authorization': `Bearer ${token}`,
-            }
-        });
+    //     const response = await fetch(`https://cargo-calc.uz/api/v1/export_excel/?${params.toString()}`, {
+    //         headers: {
+    //         'Authorization': `Bearer ${token}`,
+    //         }
+    //     });
 
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
+    //     if (!response.ok) {
+    //         throw new Error(`HTTP error! status: ${response.status}`);
+    //     }
 
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'export.xlsx');
-        document.body.appendChild(link);
-        link.click();
+    //     const blob = await response.blob();
+    //     const url = window.URL.createObjectURL(blob);
+    //     const link = document.createElement('a');
+    //     link.href = url;
+    //     link.setAttribute('download', 'export.xlsx');
+    //     document.body.appendChild(link);
+    //     link.click();
         
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
+    //     document.body.removeChild(link);
+    //     window.URL.revokeObjectURL(url);
         
-        } catch (error: any) {
-        console.error('Export failed:', error);
-        let errorMessage = t('exportError', 'Failed to export data');
+    //     } catch (error: any) {
+    //     console.error('Export failed:', error);
+    //     let errorMessage = t('exportError', 'Failed to export data');
         
-        if (error.response?.status === 401) {
-            errorMessage = t('unauthorizedError', 'Please log in again to export data');
-        }
+    //     if (error.response?.status === 401) {
+    //         errorMessage = t('unauthorizedError', 'Please log in again to export data');
+    //     }
         
-        setModalMessage(errorMessage);
-        setShowSuccessModal(true);
-        }
-    };
+    //     setModalMessage(errorMessage);
+    //     setShowSuccessModal(true);
+    //     }
+    // };
 
     const handleModesSubmit = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { SearchBar, SearchField } from "../components/SearchBar";
-import { Crown, User, Download, Eye, MoreVertical, Trash, FileText } from "lucide-react";
+import { Crown, User, Download, MoreVertical, Trash, FileText } from "lucide-react";
 import { api } from "../api/api";
 import { useNavigate } from "react-router-dom";
 import ConfirmModal from '../components/ConfirmModal';

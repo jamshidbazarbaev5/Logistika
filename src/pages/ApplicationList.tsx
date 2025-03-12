@@ -9,7 +9,6 @@ import SuccessModal from "../components/SuccessModal";
 import { SearchBar, SearchField } from "../components/SearchBar";
 import { Crown, User, Download, Edit, Calculator, FileDown, Trash2 } from "lucide-react";
 
-import { Calculator as LucideCalculator } from "lucide-react"; 
 interface ApplicationMode {
   id: number;
   mode_id: number;
