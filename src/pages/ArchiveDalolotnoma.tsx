@@ -47,6 +47,16 @@ interface Payment {
   created_at: string;
 }
 
+interface KeepingServiceType {
+  id: number;
+  name: string;
+}
+
+interface PaymentMethod {
+  id: number;
+  payment_method: string;
+}
+
 export default function ArchiveDalolatnoma() {
   const { t } = useTranslation();
   const { id } = useParams();
@@ -57,6 +67,8 @@ export default function ArchiveDalolatnoma() {
   const [activeTab, setActiveTab] = useState<'transactions' | 'payments' | 'dalolatnoma'>('transactions');
   const [payments, setPayments] = useState<Payment[]>([]);
   const [expandedTransactions, setExpandedTransactions] = useState<number[]>([]);
+  const [keepingServiceTypes, setKeepingServiceTypes] = useState<KeepingServiceType[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
 
   useEffect(() => {
     const fetchTransactions = async () => {
@@ -91,6 +103,46 @@ export default function ArchiveDalolatnoma() {
 
     fetchPayments();
   }, [id]);
+
+  useEffect(() => {
+    const fetchServiceTypes = async () => {
+      try {
+        const response = await api.get('/keeping_service/keeping_service_name/');
+        if (response.data?.results) {
+          setKeepingServiceTypes(response.data.results);
+        }
+      } catch (error) {
+        console.error('Error fetching service types:', error);
+      }
+    };
+
+    fetchServiceTypes();
+  }, []);
+
+  useEffect(() => {
+    const fetchPaymentMethods = async () => {
+      try {
+        const response = await api.get('/payment_method/');
+        if (response.data?.results) {
+          setPaymentMethods(response.data.results);
+        }
+      } catch (error) {
+        console.error('Error fetching payment methods:', error);
+      }
+    };
+
+    fetchPaymentMethods();
+  }, []);
+
+  const getServiceName = (serviceType: number) => {
+    const service = keepingServiceTypes.find(type => type.id === serviceType);
+    return service ? service.name : `Service #${serviceType}`;
+  };
+
+  const getPaymentMethodName = (methodId: number) => {
+    const method = paymentMethods.find(m => m.id === methodId);
+    return method ? method.payment_method : `Payment Method #${methodId}`;
+  };
 
   const handleDownloadExcel = async (transactionId: number) => {
     try {
@@ -258,7 +310,7 @@ export default function ArchiveDalolatnoma() {
                             >
                               <div className="flex items-center space-x-2">
                                 <span className="text-gray-900 dark:text-gray-100">
-                                  {t('dalolatnoma.keepingService')} #{service.service_type}
+                                  {getServiceName(service.service_type)}
                                 </span>
                                 <span className="text-gray-500 dark:text-gray-400">
                                   × {service.amount}
@@ -373,7 +425,7 @@ export default function ArchiveDalolatnoma() {
                     {Number(payment.amount).toLocaleString()} сум
                   </div>
                   <div className="text-sm text-gray-500">
-                    {t('archive.paymentMethod')} #{payment.payment_method}
+                    {getPaymentMethodName(payment.payment_method)}
                   </div>
                 </div>
               </div>

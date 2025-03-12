@@ -546,6 +546,13 @@
       "actions": "Háreketler"
     }
   },
+
+  "archive":{
+    "noPayments":"Tólemler tabılmadı",
+    "paymentId":"Tólem",
+    "paymentMethod":"Tólem usılı"
+
+  },
   "menu": {
     "mainMenu": "BAS MENYU",
     "general": "ULÍWMA",
@@ -857,7 +864,9 @@
     "workingService": "Jumıs xızmeti",
     "quantity": "Mug'dar",
     "storage": "Qoyma",
-    "amount": "Summa"
+    "amount": "Summa",
+    "fullName": "F.I.O",
+    "phoneNumber": "Telefon Nomeri"
   },
   "errorModal": {
     "close": "Jabıw"

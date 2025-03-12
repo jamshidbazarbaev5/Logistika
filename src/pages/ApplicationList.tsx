@@ -487,6 +487,27 @@ export default function ApplicationList() {
     }
   };
 
+  const handleDownloadPreAct = async (applicationId: number) => {
+    try {
+      const response = await api.get(`/application/export_excel_akt/${applicationId}/`, {
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `pre-act-${applicationId}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading pre-act Excel file:', error);
+      setModalMessage(t("dalolatnoma.downloadError", "Faylni yuklashda xatolik yuz berdi"));
+      setShowSuccessModal(true);
+    }
+  };
+
   const filteredApplications = applications.filter(app => isRelevantStatus(app.status));
 
   return (
@@ -584,18 +605,18 @@ export default function ApplicationList() {
                     {application.number_of_application}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {firms[application.firm_id] || t("applicationList.unknownFirm", "Unknown Firm")}
+                    <span className="block truncate max-w-[200px]" title={firms[application.firm_id] || t("applicationList.unknownFirm", "Unknown Firm")}>
+                      {firms[application.firm_id] || t("applicationList.unknownFirm", "Unknown Firm")}
+                    </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {application.vip_application ? (
                       <div className="flex items-center text-yellow-600 dark:text-yellow-500">
-                        <Crown className="w-5 h-5 mr-1" />
-                        <span>{t("applicationList.vip", "VIP")}</span>
+                        <Crown className="w-5 h-5" />
                       </div>
                     ) : (
                       <div className="flex items-center text-gray-500 dark:text-gray-400">
-                        <User className="w-5 h-5 mr-1" />
-                        <span>{t("applicationList.regular", "Regular")}</span>
+                        <User className="w-5 h-5" />
                       </div>
                     )}
                   </td>
@@ -615,13 +636,19 @@ export default function ApplicationList() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {application.transport?.map((transport, idx) => (
-                      <div key={transport.id || idx} className="flex items-center space-x-1">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mr-2">
-                          {transportTypes[transport.transport_type] || t("applicationList.unknownTransport", "Unknown")}
-                        </span>
-                        <span className="text-gray-600">
-                          {transport.transport_number}
-                        </span>
+                      <div key={transport.id || idx} className="flex items-center space-x-1 mb-1 last:mb-0">
+                        <div className="flex items-center max-w-[200px]">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 mr-2">
+                            <span className="truncate" title={transportTypes[transport.transport_type] || t("applicationList.unknownTransport", "Unknown")}>
+                              {(transportTypes[transport.transport_type] || t("applicationList.unknownTransport", "Unknown")).slice(0, 15)}
+                              {(transportTypes[transport.transport_type] || "").length > 15 ? "..." : ""}
+                            </span>
+                          </span>
+                          <span className="text-gray-600 truncate" title={transport.transport_number}>
+                            {transport.transport_number.slice(0, 10)}
+                            {transport.transport_number.length > 10 ? "..." : ""}
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </td>
@@ -678,6 +705,18 @@ export default function ApplicationList() {
                                 >
                                   <Calculator className="w-4 h-4 mr-2" />
                                   {t("applicationList.calculate")}
+                                </button>
+                              )}
+                            </Menu.Item>
+                            <Menu.Item>
+                              {({ active }) => (
+                                <button
+                                  onClick={() => handleDownloadPreAct(application.id)}
+                                  className={`${
+                                    active ? "bg-gray-100 dark:bg-gray-700" : ""
+                                  } flex w-full items-center px-4 py-2 text-sm text-green-600 dark:text-green-400`}
+                                >
+                                  {t("dalolatnoma.download", "Dalolatnoma")}
                                 </button>
                               )}
                             </Menu.Item>

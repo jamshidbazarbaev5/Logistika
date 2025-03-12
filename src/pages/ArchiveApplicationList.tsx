@@ -554,18 +554,18 @@ export default function ArchiveApplicationList() {
                     {application.number_of_application}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {firms[application.firm_id] || t("applicationList.unknownFirm", "Unknown Firm")}
+                    <div className="max-w-[150px] overflow-hidden text-ellipsis">
+                      {firms[application.firm_id] || t("applicationList.unknownFirm", "Unknown Firm")}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {application.vip_application ? (
-                      <div className="flex items-center text-yellow-600 dark:text-yellow-500">
-                        <Crown className="w-5 h-5 mr-1" />
-                        <span>{t("applicationList.vip", "VIP")}</span>
+                      <div className="flex items-center justify-center text-yellow-600 dark:text-yellow-500">
+                        <Crown className="w-5 h-5" />
                       </div>
                     ) : (
-                      <div className="flex items-center text-gray-500 dark:text-gray-400">
-                        <User className="w-5 h-5 mr-1" />
-                        <span>{t("applicationList.regular", "Regular")}</span>
+                      <div className="flex items-center justify-center text-gray-500 dark:text-gray-400">
+                        <User className="w-5 h-5" />
                       </div>
                     )}
                   </td>

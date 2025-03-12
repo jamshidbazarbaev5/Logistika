@@ -514,6 +514,11 @@
       "actions": "Действия"
     }
   },
+  "archive":{
+    "noPayments":"Оплаты не найдены",
+    "paymentId":"Оплата",
+    "paymentMethod":"Способ оплаты"
+  },
   "menu": {
     "mainMenu": "ГЛАВНОЕ МЕНЮ",
     "general": "ОБЩЕЕ",
@@ -802,6 +807,8 @@
     "workingService": "Рабочая услуга",
     "quantity": "Количество",
     "storage": "Склад",
-    "amount": "Сумма"
+    "amount": "Сумма",
+    "fullName": "ФИО",
+    "phoneNumber": "Номер Телефона"
   }
 }

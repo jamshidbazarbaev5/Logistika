@@ -525,6 +525,11 @@
       "actions": "Amallar"
     }
   },
+  "archive":{
+    "noPayments":"Tolam topilmadi",
+    "paymentId":"Tolam",
+    "paymentMethod":"Tolam usuli"
+  },
   "menu": {
     "mainMenu": "ASOSIY MENYU",
     "general": "UMUMIY",
@@ -797,6 +802,10 @@
     "services": "Xizmatlar",
     "keepingService": "Saqlash xizmati",
     "workingService": "Ish xizmati",
-    "quantity": "Miqdor"
+    "quantity": "Miqdor",
+    "storage": "Ombor",
+    "amount": "Summa",
+    "fullName": "F.I.O",
+    "phoneNumber": "Telefon Raqami"
   }
 } 
