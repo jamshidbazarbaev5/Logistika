@@ -832,6 +832,18 @@
     "storage": "Ombor",
     "selectProduct": "Mahsulotni tanlang",
     "allProducts": "Barcha mahsulotlar",
-    "selectedProductDistribution": "Tanlangan mahsulot taqsimoti"
+    "selectedProductDistribution": "Tanlangan mahsulot taqsimoti",
+    "dateFrom": "Boshlanish sanasi",
+    "dateTo": "Tugash sanasi",
+    "transportDistribution": "Transport taqsimoti",
+    "totalQuantity": "Umumiy miqdor",
+    "product": "Mahsulot",
+    "active": "Faol",
+    "completed": "Yakunlangan",
+    "amount": "Summa",
+    "transport": {
+      "quantity": "Soni",
+      "number": "Raqami"
+    }
   }
 } 

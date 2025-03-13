@@ -53,5 +53,20 @@
     "totalPrice": "Total Price",
     "payments": "Payments",
     "addPayment": "Add Payment"
+  },
+  "dashboard": {
+    "dateFrom": "Start Date",
+    "dateTo": "End Date",
+    "transportDistribution": "Transport Distribution",
+    "totalQuantity": "Total Quantity",
+    "product": "Product",
+    "active": "Active",
+    "completed": "Completed",
+    "quantity": "Quantity",
+    "amount": "Amount",
+    "transport": {
+      "quantity": "Quantity",
+      "number": "Number"
+    }
   }
 }

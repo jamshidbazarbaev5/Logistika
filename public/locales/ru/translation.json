@@ -835,6 +835,18 @@
     "storage": "Склад",
     "selectProduct": "Выберите продукт",
     "allProducts": "Все продукты",
-    "selectedProductDistribution": "Распределение выбранного продукта"
+    "selectedProductDistribution": "Распределение выбранного продукта",
+    "dateFrom": "Дата начала",
+    "dateTo": "Дата окончания",
+    "transportDistribution": "Распределение транспорта",
+    "totalQuantity": "Общее количество",
+    "product": "Продукт",
+    "active": "Активный",
+    "completed": "Завершенный",
+    "amount": "Сумма",
+    "transport": {
+      "quantity": "Количество",
+      "number": "Номер"
+    }
   }
 }
