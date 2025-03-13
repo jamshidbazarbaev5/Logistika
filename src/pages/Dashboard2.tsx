@@ -397,19 +397,23 @@ export default function Dashboard2() {
   }, []);
 
   const applicationStats = useMemo(() => {
-    const relevantApplications = selectedFirm
+    let relevantApplications = selectedFirm
       ? applications.filter((app) => app.firm_id === selectedFirm.id)
       : applications;
 
+    // Filter by selected product if any
+    if (selectedProduct) {
+      relevantApplications = relevantApplications.filter(app => 
+        app.products.some(p => p.product_name === selectedProduct.name)
+      );
+    }
+
     return {
       total: relevantApplications.length,
-      active: relevantApplications.filter((app) => app.status === "active")
-        .length,
-      completed: relevantApplications.filter(
-        (app) => app.status === "completed"
-      ).length,
+      active: relevantApplications.filter((app) => app.status === "active").length,
+      completed: relevantApplications.filter((app) => app.status === "completed").length,
     };
-  }, [applications, selectedFirm]);
+  }, [applications, selectedFirm, selectedProduct]);
 
   const statusData = useMemo(
     () => [
@@ -507,18 +511,23 @@ export default function Dashboard2() {
 
     let productData = dataSource
       .filter((transaction) => relevantApplicationIds.has(transaction.application_id))
-      .reduce((acc: { [key: string]: number }, transaction) => {
+      .reduce((acc: { [key: string]: { value: number, applications: Set<number> } }, transaction) => {
         transaction.products.forEach((product) => {
           const productName = product.product.name;
-          acc[productName] = (acc[productName] || 0) + product.quantity;
+          if (!acc[productName]) {
+            acc[productName] = { value: 0, applications: new Set() };
+          }
+          acc[productName].value += product.quantity;
+          acc[productName].applications.add(transaction.application_id);
         });
         return acc;
       }, {});
 
     let result = Object.entries(productData)
-      .map(([name, value]) => ({
+      .map(([name, data]) => ({
         name,
-        value
+        value: data.value,
+        applicationCount: data.applications.size
       }))
       .filter(item => item.value > 0)
       .sort((a, b) => b.value - a.value);
@@ -600,22 +609,17 @@ export default function Dashboard2() {
       : applications.filter(app => app.status === "completed");
 
     const transportCounts = new Map<number, number>();
-    const transportNumbers = new Map<number, string[]>();
     
     relevantApplications.forEach(app => {
       app.transport?.forEach(transport => {
         const count = transportCounts.get(transport.transport_type) || 0;
         transportCounts.set(transport.transport_type, count + 1);
-        
-        const numbers = transportNumbers.get(transport.transport_type) || [];
-        transportNumbers.set(transport.transport_type, [...numbers, transport.transport_number]);
       });
     });
 
     return transportTypes.map(type => ({
       name: type.transport_type,
-      value: transportCounts.get(type.id) || 0,
-      transportNumbers: transportNumbers.get(type.id) || []
+      value: transportCounts.get(type.id) || 0
     })).filter(item => item.value > 0);
   }, [applications, selectedFirm, transportTypes]);
 
@@ -1132,22 +1136,7 @@ export default function Dashboard2() {
                             padding: "8px",
                             border: "1px solid #e2e8f0",
                           }}
-                          formatter={(value, name, _props) => {
-                            const entry = transportData.find(item => item.name === name);
-                            if (entry && entry.transportNumbers.length > 0) {
-                              return [
-                                <div key="tooltip">
-                                  <div>Количество: {value}</div>
-                                  <div className="text-sm text-gray-500">
-                                    {entry.transportNumbers.map(num => (
-                                      <div key={num}>№: {num}</div>
-                                    ))}
-                                  </div>
-                                </div>
-                              ];
-                            }
-                            return value;
-                          }}
+                          formatter={(value) => formatNumber(Number(value))}
                         />
                         <Legend />
                       </PieChart>
@@ -1299,6 +1288,9 @@ export default function Dashboard2() {
                             {t("dashboard.quantity")}
                           </th>
                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                            {t("dashboard.applications")}
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                             {t("dashboard.storage")}
                           </th>
                         </tr>
@@ -1314,6 +1306,9 @@ export default function Dashboard2() {
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                               {formatNumber(product.quantity)}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                              {firmProductData.find(item => item.name === product.name)?.applicationCount || 0}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                               {product.storage}
@@ -1674,22 +1669,7 @@ export default function Dashboard2() {
                           padding: "8px",
                           border: "1px solid #e2e8f0",
                         }}
-                        formatter={(value, name, _props) => {
-                          const entry = transportData.find(item => item.name === name);
-                          if (entry && entry.transportNumbers.length > 0) {
-                            return [
-                              <div key="tooltip">
-                                <div>Количество: {value}</div>
-                                <div className="text-sm text-gray-500">
-                                  {entry.transportNumbers.map(num => (
-                                    <div key={num}>№: {num}</div>
-                                  ))}
-                                </div>
-                              </div>
-                            ];
-                          }
-                          return value;
-                        }}
+                        formatter={(value) => formatNumber(Number(value))}
                       />
                       <Legend />
                     </PieChart>
@@ -1841,6 +1821,9 @@ export default function Dashboard2() {
                           {t("dashboard.quantity")}
                         </th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                          {t("dashboard.applications")}
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                           {t("dashboard.storage")}
                         </th>
                       </tr>
@@ -1856,6 +1839,9 @@ export default function Dashboard2() {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                             {formatNumber(product.quantity)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                            {firmProductData.find(item => item.name === product.name)?.applicationCount || 0}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                             {product.storage}
