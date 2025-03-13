@@ -14,7 +14,8 @@ import {
   RiBarChartFill,
   RiUserFill,
   RiServiceFill,
-  RiLogoutBoxRFill
+  RiLogoutBoxRFill,
+  RiDashboardFill
 } from 'react-icons/ri';
 import { authService } from '../services/auth';
 
@@ -22,6 +23,7 @@ import { authService } from '../services/auth';
 const menuSections = {
   main: [
     // { name: "Photo Report", icon: RiCameraFill, href: "/photo-report" },
+    { name: "menu.dashboard", icon: RiDashboardFill, href: "/dashboard" },
     { name: "menu.createApplication", icon: RiFileAddFill, href: "/application-list" },
     { name: "menu.archiveApplication", icon: RiFileAddFill, href: "/archive-application-list" },
   ],

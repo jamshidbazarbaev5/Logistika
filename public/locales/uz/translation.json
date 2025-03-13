@@ -532,6 +532,7 @@
   },
   "menu": {
     "mainMenu": "ASOSIY MENYU",
+    "dashboard": "Dashboard",
     "general": "UMUMIY",
     "main":"Asosiy",
     "archiveApplication": "Arxiv Arizalar",
@@ -807,5 +808,30 @@
     "amount": "Summa",
     "fullName": "F.I.O",
     "phoneNumber": "Telefon Raqami"
+  },
+  "dashboard": {
+    "title": "Boshqaruv paneli",
+    "subtitle": "Tahlil va statistika",
+    "selectFirm": "Tashkilotni tanlang",
+    "searchFirm": "Tashkilotni qidirish...",
+    "applications": "Arizalar",
+    "metrics": "Ko'rsatkichlar",
+    "totalApplications": "Jami arizalar",
+    "activeApplications": "Faol arizalar",
+    "completedApplications": "Yakunlangan arizalar",
+    "totalRevenue": "Umumiy daromad",
+    "totalBrutto": "Umumiy brutto",
+    "totalNetto": "Umumiy netto",
+    "applicationStatus": "Ariza holati",
+    "topFirms": "Top tashkilotlar",
+    "productDistribution": "Mahsulotlar taqsimoti",
+    "sortByQuantity": "Miqdor bo'yicha saralash",
+    "sortByName": "Nom bo'yicha saralash",
+    "productName": "Mahsulot nomi",
+    "quantity": "Miqdori",
+    "storage": "Ombor",
+    "selectProduct": "Mahsulotni tanlang",
+    "allProducts": "Barcha mahsulotlar",
+    "selectedProductDistribution": "Tanlangan mahsulot taqsimoti"
   }
 } 

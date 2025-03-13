@@ -165,30 +165,25 @@ export default function EditApplication() {
   const handleSubmit = async () => {
     try {
       const formDataToSend = new FormData();
+      
+      // Create upload_transport array from transport data
+      const upload_transport = formData.transport.map(t => ({
+        transport_number: t.transport_number,
+        transport_type: t.transport_type
+      }));
 
-      const token = localStorage.getItem('accessToken'); 
+      // Create a copy of form data without the transport array
+      const formDataWithoutTransport = {
+        ...formData,
+        upload_transport, // Add the upload_transport array
+        transport: undefined // Remove the original transport array
+      };
 
-      if (!token) {
-        setModalMessage(t('common.unauthorized'));
-        setShowSuccessModal(true);
-        setTimeout(() => {
-          navigate('/login'); 
-        }, 1500);
-        return;
-      }
-
-      Object.entries(formData).forEach(([key, value]) => {
-        if (key === 'decloration_date' && value) {
-          formDataToSend.append(key, formatDateForAPI(value as string));
-        } else if (key === 'coming_date' && value) {
-          formDataToSend.append(key, formatDateForAPI(value as string));
-        } else if (value !== null && value !== undefined && key !== 'decloration_file' && key !== 'photo_report') {
+      // Append all form data
+      Object.entries(formDataWithoutTransport).forEach(([key, value]) => {
+        if (value !== null && value !== undefined && key !== 'decloration_file' && key !== 'photo_report') {
           if (Array.isArray(value)) {
-            if (key === 'upload_products') {
-              formDataToSend.append(key, JSON.stringify(value));
-            } else {
-              formDataToSend.append(key, JSON.stringify(value));
-            }
+            formDataToSend.append(key, JSON.stringify(value));
           } else {
             formDataToSend.append(key, value.toString());
           }
@@ -200,7 +195,6 @@ export default function EditApplication() {
         formDataToSend.append('decloration_file', formData.decloration_file);
       }
 
-      // Handle photo report files
       if (formData.photo_report && Array.isArray(formData.photo_report)) {
         formData.photo_report.forEach((photo) => {
           if (photo instanceof File) {
@@ -212,7 +206,7 @@ export default function EditApplication() {
       const response = await api.put(`/application/${id}/`, formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`, 
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
       
@@ -245,23 +239,23 @@ export default function EditApplication() {
     }
   };
 
-  const formatDateForAPI = (dateString: string): string => {
-    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-      return dateString;
-    }
+  // const formatDateForAPI = (dateString: string): string => {
+  //   if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+  //     return dateString;
+  //   }
 
-    if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateString)) {
-      const [day, month, year] = dateString.split('.');
-      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-    }
+  //   if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateString)) {
+  //     const [day, month, year] = dateString.split('.');
+  //     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+  //   }
 
-    const date = new Date(dateString);
-    if (!isNaN(date.getTime())) {
-      return date.toISOString().split('T')[0];
-    }
+  //   const date = new Date(dateString);
+  //   if (!isNaN(date.getTime())) {
+  //     return date.toISOString().split('T')[0];
+  //   }
 
-    return dateString;
-  };
+  //   return dateString;
+  // };
 
   const validateDate = (dateString: string): boolean => {
     const date = new Date(dateString);

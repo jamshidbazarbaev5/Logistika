@@ -45,7 +45,10 @@ import store from "./storage/storage";
 import ArchiveApplicationList from "./pages/ArchiveApplicationList";
 import ArchiveApplicationShowDetails from "./pages/ArchiveApplicationShowDetails";
 import ArchiveDalolatnoma from './pages/ArchiveDalolotnoma'
+// import { Dashboard } from "./pages/Dashboard";
+import Dashboard2 from "./pages/Dashboard2";
 const queryClient = new QueryClient();
+
 
 function App() {
   return (
@@ -99,6 +102,7 @@ function App() {
                 <Route path="/archive-application-list" element={<ArchiveApplicationList/>}/>
                 <Route path="/archive/:id" element={<ArchiveApplicationShowDetails/>}/>
                 <Route path="/archive/:id/dalolatnoma" element={<ArchiveDalolatnoma />} />
+                <Route path="/dashboard" element={<Dashboard2/>}/>
               </Route>
             </Routes>
           </Router>

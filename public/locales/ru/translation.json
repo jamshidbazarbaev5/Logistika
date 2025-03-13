@@ -522,6 +522,7 @@
   "menu": {
     "mainMenu": "ГЛАВНОЕ МЕНЮ",
     "general": "ОБЩЕЕ",
+    "dashboard": "Дашбоард",
     "main":"Главная",
     "others": "ДРУГОЕ",
     "firm": "Организаций",
@@ -810,5 +811,30 @@
     "amount": "Сумма",
     "fullName": "ФИО",
     "phoneNumber": "Номер Телефона"
+  },
+  "dashboard": {
+    "title": "Панель управления",
+    "subtitle": "Аналитика и статистика",
+    "selectFirm": "Выберите организацию",
+    "searchFirm": "Поиск организации...",
+    "applications": "Заявки",
+    "metrics": "Метрики",
+    "totalApplications": "Всего заявок",
+    "activeApplications": "Активные заявки",
+    "completedApplications": "Завершенные заявки",
+    "totalRevenue": "Общий доход",
+    "totalBrutto": "Общий брутто",
+    "totalNetto": "Общий нетто",
+    "applicationStatus": "Статус заявок",
+    "topFirms": "Топ организаций",
+    "productDistribution": "Распределение продуктов",
+    "sortByQuantity": "Сортировать по количеству",
+    "sortByName": "Сортировать по названию",
+    "productName": "Название продукта",
+    "quantity": "Количество",
+    "storage": "Склад",
+    "selectProduct": "Выберите продукт",
+    "allProducts": "Все продукты",
+    "selectedProductDistribution": "Распределение выбранного продукта"
   }
 }
