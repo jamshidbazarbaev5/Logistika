@@ -21,6 +21,8 @@ interface KeepingService {
   id?: number;
   day: number;
   keeping_services_id: number;
+  service_type_id?: number;
+  amount?: number;
   application_id?: number;
 }
 
@@ -28,8 +30,10 @@ interface WorkingService {
   id?: number;
   quantity: number;
   service_id: number;
+  service_type_id?: number;
+  amount?: number;
   application_id?: number;
-  service_name: string;
+  service_name?: string;
 }
 
 interface PhotoReport {
@@ -170,6 +174,7 @@ export default function ApplicationList() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [firms, setFirms] = useState<Record<number, string>>({});
+  const [, setModes] = useState<Record<number, ApplicationMode[]>>({});
   const [searchParams, setSearchParams] = useState<SearchParams>({
     firm_name: '',
     decloration_number: '',
@@ -295,8 +300,7 @@ export default function ApplicationList() {
       }, {});
 
       const modesData = Array.isArray(modesResponse.data?.results) ? modesResponse.data.results : [];
-      // @ts-expect-error Intentionally unused - will be used in future implementation
-      const _modesMap = modesData.reduce((acc: Record<number, ApplicationMode[]>, mode: ApplicationMode) => {
+      const modesMap = modesData.reduce((acc: Record<number, ApplicationMode[]>, mode: ApplicationMode) => {
         if (mode && mode.application_id) {
           if (!acc[mode.application_id]) {
             acc[mode.application_id] = [];
@@ -315,6 +319,7 @@ export default function ApplicationList() {
       setTransportTypes(transportTypesMap);
 
       setFirms(firmMap);
+      setModes(modesMap);
       setAvailableModes(Array.isArray(availableModesResponse.data.results) 
         ? availableModesResponse.data.results 
         : []);
@@ -388,14 +393,15 @@ export default function ApplicationList() {
         if (application) {
           // Format the keeping services correctly based on the application data structure
           const keepingServices = application.keeping_services.map(service => ({
-            service_type_id: service.keeping_services_id,
-            amount: service.day
+            // Use the correct field name from your application data
+            service_type_id: service.service_type_id || service.keeping_services_id,
+            amount: service.amount || service.day
           }));
           
           // Format the working services correctly
           const workingServices = application.working_services.map(service => ({
-            service_type_id: service.service_id,
-            amount: service.quantity
+            service_type_id: service.service_type_id || service.service_id,
+            amount: service.amount || service.quantity
           }));
           
           console.log('Sending calculation request for application', applicationId, {
@@ -755,7 +761,9 @@ export default function ApplicationList() {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                       >
-                        <Menu.Items className="absolute right-0 z-50 w-36 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none mt-[-120px]">
+                        <Menu.Items className={`absolute right-0 z-50 w-36 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none ${
+                          index < 3 ? 'top-0' : 'bottom-0'
+                        }`}>
                           <div className="py-1">
                             <Menu.Item>
                               {({ active }) => (
@@ -816,7 +824,6 @@ export default function ApplicationList() {
                   </td>
                 </tr>
                 
-                {/* Improved expanded services section with better styling */}
                 {expandedApplications.includes(application.id) && (
                   <tr>
                     <td colSpan={10} className="px-0 py-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
@@ -832,7 +839,6 @@ export default function ApplicationList() {
                                 {t("applicationList.serviceCalculation", "Service Calculation")}
                               </h3>
                               
-                              {/* Total Price Card - Moved to top for better visibility */}
                               <div className="bg-white dark:bg-gray-700 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
                                 <div className="flex items-center space-x-2">
                                   <span className="text-gray-700 dark:text-gray-300">{t('calculateServices.totalPrice')}:</span>
@@ -846,7 +852,6 @@ export default function ApplicationList() {
                             {(calculationResults[application.id].keeping_services?.length > 0 || 
                               calculationResults[application.id].working_services?.length > 0) ? (
                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                {/* Keeping Services */}
                                 {calculationResults[application.id].keeping_services
                                   ?.filter((service: any) => service.total_amount > 0 || service.price > 0)
                                   .map((service: any, idx: number) => (
@@ -874,7 +879,6 @@ export default function ApplicationList() {
                                     </div>
                                   ))}
                                   
-                                {/* Working Services */}
                                 {calculationResults[application.id].working_services
                                   ?.filter((service: any) => service.total_amount > 0 || service.price > 0)
                                   .map((service: any, idx: number) => {
