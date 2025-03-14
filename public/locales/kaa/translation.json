@@ -759,6 +759,7 @@
   
   "calculateServices": {
     "fullyPaid":"Толық төленген",
+    "totalQuantity":"Barliq ",
     "workingServices": "Jumıs Xızmetleri",
     "noResults": " xizmetler joq",
     "paymentSuccess":"Muvaffaqiyatli",

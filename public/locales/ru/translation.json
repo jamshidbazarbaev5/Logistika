@@ -702,6 +702,7 @@
   "calculateServices": {
     "declarationRequiredForPayment":"Для оплаты необходимо заполнить информацию о декларации",
     "workingServices": "Рабочие Услуги",
+    "totalQuantity":"Всего количества",
     "dalolatnomaTitle":"Акт",
     "fullyPaid":"Полностью оплачено",
     "title": "Расчет Услуг",

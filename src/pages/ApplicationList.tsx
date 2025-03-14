@@ -901,7 +901,7 @@ export default function ApplicationList() {
                                             <span className="font-medium">{service.requested_amount}</span>
                                           </div>
                                           <div className="flex justify-between">
-                                            <span>{t('calculateServices.totalAmount')}:</span>
+                                            <span>{t('calculateServices.totalQuantity')}:</span>
                                             <span className="font-medium">{service.total_amount}</span>
                                           </div>
                                           <div className="flex justify-between">
