@@ -295,7 +295,8 @@ export default function ApplicationList() {
       }, {});
 
       const modesData = Array.isArray(modesResponse.data?.results) ? modesResponse.data.results : [];
-      const modesMap = modesData.reduce((acc: Record<number, ApplicationMode[]>, mode: ApplicationMode) => {
+      // @ts-expect-error Intentionally unused - will be used in future implementation
+      const _modesMap = modesData.reduce((acc: Record<number, ApplicationMode[]>, mode: ApplicationMode) => {
         if (mode && mode.application_id) {
           if (!acc[mode.application_id]) {
             acc[mode.application_id] = [];
