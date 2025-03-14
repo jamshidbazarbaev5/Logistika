@@ -28,6 +28,7 @@
     "submit": "Создать Компанию"
   },
   "createApplication": {
+    "removeFile": "Удалить файл",
     "title": "Создать Заявку",
     "numberOfApplication": "Номер Заявки",
     "numberOfApplicationPlaceholder": "Номер будет сгенерирован автоматически",

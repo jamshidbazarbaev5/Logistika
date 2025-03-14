@@ -628,7 +628,7 @@ export default function ArchiveApplicationList() {
                       </button>
                       
                       {showActionMenu === application.id && (
-                        <div className="absolute right-0 top-8 z-10 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
+                        <div className="absolute right-0 top-[-5rem] z-10 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5">
                           <div className="py-1">
                             <button
                               onClick={() => {

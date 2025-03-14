@@ -28,6 +28,7 @@
     "submit": "Firma Yaratish"
   },
   "createApplication": {
+    "removeFile": "Fayl o'chirish",
     "searchStorage": "Omborni izlash",
     "exportToExcel":"Excelga eksport qilish",
     "numberOfApplication": "Ariza Raqami",

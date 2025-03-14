@@ -23,7 +23,6 @@ import { authService } from '../services/auth';
 const menuSections = {
   main: [
     // { name: "Photo Report", icon: RiCameraFill, href: "/photo-report" },
-    { name: "menu.dashboard", icon: RiDashboardFill, href: "/dashboard" },
     { name: "menu.createApplication", icon: RiFileAddFill, href: "/application-list" },
     { name: "menu.archiveApplication", icon: RiFileAddFill, href: "/archive-application-list" },
   ],
@@ -32,6 +31,8 @@ const menuSections = {
     { name: "menu.keepingServices", icon: RiUserFill, href: "/keeping-services" },
   ],
   settings: [
+    { name: "menu.dashboard", icon: RiDashboardFill, href: "/dashboard" },
+
     { name: "menu.createProduct", icon: RiTBoxFill, href: "/products-list" },
     { name: "menu.createCategory", icon: RiBarChartFill, href: "/category" },
     { name: "menu.measurement", icon: RiBarChartFill, href: "/measurements" },

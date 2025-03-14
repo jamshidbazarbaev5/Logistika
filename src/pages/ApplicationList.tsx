@@ -2,7 +2,7 @@ import { useState, useEffect, Fragment } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Menu, Transition } from "@headlessui/react";
-import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
+import { EllipsisVerticalIcon, ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import { api } from "../api/api";
 import ConfirmModal from "../components/ConfirmModal";
 import SuccessModal from "../components/SuccessModal";
@@ -29,6 +29,7 @@ interface WorkingService {
   quantity: number;
   service_id: number;
   application_id?: number;
+  service_name: string;
 }
 
 interface PhotoReport {
@@ -169,7 +170,6 @@ export default function ApplicationList() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [firms, setFirms] = useState<Record<number, string>>({});
-  const [modes, setModes] = useState<Record<number, ApplicationMode[]>>({});
   const [searchParams, setSearchParams] = useState<SearchParams>({
     firm_name: '',
     decloration_number: '',
@@ -184,8 +184,9 @@ export default function ApplicationList() {
   const [totalPages, setTotalPages] = useState(1);
 
   const [isFormModalOpen] = useState(false);
-  const [] = useState(false);
-  
+  const [expandedApplications, setExpandedApplications] = useState<number[]>([]);
+  const [calculationResults, setCalculationResults] = useState<Record<number, any>>({});
+  const [calculationLoading, setCalculationLoading] = useState<Record<number, boolean>>({});
 
   const [, setKeepingServices] = useState<Array<{ id: number; name: string; base_price: number; extra_price: number }>>([]);
   const [, setWorkingServices] = useState<Array<{ id: number; service_name: string; base_price: number; extra_price: number; units: string }>>([]);
@@ -313,7 +314,6 @@ export default function ApplicationList() {
       setTransportTypes(transportTypesMap);
 
       setFirms(firmMap);
-      setModes(modesMap);
       setAvailableModes(Array.isArray(availableModesResponse.data.results) 
         ? availableModesResponse.data.results 
         : []);
@@ -368,6 +368,71 @@ export default function ApplicationList() {
       fetchFormData();
     }
   }, [isFormModalOpen]);
+
+  const toggleApplicationExpand = async (applicationId: number) => {
+    if (expandedApplications.includes(applicationId)) {
+      setExpandedApplications(prev => prev.filter(id => id !== applicationId));
+      return;
+    }
+    
+    setExpandedApplications(prev => [...prev, applicationId]);
+    
+    // Only fetch calculation if we don't already have it
+    if (!calculationResults[applicationId]) {
+      setCalculationLoading(prev => ({ ...prev, [applicationId]: true }));
+      
+      try {
+        const application = applications.find(app => app.id === applicationId);
+        
+        if (application) {
+          // Format the keeping services correctly based on the application data structure
+          const keepingServices = application.keeping_services.map(service => ({
+            service_type_id: service.keeping_services_id,
+            amount: service.day
+          }));
+          
+          // Format the working services correctly
+          const workingServices = application.working_services.map(service => ({
+            service_type_id: service.service_id,
+            amount: service.quantity
+          }));
+          
+          console.log('Sending calculation request for application', applicationId, {
+            keeping_services: keepingServices,
+            working_services: workingServices
+          });
+          
+          // Make the API call to the correct endpoint
+          const response = await api.post(`/keeping_service/service_calculate/${applicationId}/`, {
+            keeping_services: keepingServices,
+            working_services: workingServices
+          });
+          
+          console.log('Calculation response:', response.data);
+          
+          if (response.data) {
+            setCalculationResults(prev => ({ 
+              ...prev, 
+              [applicationId]: response.data 
+            }));
+          }
+        }
+      } catch (error) {
+        console.error('Error calculating services:', error);
+        // Set empty result to avoid repeated failed requests
+        setCalculationResults(prev => ({ 
+          ...prev, 
+          [applicationId]: { 
+            keeping_services: [], 
+            working_services: [], 
+            total_price: 0 
+          } 
+        }));
+      } finally {
+        setCalculationLoading(prev => ({ ...prev, [applicationId]: false }));
+      }
+    }
+  };
 
   if (loading) {
     return (
@@ -593,15 +658,24 @@ export default function ApplicationList() {
             </tr>
           </thead>
           <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
-            {filteredApplications.map((application, index) => {
-              console.log(`Modes for application ${application.id}:`, modes[application.id]);
-              return (
-                <tr key={application.id} className="hover:bg-gray-50 dark:hover:bg-gray-800">
+            {filteredApplications.map((application, index) => (
+              <Fragment key={application.id}>
+                <tr 
+                  className="hover:bg-gray-50 dark:hover:bg-gray-800 cursor-pointer"
+                  onClick={() => toggleApplicationExpand(application.id)}
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {index + 1}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {application.number_of_application}
+                    <div className="flex items-center">
+                      {application.number_of_application}
+                      {expandedApplications.includes(application.id) ? (
+                        <ChevronUpIcon className="h-4 w-4 ml-1 text-[#6C5DD3]" />
+                      ) : (
+                        <ChevronDownIcon className="h-4 w-4 ml-1 text-[#6C5DD3]" />
+                      )}
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     <span className="block truncate max-w-[200px]" title={firms[application.firm_id] || t("applicationList.unknownFirm", "Unknown Firm")}>
@@ -666,7 +740,7 @@ export default function ApplicationList() {
                       );
                     })}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100" onClick={(e) => e.stopPropagation()}>
                     <Menu as="div" className="relative inline-block text-left">
                       <Menu.Button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors">
                         <EllipsisVerticalIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
@@ -680,7 +754,7 @@ export default function ApplicationList() {
                         leaveFrom="transform opacity-100 scale-100"
                         leaveTo="transform opacity-0 scale-95"
                       >
-                        <Menu.Items className="absolute right-0 z-50 w-36 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none mt-[-70px]">
+                        <Menu.Items className="absolute right-0 z-50 w-36 rounded-md bg-white dark:bg-gray-800 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none mt-[-120px]">
                           <div className="py-1">
                             <Menu.Item>
                               {({ active }) => (
@@ -740,8 +814,131 @@ export default function ApplicationList() {
                     </Menu>
                   </td>
                 </tr>
-              );
-            })}
+                
+                {/* Improved expanded services section with better styling */}
+                {expandedApplications.includes(application.id) && (
+                  <tr>
+                    <td colSpan={10} className="px-0 py-0 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                      <div className="p-6">
+                        {calculationLoading[application.id] ? (
+                          <div className="flex justify-center items-center py-8">
+                            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#6C5DD3]"></div>
+                          </div>
+                        ) : calculationResults[application.id] ? (
+                          <div className="space-y-6">
+                            <div className="flex items-center justify-between">
+                              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                                {t("applicationList.serviceCalculation", "Service Calculation")}
+                              </h3>
+                              
+                              {/* Total Price Card - Moved to top for better visibility */}
+                              <div className="bg-white dark:bg-gray-700 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-gray-700 dark:text-gray-300">{t('calculateServices.totalPrice')}:</span>
+                                  <span className="text-lg font-medium text-[#6C5DD3] dark:text-[#8B7BE8]">
+                                    {calculationResults[application.id].total_price.toLocaleString()} сум
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {(calculationResults[application.id].keeping_services?.length > 0 || 
+                              calculationResults[application.id].working_services?.length > 0) ? (
+                              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {/* Keeping Services */}
+                                {calculationResults[application.id].keeping_services
+                                  ?.filter((service: any) => service.total_amount > 0 || service.price > 0)
+                                  .map((service: any, idx: number) => (
+                                    <div 
+                                      key={`keeping-${idx}`} 
+                                      className="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow duration-200"
+                                    >
+                                      <h3 className="font-medium text-[#6C5DD3] dark:text-[#8B7BE8] mb-2 truncate" title={service.service_name}>
+                                        {service.service_name}
+                                      </h3>
+                                      <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between">
+                                          <span>{t('calculateServices.requestedAmount')}:</span>
+                                          <span className="font-medium">{service.requested_amount}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span>{t('calculateServices.totalAmount')}:</span>
+                                          <span className="font-medium">{service.total_amount}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                          <span>{t('calculateServices.price')}:</span>
+                                          <span className="font-medium">{service.price.toLocaleString()} сум</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                  
+                                {/* Working Services */}
+                                {calculationResults[application.id].working_services
+                                  ?.filter((service: any) => service.total_amount > 0 || service.price > 0)
+                                  .map((service: any, idx: number) => {
+                                    const originalService = application.working_services.find(
+                                      (ws: any) => ws.service_id === service.service_type_id
+                                    );
+                                    
+                                    return (
+                                      <div 
+                                        key={`working-${idx}`} 
+                                        className="bg-white dark:bg-gray-700 p-4 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow duration-200"
+                                      >
+                                        <h3 className="font-medium text-[#6C5DD3] dark:text-[#8B7BE8] mb-2 truncate" 
+                                          title={originalService?.service_name || service.service_name || `Service ${service.service_type_id}`}>
+                                          {originalService?.service_name || service.service_name || `Service ${service.service_type_id}`}
+                                        </h3>
+                                        <div className="space-y-2 text-sm">
+                                          <div className="flex justify-between">
+                                            <span>{t('calculateServices.requestedAmount')}:</span>
+                                            <span className="font-medium">{service.requested_amount}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span>{t('calculateServices.totalAmount')}:</span>
+                                            <span className="font-medium">{service.total_amount}</span>
+                                          </div>
+                                          <div className="flex justify-between">
+                                            <span>{t('calculateServices.price')}:</span>
+                                            <span className="font-medium">{service.price.toLocaleString()} сум</span>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    );
+                                  })}
+                              </div>
+                            ) : (
+                              <div className="text-center py-8 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                                <div className="flex flex-col items-center justify-center">
+                                  <svg className="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                  <p className="text-gray-500 dark:text-gray-400">
+                                    {t('calculateServices.noServicesFound', 'Услуги не найдены')}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-center py-8 bg-white dark:bg-gray-700 rounded-lg border border-gray-200 dark:border-gray-600">
+                            <div className="flex flex-col items-center justify-center">
+                              <svg className="w-12 h-12 text-gray-400 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.75 9.75l4.5 4.5m0-4.5l-4.5 4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                              </svg>
+                              <p className="text-gray-500 dark:text-gray-400">
+                                {t('calculateServices.noResults', 'No calculation results available')}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </Fragment>
+            ))}
           </tbody>
         </table>
       </div>

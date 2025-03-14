@@ -2123,25 +2123,95 @@ export default function CreateApplication() {
                   </div>
 
                   <div className="md:col-span-2">
-                    <label htmlFor="decloration_file" className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors">
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors mb-2">
                       {t('createApplication.declarationFile')}
                     </label>
-                    <input
-                      type="file"
-                      name="decloration_file"
-                      id="decloration_file"
-                      onChange={handleFileChange}
-                      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                      className="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400
-                        file:mr-4 file:py-2 file:px-4
-                        file:rounded-md file:border-0
-                        file:text-sm file:font-semibold
-                        file:bg-[#6C5DD3] file:text-white
-                        hover:file:bg-[#5b4eb3]
-                        file:cursor-pointer
-                        dark:file:bg-[#6C5DD3] dark:file:text-white
-                        dark:hover:file:bg-[#5b4eb3]"
-                    />
+                    
+                    <div 
+                      className={`border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center
+                        ${formData.decloration_file ? 'border-green-300 bg-green-50 dark:border-green-800 dark:bg-green-900/20' : 
+                        'border-gray-300 dark:border-gray-600 hover:border-[#6C5DD3] dark:hover:border-[#6C5DD3]'}
+                        transition-colors duration-200 cursor-pointer`}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onDragEnter={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onDragLeave={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+                          const file = e.dataTransfer.files[0];
+                          setFormData(prev => ({
+                            ...prev,
+                            decloration_file: file
+                          }));
+                        }
+                      }}
+                      onClick={() => document.getElementById('declaration-file-input')?.click()}
+                    >
+                      <input
+                        type="file"
+                        id="declaration-file-input"
+                        onChange={handleFileChange}
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                        className="hidden"
+                      />
+                      
+                      {formData.decloration_file ? (
+                        <>
+                          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-green-100 dark:bg-green-900 mb-4">
+                            <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                          </div>
+                          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
+                            {formData.decloration_file.name}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {(formData.decloration_file.size / 1024).toFixed(2)} KB
+                          </p>
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setFormData(prev => ({
+                                ...prev,
+                                decloration_file: undefined
+                              }));
+                            }}
+                            className="mt-4 px-3 py-1.5 bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 
+                              text-xs font-medium rounded-md hover:bg-red-200 dark:hover:bg-red-900/50 transition-colors"
+                          >
+                            {t('createApplication.removeFile')}
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-12 h-12 text-gray-400 dark:text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                              d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                          </svg>
+                          {/* <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                            {t('createApplication.dragAndDrop')}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            {t('createApplication.orClickToUpload')}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400 mt-4">
+                            {t('createApplication.supportedFormats')}: PDF, DOC, DOCX, JPG, JPEG, PNG
+                          </p> */}
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
 

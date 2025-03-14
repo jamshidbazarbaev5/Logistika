@@ -29,6 +29,7 @@
   },
 
   "createApplication": {
+    "removeFile": "Fayl o'shiriw",
     "title": "Ótinish Jaratıw",
     "productName": "Ónim Atı",
     "productNamePlaceholder": "Ónim atın kiritiń",
