@@ -864,13 +864,13 @@ export default function ApplicationList() {
                                       </h3>
                                       <div className="space-y-2 text-sm">
                                         <div className="flex justify-between">
-                                          <span>{t('calculateServices.requestedAmount')}:</span>
+                                          <span>{t('calculateServices.totalQuantity')}:</span>
                                           <span className="font-medium">{service.requested_amount}</span>
                                         </div>
-                                        <div className="flex justify-between">
-                                          <span>{t('calculateServices.totalAmount')}:</span>
-                                          <span className="font-medium">{service.total_amount}</span>
-                                        </div>
+                                        {/*<div className="flex justify-between">*/}
+                                        {/*  <span>{t('calculateServices.totalAmount')}:</span>*/}
+                                        {/*  <span className="font-medium">{service.total_amount}</span>*/}
+                                        {/*</div>*/}
                                         <div className="flex justify-between">
                                           <span>{t('calculateServices.price')}:</span>
                                           <span className="font-medium">{service.price.toLocaleString()} сум</span>
