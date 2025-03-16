@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
@@ -67,10 +67,32 @@ export default function Layout() {
     navigate("/login");
   };
 
+  useEffect(() => {
+    // Check localStorage for saved preference
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    setIsDarkMode(isDark);
+    
+    // Apply the theme class
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
   const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-    document.documentElement.classList.toggle('dark');
-    localStorage.setItem('darkMode', (!isDarkMode).toString());
+    const newDarkMode = !isDarkMode;
+    setIsDarkMode(newDarkMode);
+    
+    // Update classList based on the new state
+    if (newDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    
+    // Save to localStorage
+    localStorage.setItem('darkMode', newDarkMode.toString());
   };
 
   const languages = [

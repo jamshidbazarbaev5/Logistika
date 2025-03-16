@@ -1631,7 +1631,7 @@ export default function CreateApplication() {
     try {
       const formDataObj = new FormData();
       
-      // Required fields
+      // Required fields validation
       if (!formData.firm_id) {
         setErrorMessage('Please select a firm');
         setErrorModalOpen(true);
@@ -1687,9 +1687,13 @@ export default function CreateApplication() {
       });
 
       console.log('Application created successfully:', response.data);
-      setApplicationId(response.data.id);
+      
+      // Show success modal first
       setShowSuccessModal(true);
-      navigate('/application-list');
+
+      // Only navigate after modal is closed
+      // Remove the automatic navigation here
+      // The navigation will happen in handleSuccessModalClose
 
     } catch (error: any) {
       console.error('Error submitting application:', error);
@@ -1719,7 +1723,7 @@ export default function CreateApplication() {
   
   const handleSuccessModalClose = () => {
     setShowSuccessModal(false);
-    setSelectedTab(3);
+    navigate('/application-list'); // Navigate only after modal is closed
   };
 
   const handleChange = (
@@ -2253,7 +2257,7 @@ export default function CreateApplication() {
         <SuccessModal
           isOpen={showSuccessModal}
           onClose={handleSuccessModalClose}
-          message={t('createApplication.successMessage')}
+          message={t('createApplication.successMessage', 'Application created successfully!')}
         />
 
         <CreateFirmModal
