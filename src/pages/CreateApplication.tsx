@@ -1538,7 +1538,6 @@ export default function CreateApplication() {
   const workingServicesRef = useRef<HTMLDivElement>(null);
   const [showCreateFirmModal, setShowCreateFirmModal] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
-  const [, setApplicationId] = useState<number | null>(null);
   const navigate = useNavigate();
   const [errorModalOpen, setErrorModalOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
