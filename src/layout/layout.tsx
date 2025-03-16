@@ -19,10 +19,8 @@ import {
 } from 'react-icons/ri';
 import { authService } from '../services/auth';
 
-// Organize menu items into sections
 const menuSections = {
   main: [
-    // { name: "Photo Report", icon: RiCameraFill, href: "/photo-report" },
     { name: "menu.createApplication", icon: RiFileAddFill, href: "/application-list" },
     { name: "menu.archiveApplication", icon: RiFileAddFill, href: "/archive-application-list" },
   ],
