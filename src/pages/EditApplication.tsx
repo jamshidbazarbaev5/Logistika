@@ -213,9 +213,6 @@ export default function EditApplication() {
       if (response.status === 200) {
         setModalMessage(t('editApplication.successMessage'));
         setShowSuccessModal(true);
-        setTimeout(() => {
-          navigate('/application-list');
-        }, 1500);
       }
     } catch (error: any) {
       console.error('Error updating application:', error);
@@ -239,23 +236,20 @@ export default function EditApplication() {
     }
   };
 
-  // const formatDateForAPI = (dateString: string): string => {
-  //   if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
-  //     return dateString;
-  //   }
+  const handleDeclarationSubmit = () => {
+    if (!formData.decloration_number || !formData.decloration_date) {
+      setModalMessage(t('editApplication.declarationFieldsRequired'));
+      setShowSuccessModal(true);
+      return;
+    }
 
-  //   if (/^\d{2}\.\d{2}\.\d{4}$/.test(dateString)) {
-  //     const [day, month, year] = dateString.split('.');
-  //     return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-  //   }
-
-  //   const date = new Date(dateString);
-  //   if (!isNaN(date.getTime())) {
-  //     return date.toISOString().split('T')[0];
-  //   }
-
-  //   return dateString;
-  // };
+    setModalMessage(t('editApplication.declarationAdded'));
+    setShowSuccessModal(true);
+    
+    setTimeout(() => {
+      setSelectedTab(5);
+    }, 1500);
+  };
 
   const validateDate = (dateString: string): boolean => {
     const date = new Date(dateString);
@@ -302,13 +296,11 @@ export default function EditApplication() {
     const [transportNumber, setTransportNumber] = useState('');
     const [transportTypeId, setTransportTypeId] = useState<number>(0);
 
-    // Type assertion for formData to include string indexing
     const typedFormData = formData as EditApplicationFormState;
 
     const handleAddTransport = () => {
       if (!transportNumber || !transportTypeId) return;
 
-      // Check if transport number already exists for this application
       const isDuplicate = typedFormData.transport.some(
         (t: any) => t.transport_number.toLowerCase() === transportNumber.toLowerCase()
       );
@@ -523,21 +515,6 @@ export default function EditApplication() {
                 )
               }
             >
-              {t('editApplication.declaration')}
-            </Tab>
-            <Tab
-              className={({ selected }) =>
-                classNames(
-                  'whitespace-nowrap rounded-lg py-2 px-3 sm:py-2.5 sm:px-4 text-xs sm:text-sm font-medium leading-5',
-                  'min-w-[100px] sm:min-w-[120px] flex-shrink-0',
-                  'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
-                  'transition-all duration-200 ease-in-out',
-                  selected
-                    ? 'bg-white text-[#6C5DD3] shadow-sm'
-                    : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
-                )
-              }
-            >
               {t('editApplication.services')}
             </Tab>
             <Tab
@@ -569,6 +546,21 @@ export default function EditApplication() {
               }
             >
               {t('editApplication.products')}
+            </Tab>
+            <Tab
+              className={({ selected }) =>
+                classNames(
+                  'whitespace-nowrap rounded-lg py-2 px-3 sm:py-2.5 sm:px-4 text-xs sm:text-sm font-medium leading-5',
+                  'min-w-[100px] sm:min-w-[120px] flex-shrink-0',
+                  'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
+                  'transition-all duration-200 ease-in-out',
+                  selected
+                    ? 'bg-white text-[#6C5DD3] shadow-sm'
+                    : 'text-gray-500 hover:bg-white/[0.12] hover:text-[#6C5DD3]'
+                )
+              }
+            >
+              {t('editApplication.declaration')}
             </Tab>
             <Tab
               className={({ selected }) =>
@@ -713,6 +705,35 @@ export default function EditApplication() {
             </Tab.Panel>
 
             <Tab.Panel>
+              <ServicesTab 
+                formData={formData as ApplicationFormData}
+                setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
+                keepingServices={keepingServices}
+                workingServices={workingServices}
+                onSuccess={() => setSelectedTab(2)}
+              />
+            </Tab.Panel>
+
+            <Tab.Panel>
+              <PhotoReportTab 
+                formData={formData as ApplicationFormData}
+                setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
+                onSuccess={() => setSelectedTab(3)}
+                setSelectedTab={setSelectedTab}
+              />
+            </Tab.Panel>
+
+            <Tab.Panel>
+              <ProductsTab 
+                formData={formData as ApplicationFormData}
+                setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
+                products={products}
+                storages={storages}
+                onSuccess={() => setSelectedTab(4)}
+              />
+            </Tab.Panel>
+
+            <Tab.Panel>
               <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow-sm">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div>
@@ -804,7 +825,7 @@ export default function EditApplication() {
                 <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
                   <button
                     type="button"
-                    onClick={() => setSelectedTab(0)}
+                    onClick={() => setSelectedTab(3)}
                     className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 border border-gray-300 
                       rounded-lg text-gray-700 hover:bg-gray-50 text-sm font-medium"
                   >
@@ -812,43 +833,14 @@ export default function EditApplication() {
                   </button>
                   <button
                     type="button"
-                    onClick={() => setSelectedTab(2)}
+                    onClick={handleDeclarationSubmit}
                     className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-[#6C5DD3] 
                       text-white rounded-lg hover:bg-[#5b4eb3] text-sm font-medium"
                   >
-                    {t('editApplication.next')}
+                    {t('editApplication.addDeclaration')}
                   </button>
                 </div>
               </div>
-            </Tab.Panel>
-
-            <Tab.Panel>
-              <ServicesTab 
-                formData={formData as ApplicationFormData}
-                setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
-                keepingServices={keepingServices}
-                workingServices={workingServices}
-                onSuccess={() => setSelectedTab(3)}
-              />
-            </Tab.Panel>
-
-            <Tab.Panel>
-              <PhotoReportTab 
-                formData={formData as ApplicationFormData}
-                setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
-                onSuccess={() => setSelectedTab(4)}
-                setSelectedTab={setSelectedTab}
-              />
-            </Tab.Panel>
-
-            <Tab.Panel>
-              <ProductsTab 
-                formData={formData as ApplicationFormData}
-                setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
-                products={products}
-                storages={storages}
-                onSuccess={() => setSelectedTab(5)}
-              />
             </Tab.Panel>
 
             <Tab.Panel>
@@ -860,6 +852,26 @@ export default function EditApplication() {
                   availableModes={availableModes}
                   inputClassName={inputClassName}
                 />
+                
+                <div className="mt-6 flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedTab(4)}
+                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 border border-gray-300 
+                      rounded-lg text-gray-700 hover:bg-gray-50 text-sm font-medium"
+                  >
+                    {t('editApplication.back')}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/calculate-services/${id}`)}
+                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 border border-[#6C5DD3] 
+                      text-[#6C5DD3] rounded-lg hover:bg-[#6C5DD3]/10 text-sm font-medium"
+                  >
+                    {t('editApplication.calculate')}
+                  </button>
+                
+                </div>
               </div>
             </Tab.Panel>
           </Tab.Panels>

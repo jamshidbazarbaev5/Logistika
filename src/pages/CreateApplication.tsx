@@ -1859,7 +1859,48 @@ export default function CreateApplication() {
                 )
               }
             >
+              {t('createApplication.services')}
+            </Tab>
 
+            <Tab
+              className={({ selected }) =>
+                classNames(
+                  'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
+                  'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
+                  selected
+                    ? 'bg-white dark:bg-gray-700 text-[#6C5DD3] shadow'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-white/[0.12] dark:hover:bg-transparent hover:text-[#6C5DD3]'
+                )
+              }
+            >
+              {t('createApplication.photos')}
+            </Tab>
+
+            <Tab
+              className={({ selected }) =>
+                classNames(
+                  'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
+                  'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
+                  selected
+                    ? 'bg-white dark:bg-gray-700 text-[#6C5DD3] shadow'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-white/[0.12] dark:hover:bg-transparent hover:text-[#6C5DD3]'
+                )
+              }
+            >
+              {t('createApplication.products')}
+            </Tab>
+
+            <Tab
+              className={({ selected }) =>
+                classNames(
+                  'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
+                  'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
+                  selected
+                    ? 'bg-white dark:bg-gray-700 text-[#6C5DD3] shadow'
+                    : 'text-gray-500 dark:text-gray-400 hover:bg-white/[0.12] dark:hover:bg-transparent hover:text-[#6C5DD3]'
+                )
+              }
+            >
               {t('createApplication.declarationInfo')}
             </Tab>
 
@@ -1874,50 +1915,12 @@ export default function CreateApplication() {
                 )
               }
             >
-              {t('createApplication.services', 'Services')}
-            </Tab>
-            <Tab
-              className={({ selected }) =>
-                classNames(
-                  'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
-                  'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
-                  selected
-                    ? 'bg-white dark:bg-gray-700 text-[#6C5DD3] shadow'
-                    : 'text-gray-500 dark:text-gray-400 hover:bg-white/[0.12] dark:hover:bg-transparent hover:text-[#6C5DD3]'
-                )
-              }
-            >
-              {t('createApplication.photos')}
-            </Tab>
-            <Tab
-              className={({ selected }) =>
-                classNames(
-                  'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
-                  'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
-                  selected
-                    ? 'bg-white dark:bg-gray-700 text-[#6C5DD3] shadow'
-                    : 'text-gray-500 dark:text-gray-400 hover:bg-white/[0.12] dark:hover:bg-transparent hover:text-[#6C5DD3]'
-                )
-              }
-            >
-              {t('createApplication.products',)}
-            </Tab>
-            <Tab
-              className={({ selected }) =>
-                classNames(
-                  'whitespace-nowrap rounded-lg py-2.5 px-4 text-sm font-medium leading-5',
-                  'ring-white ring-opacity-60 ring-offset-2 focus:outline-none',
-                  selected
-                    ? 'bg-white dark:bg-gray-700 text-[#6C5DD3] shadow'
-                    : 'text-gray-500 dark:text-gray-400 hover:bg-white/[0.12] dark:hover:bg-transparent hover:text-[#6C5DD3]'
-                )
-              }
-            >
-              {t('createApplication.modes',)}
+              {t('createApplication.modes')}
             </Tab>
           </Tab.List>
 
           <Tab.Panels>
+            {/* Basic Info Panel */}
             <Tab.Panel>
               <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -2094,6 +2097,25 @@ export default function CreateApplication() {
               </div>
             </Tab.Panel>
 
+            {/* Services Panel */}
+            <Tab.Panel>
+              <ServicesTab onSuccess={() => setSelectedTab(2)} />
+            </Tab.Panel>
+
+            {/* Photos Panel */}
+            <Tab.Panel>
+              <PhotoReportTab 
+                onSuccess={() => setSelectedTab(3)}
+                setSelectedTab={setSelectedTab}
+              />
+            </Tab.Panel>
+
+            {/* Products Panel */}
+            <Tab.Panel>
+              <ProductsTab onSuccess={() => setSelectedTab(4)} />
+            </Tab.Panel>
+
+            {/* Declaration Panel */}
             <Tab.Panel>
               <div className="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-sm">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -2221,7 +2243,7 @@ export default function CreateApplication() {
                 <div className="mt-6 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => setSelectedTab(2)}
+                    onClick={() => setSelectedTab(4)}
                     className="bg-[#6C5DD3] text-white px-6 py-2 rounded-lg hover:bg-[#5b4eb3]
                       focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
                       dark:focus:ring-offset-gray-800"
@@ -2232,21 +2254,7 @@ export default function CreateApplication() {
               </div>
             </Tab.Panel>
 
-            <Tab.Panel>
-              <ServicesTab onSuccess={() => setSelectedTab(3)} />
-            </Tab.Panel>
-
-            <Tab.Panel>
-              <PhotoReportTab 
-                onSuccess={() => setSelectedTab(4)}
-                setSelectedTab={setSelectedTab}
-              />
-            </Tab.Panel>
-
-            <Tab.Panel>
-              <ProductsTab onSuccess={() => setSelectedTab(5)} />
-            </Tab.Panel>
-
+            {/* Modes Panel */}
             <Tab.Panel>
               <ModesTab onSubmit={handleSubmit} />
             </Tab.Panel>

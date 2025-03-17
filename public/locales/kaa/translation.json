@@ -310,13 +310,15 @@
     "search":{
       "title":"O'tinishlerid izlew"
     },
+    "serviceCalculation":"Xızmet Esablanıw",
+    
     "dalolatnoma": "Dalolatnoma",
     "previous": "Aldıńǵı",
     "calculate": "Esablaw",
     "STATUS":"Status",
     "status":{
       "active": "Aktiv",
-      "unpaid": "Tólenbegen",
+      "unpaid": "Qarızdar",
       "completed": "Tamamlanǵan"
     },
     "viewDetails":"Ótinish toliq  kóriw",
@@ -678,7 +680,9 @@
     "apply": "Qollanıw"
   },
   "editApplication": {
+    "calculate":"Esaplaw",
     "numberOfApplication":"Ariza Raqami",
+    "addDeclaration":"Deklaratsiya Qosıw",
     "successMessage":"Ariza muvaffaqiyatli o'zgardi",
     "deportedDate":"Ketiw Sánesi",
     "selectPhotos": "Foto tanlash",
@@ -834,7 +838,7 @@
   },
   "status": {
     "active": "Aktiv",
-    "unpaid": "Tólenbegen",
+    "unpaid": "Qarızdar",
     "completed": "Tamamlanǵan"
   },
   "updateUser": {
@@ -873,5 +877,8 @@
   },
   "errorModal": {
     "close": "Jabıw"
+  },
+  "companyName": {
+    "title": "\"UMID NUKUS\" МЧЖ"
   }
 }

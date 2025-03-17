@@ -163,6 +163,22 @@ const formatNumber = (num: number | string) => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ", ");
 };
 
+// Add new interfaces for payments and transactions
+interface Payment {
+  id: number;
+  application: number;
+  payment_method: number;
+  amount: string;
+  comment: string;
+  created_at: string;
+}
+
+interface Transaction {
+  id: number;
+  application_id: number;
+  // ... other fields not needed for this check
+}
+
 export default function ApplicationList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -202,6 +218,10 @@ export default function ApplicationList() {
   const [availableModes, setAvailableModes] = useState<Mode[]>([]);
 
   const [transportTypes, setTransportTypes] = useState<Record<number, string>>({});
+
+  // Add new state variables
+  const [payments, setPayments] = useState<Record<number, Payment[]>>({});
+  const [transactions, setTransactions] = useState<Record<number, Transaction[]>>({});
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -283,12 +303,13 @@ export default function ApplicationList() {
       
       params.append('page', currentPage.toString());
 
-      const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse, transportTypesResponse] = await Promise.all([
+      const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse, transportTypesResponse, paymentsResponse] = await Promise.all([
         api.get<PaginatedResponse<Application>>(`/application/?${params.toString()}`),
         api.get<PaginatedResponse<FirmResponse>>('/firms/'),
         api.get<PaginatedResponse<ApplicationMode>>('/modes/application_modes/'),
         api.get<ModesResponse>('/modes/modes/'),
-        api.get('/transport/type/')
+        api.get('/transport/type/'),
+        api.get('/application/pay/')
       ]);
 
       const firmsData = Array.isArray(firmsResponse.data?.results) ? firmsResponse.data.results : [];
@@ -317,6 +338,32 @@ export default function ApplicationList() {
         return acc;
       }, {});
       setTransportTypes(transportTypesMap);
+
+      // Group payments by application ID
+      const paymentsMap = paymentsResponse.data.results.reduce((acc: Record<number, Payment[]>, payment: Payment) => {
+        if (!acc[payment.application]) {
+          acc[payment.application] = [];
+        }
+        acc[payment.application].push(payment);
+        return acc;
+      }, {});
+
+      setPayments(paymentsMap);
+
+      // Fetch transactions for each application
+      const applicationIds = applicationsResponse.data.results.map(app => app.id);
+      const transactionPromises = applicationIds.map(id => 
+        api.get(`/transactions/history/${id}`).catch(() => ({ data: [] }))
+      );
+      const transactionResponses = await Promise.all(transactionPromises);
+
+      const transactionsMap = transactionResponses.reduce((acc: Record<number, Transaction[]>, response, index) => {
+        const appId = applicationIds[index];
+        acc[appId] = response.data;
+        return acc;
+      }, {});
+
+      setTransactions(transactionsMap);
 
       setFirms(firmMap);
       setModes(modesMap);
@@ -438,6 +485,25 @@ export default function ApplicationList() {
       } finally {
         setCalculationLoading(prev => ({ ...prev, [applicationId]: false }));
       }
+    }
+  };
+
+  // Add function to determine application status
+  const getApplicationStatus = (application: Application) => {
+    const hasTransactions = transactions[application.id]?.length > 0;
+    const applicationPayments = payments[application.id] || [];
+    const totalPaid = applicationPayments.reduce((sum, payment) => 
+      sum + parseFloat(payment.amount), 0
+    );
+
+    if (!hasTransactions) {
+      return 'active';
+    } else if (totalPaid === 0) {
+      return 'unpaid';
+    } else if (application.total_price && totalPaid >= application.total_price) {
+      return 'completed';
+    } else {
+      return 'active';
     }
   };
 
@@ -710,8 +776,8 @@ export default function ApplicationList() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusClasses(application.status as ApplicationStatus)}`}>
-                      {t(`applicationList.status.${application.status}`, application.status)}
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusClasses(getApplicationStatus(application) as ApplicationStatus)}`}>
+                      {t(`applicationList.status.${getApplicationStatus(application)}`, getApplicationStatus(application))}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
@@ -836,7 +902,7 @@ export default function ApplicationList() {
                           <div className="space-y-6">
                             <div className="flex items-center justify-between">
                               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                                {t("applicationList.serviceCalculation", "Service Calculation")}
+                                {t("applicationList.serviceCalculation", )}
                               </h3>
                               
                               <div className="bg-white dark:bg-gray-700 px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm">

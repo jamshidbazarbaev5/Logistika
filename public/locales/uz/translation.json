@@ -297,6 +297,7 @@
     "error": "Noto'g'ri foydalanuvchi nomi yoki parol"
   },
   "applicationList": {
+    "serviceCalculation":"Xizmat Hisoblash",
     "previous": "Oldingi",
     "STATUS":"Status",
     "status":{
@@ -693,6 +694,8 @@
     }
   },
   "editApplication": {
+    "calculate":"Hisoblash",
+    "addDeclaration":"Deklaratsiya Qo'shish",
     "deportedDate":"Ketish sanasi",
     "successMessage":"Ariza muvaffaqiyatli o'zgardi",
     "status": "Status",
@@ -847,5 +850,8 @@
       "quantity": "Soni",
       "number": "Raqami"
     }
+  },
+  "companyName": {
+    "title": "\"UMID NUKUS\" МЧЖ"
   }
 } 

@@ -297,6 +297,7 @@
     "cancelText": "Отмена"
   },
   "applicationList": {
+    "serviceCalculation":"Рассчитать Услугу",
     "dalolatnoma": "Акт",
     "previous": "Предыдущий",
     "downloadExcel":"Экспорт в Excel",
@@ -306,7 +307,7 @@
     "STATUS":"Статус",
     "status":{
       "active": "Активный",
-      "unpaid": "Неоплаченный",
+      "unpaid": "В долг",
       "completed": "Завершенный"
     },
     "search":{
@@ -617,6 +618,8 @@
     "errorMessage": "Ошибка при сохранении пользователя"
   },
   "editApplication": {
+    "calculate":"Рассчитать",
+    "addDeclaration":"Добавить Декларацию",
     "successMessage":"Заявка успешно обновлена",
     "completedDisabledPrice":"Для завершения заявки необходимо, чтобы общая сумма была равна 0",
     "completedDisabledDeclaration":"Для завершения заявки необходимо, чтобы была заполнена информация о декларации",
@@ -777,7 +780,7 @@
   },
   "status": {
     "active": "Активный",
-    "unpaid": "Неоплаченный",
+    "unpaid": "В долг",
     "completed": "Завершенный"
   },
   "updateUser": {
@@ -852,5 +855,8 @@
       "quantity": "Количество",
       "number": "Номер"
     }
+  },
+  "companyName": {
+    "title": "ООО \"UMID NUKUS\""
   }
 }
