@@ -146,7 +146,7 @@ export default function Layout() {
       </div>
       {/* Top Right Controls */}
       <div className={`fixed top-0 right-0 ${
-        isMenuOpen ? 'w-[82.3%]' : 'w-[96.3%]'
+        isMenuOpen ? 'w-[calc(100%-16rem)]' : 'w-[calc(100%-4rem)]'
       } ${isDarkMode ? 'bg-[#070229]' : 'bg-blue-500'} p-4 z-50 flex items-center justify-end gap-4`}>
         <h1 className="text-xl font-bold text-white">
           {t("companyName.title")}
@@ -191,7 +191,7 @@ export default function Layout() {
       <div
         className={`fixed left-0 top-0 h-full ${
           isMenuOpen ? "w-64" : "w-16"
-        } transform transition-all duration-300 ease-in-out flex flex-col border-r 
+        } transform transition-all duration-300 flex flex-col border-r 
         border-gray-200 dark:border-gray-700 bg-white dark:bg-[#070229] z-40`}
       >
         <nav className={`flex-1 space-y-2 p-4 pt-24 overflow-y-auto ${
@@ -238,12 +238,12 @@ export default function Layout() {
                     >
                       <item.icon className={`h-5 w-5 ${
                         window.location.pathname === item.href
-                          ? "text-[#6C5DD3] dark:text-[#8B80F9]"
+                          ? "text-[#ffffff] dark:text-[#8B80F9]"
                           : "text-gray-100 dark:text-white"
                       }`} />
                       {isMenuOpen && (
                         <span className={window.location.pathname === item.href
-                          ? "text-[#6C5DD3] dark:text-[#8B80F9]"
+                          ? "text-[#ffffff] dark:text-[#8B80F9]"
                           : "text-gray-100 dark:text-white"
                         }>{t(item.name)}</span>
                       )}

@@ -645,7 +645,12 @@ export default function ApplicationList() {
     }
   };
 
-  const filteredApplications = applications.filter(app => isRelevantStatus(app.status));
+  const filteredApplications = applications
+    .filter(app => isRelevantStatus(app.status))
+    .sort((a, b) => {
+      // Sort by coming_date in descending order (newest first)
+      return new Date(b.coming_date).getTime() - new Date(a.coming_date).getTime();
+    });
 
   return (
     <div className="p-2 sm:p-4 md:p-6">

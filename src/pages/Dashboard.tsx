@@ -39,6 +39,7 @@
 //     product_name: string;
 //   }>;
 //   transport: Transport[];
+//   coming_date: string;
 // }
 
 // interface Transaction {
@@ -179,7 +180,7 @@
 //     date_to: "",
 //     firm_name: "",
 //   });
-//   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+//   const [, setSelectedProducts] = useState<string[]>([]);
 //   const [productDisplayLimit, setProductDisplayLimit] = useState(10);
 //   const [sortBy, setSortBy] = useState<"quantity" | "name">("quantity");
 //   const [loadingProgress] = useState(0);
@@ -224,7 +225,7 @@
 //     fetchDataForFirm(firm.id);
 //   };
 
-//   const fetchDataForFirm = async (firmId: number) => {
+//   const fetchDataForFirm = async (firmId: number, fromDate?: string, toDate?: string) => {
 //     try {
 //       setLoading(true);
 
@@ -241,8 +242,8 @@
 //         decloration_number: "",
 //         number_of_application: "",
 //         firm_INN: "",
-//         coming_date_gte: dateFrom,
-//         coming_date_lte: dateTo,
+//         coming_date_gte: fromDate || "",
+//         coming_date_lte: toDate || "",
 //         products: "",
 //         page: "1",
 //       });
@@ -253,13 +254,27 @@
 
 //       setApplications(applicationsResponse.data.results);
 
-//       const applicationIds = applicationsResponse.data.results.map(
+//       const allApplicationsParams = new URLSearchParams({
+//         firm_name: firmName,
+//         decloration_number: "",
+//         number_of_application: "",
+//         firm_INN: "",
+//         products: "",
+//         page: "1",
+//       });
+
+//       const allApplicationsResponse = await api.get<PaginatedResponse<Application>>(
+//         `https://cargo-calc.uz/api/v1/application/?${allApplicationsParams.toString()}`
+//       );
+
+//       const allApplicationIds = allApplicationsResponse.data.results.map(
 //         (app) => app.id
 //       );
+
 //       const allTransactionHistory: TransactionHistory[] = [];
 
 //       await Promise.all(
-//         applicationIds.map(async (appId) => {
+//         allApplicationIds.map(async (appId) => {
 //           try {
 //             const transactionResponse = await api.get<TransactionHistory[]>(
 //               `https://cargo-calc.uz/api/v1/transactions/history/${appId}`
@@ -274,7 +289,19 @@
 //         })
 //       );
 
-//       setTransactionHistory(allTransactionHistory);
+//       const filteredTransactions = allTransactionHistory.filter(transaction => {
+//         if (!fromDate && !toDate) return true;
+        
+//         const transactionDate = new Date(transaction.date_of_transaction);
+//         const fromDateDate = fromDate ? new Date(fromDate) : null;
+//         const toDateDate = toDate ? new Date(toDate) : null;
+
+//         return (!fromDateDate || transactionDate >= fromDateDate) && 
+//                (!toDateDate || transactionDate <= toDateDate);
+//       });
+
+//       setTransactionHistory(filteredTransactions);
+
 //     } catch (error) {
 //       console.error("Error fetching data for firm:", error);
 //     } finally {
@@ -282,7 +309,7 @@
 //     }
 //   };
 
-//   const fetchData = async () => {
+//   const fetchData = async (fromDate?: string, toDate?: string) => {
 //     try {
 //       setLoading(true);
 
@@ -291,8 +318,8 @@
 //         decloration_number: "",
 //         number_of_application: "",
 //         firm_INN: "",
-//         coming_date_gte: dateFrom,
-//         coming_date_lte: dateTo,
+//         coming_date_gte: fromDate || "",
+//         coming_date_lte: toDate || "",
 //         products: "",
 //         page: "1",
 //       });
@@ -302,12 +329,27 @@
 //       );
 //       setApplications(applicationsResponse.data.results);
 
-//       setTransactionHistory([]);
-
 //       const transactionsResponse = await api.get<
 //         PaginatedResponse<Transaction>
 //       >("https://cargo-calc.uz/api/v1/transactions/");
-//       setTransactions(transactionsResponse.data.results);
+
+//       const filteredTransactions = transactionsResponse.data.results.filter(transaction => {
+//         if (!fromDate && !toDate) return true;
+        
+//         const application = applicationsResponse.data.results.find(
+//           app => app.id === transaction.application_id
+//         );
+//         if (!application) return false;
+
+//         const appDate = new Date(application.coming_date);
+//         const fromDateDate = fromDate ? new Date(fromDate) : null;
+//         const toDateDate = toDate ? new Date(toDate) : null;
+
+//         return (!fromDateDate || appDate >= fromDateDate) && 
+//                (!toDateDate || appDate <= toDateDate);
+//       });
+
+//       setTransactions(filteredTransactions);
 
 //       const paymentsResponse = await api.get<PaginatedPaymentResponse>(
 //         "https://cargo-calc.uz/api/v1/application/pay/"
@@ -350,24 +392,28 @@
 //   }, [selectedFirm]);
 
 //   useEffect(() => {
-//     fetchData();
+//     handleDateChange();
 //     fetchTransportTypes();
 //   }, []);
 
 //   const applicationStats = useMemo(() => {
-//     const relevantApplications = selectedFirm
+//     let relevantApplications = selectedFirm
 //       ? applications.filter((app) => app.firm_id === selectedFirm.id)
 //       : applications;
 
+//     // Filter by selected product if any
+//     if (selectedProduct) {
+//       relevantApplications = relevantApplications.filter(app => 
+//         app.products.some(p => p.product_name === selectedProduct.name)
+//       );
+//     }
+
 //     return {
 //       total: relevantApplications.length,
-//       active: relevantApplications.filter((app) => app.status === "active")
-//         .length,
-//       completed: relevantApplications.filter(
-//         (app) => app.status === "completed"
-//       ).length,
+//       active: relevantApplications.filter((app) => app.status === "active").length,
+//       completed: relevantApplications.filter((app) => app.status === "completed").length,
 //     };
-//   }, [applications, selectedFirm]);
+//   }, [applications, selectedFirm, selectedProduct]);
 
 //   const statusData = useMemo(
 //     () => [
@@ -453,21 +499,105 @@
 //       }, []);
 //   }, [selectedFirm, transactions, transactionHistory, applications]);
 
+//   const firmProductData = useMemo(() => {
+//     const dataSource = selectedFirm ? transactionHistory : transactions;
+//     const relevantApplications = selectedFirm
+//       ? applications.filter(app => app.firm_id === selectedFirm.id && app.status === "completed")
+//       : applications.filter(app => app.status === "completed");
+
+//     const relevantApplicationIds = new Set(
+//       relevantApplications.map((app) => app.id)
+//     );
+
+//     let productData = dataSource
+//       .filter((transaction) => relevantApplicationIds.has(transaction.application_id))
+//       .reduce((acc: { [key: string]: { value: number, applications: Set<number> } }, transaction) => {
+//         transaction.products.forEach((product) => {
+//           const productName = product.product.name;
+//           if (!acc[productName]) {
+//             acc[productName] = { value: 0, applications: new Set() };
+//           }
+//           acc[productName].value += product.quantity;
+//           acc[productName].applications.add(transaction.application_id);
+//         });
+//         return acc;
+//       }, {});
+
+//     // Convert to array and sort by value
+//     let result = Object.entries(productData)
+//       .map(([name, data]) => ({
+//         name,
+//         value: data.value,
+//         applicationCount: data.applications.size
+//       }))
+//       .filter(item => item.value > 0)
+//       .sort((a, b) => b.value - a.value);
+
+//     if (selectedProduct) {
+//       result = result.filter(item => item.name === selectedProduct.name);
+//     } else {
+//       // Calculate total value
+//       const totalValue = result.reduce((sum, item) => sum + item.value, 0);
+      
+//       // Set threshold for grouping (e.g., items less than 1% of total)
+//       const threshold = totalValue * 0.01;
+      
+//       // Separate items into main items and others
+//       const mainItems = result.filter(item => item.value >= threshold);
+//       const smallItems = result.filter(item => item.value < threshold);
+      
+//       // If we have small items, group them into "Others"
+//       if (smallItems.length > 0) {
+//         const othersValue = smallItems.reduce((sum, item) => sum + item.value, 0);
+//         const othersApplications = new Set(
+//           smallItems.flatMap(item => Array.from(productData[item.name].applications))
+//         );
+        
+//         result = [
+//           ...mainItems,
+//           {
+//             name: t("dashboard.others"),
+//             value: othersValue,
+//             applicationCount: othersApplications.size,
+//             items: smallItems // Store original items for tooltip
+//           }
+//         ];
+//       }
+
+//       // Limit to display limit (excluding "Others" which is always shown)
+//       const mainItemsLimit = productDisplayLimit - (smallItems.length > 0 ? 1 : 0);
+//       result = [
+//         ...result.slice(0, mainItemsLimit),
+//         ...(smallItems.length > 0 ? [result[result.length - 1]] : [])
+//       ];
+//     }
+
+//     return result;
+//   }, [
+//     selectedFirm,
+//     applications,
+//     transactionHistory,
+//     transactions,
+//     selectedProduct,
+//     productDisplayLimit,
+//     t
+//   ]);
+
 //   const getFilteredProductData = () => {
 //     let filtered = [...productData];
 
-//     filtered.sort((a, b) => {
-//       if (sortBy === "quantity") {
-//         return b.quantity - a.quantity;
-//       }
-//       return a.name.localeCompare(b.name);
-//     });
-
-//     if (selectedProducts.length > 0) {
-//       filtered = filtered.filter((product) =>
-//         selectedProducts.includes(product.name)
+//     if (selectedProduct) {
+//       filtered = filtered.filter((product) => 
+//         product.name === selectedProduct.name
 //       );
 //     } else {
+//       filtered.sort((a, b) => {
+//         if (sortBy === "quantity") {
+//           return b.quantity - a.quantity;
+//         }
+//         return a.name.localeCompare(b.name);
+//       });
+
 //       filtered = filtered.slice(0, productDisplayLimit);
 //     }
 
@@ -514,25 +644,17 @@
 //       : applications.filter(app => app.status === "completed");
 
 //     const transportCounts = new Map<number, number>();
-//     const transportNumbers = new Map<number, string[]>();
     
 //     relevantApplications.forEach(app => {
 //       app.transport?.forEach(transport => {
-//         // Count transport types
 //         const count = transportCounts.get(transport.transport_type) || 0;
 //         transportCounts.set(transport.transport_type, count + 1);
-        
-//         // Store transport numbers
-//         const numbers = transportNumbers.get(transport.transport_type) || [];
-//         transportNumbers.set(transport.transport_type, [...numbers, transport.transport_number]);
 //       });
 //     });
 
 //     return transportTypes.map(type => ({
 //       name: type.transport_type,
-//       value: transportCounts.get(type.id) || 0,
-//       // Add transport numbers to the tooltip
-//       transportNumbers: transportNumbers.get(type.id) || []
+//       value: transportCounts.get(type.id) || 0
 //     })).filter(item => item.value > 0);
 //   }, [applications, selectedFirm, transportTypes]);
 
@@ -695,42 +817,14 @@
 //     fetchProducts();
 //   }, []);
 
-//   const firmProductData = useMemo(() => {
-//     const dataSource = selectedFirm ? transactionHistory : transactions;
-//     const relevantApplications = selectedFirm
-//       ? applications.filter((app) => app.firm_id === selectedFirm.id && app.status === "completed")
-//       : applications.filter(app => app.status === "completed");
-
-//     const relevantApplicationIds = new Set(
-//       relevantApplications.map((app) => app.id)
-//     );
-
-//     // Group by product and calculate quantities
-//     const productData = dataSource
-//       .filter((transaction) => relevantApplicationIds.has(transaction.application_id))
-//       .reduce((acc: { [key: string]: number }, transaction) => {
-//         transaction.products.forEach((product) => {
-//           const productName = product.product.name;
-//           acc[productName] = (acc[productName] || 0) + product.quantity;
-//         });
-//         return acc;
-//       }, {});
-
-//     // Convert to array format for the pie chart
-//     return Object.entries(productData)
-//       .map(([name, value]) => ({
-//         name,
-//         value
-//       }))
-//       .filter(item => item.value > 0)
-//       .sort((a, b) => b.value - a.value);
-//   }, [selectedFirm, applications, transactions, transactionHistory]);
-
-//   const handleDateChange = () => {
+//   const handleDateChange = (newDateFrom?: string, newDateTo?: string) => {
+//     const dateFromToUse = newDateFrom ?? dateFrom;
+//     const dateToToUse = newDateTo ?? dateTo;
+    
 //     if (selectedFirm) {
-//       fetchDataForFirm(selectedFirm.id);
+//       fetchDataForFirm(selectedFirm.id, dateFromToUse, dateToToUse);
 //     } else {
-//       fetchData();
+//       fetchData(dateFromToUse, dateToToUse);
 //     }
 //   };
 
@@ -818,9 +912,10 @@
 //                       type="date"
 //                       value={dateFrom}
 //                       onChange={(e) => {
-//                         setDateFrom(e.target.value);
+//                         const newDate = e.target.value;
+//                         setDateFrom(newDate);
+//                         handleDateChange(newDate, dateTo);
 //                       }}
-//                       onBlur={handleDateChange}
 //                       className="w-full p-3 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600"
 //                     />
 //                   </div>
@@ -832,9 +927,10 @@
 //                       type="date"
 //                       value={dateTo}
 //                       onChange={(e) => {
-//                         setDateTo(e.target.value);
+//                         const newDate = e.target.value;
+//                         setDateTo(newDate);
+//                         handleDateChange(dateFrom, newDate);
 //                       }}
-//                       onBlur={handleDateChange}
 //                       className="w-full p-3 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600"
 //                     />
 //                   </div>
@@ -963,7 +1059,7 @@
 //                           label
 //                           className="drop-shadow-lg"
 //                         >
-//                           {statusData.map((entry, index) => (
+//                           {statusData.map((_entry, index) => (
 //                             <Cell
 //                               key={`cell-${index}`}
 //                               fill={COLORS[index % COLORS.length]}
@@ -1060,7 +1156,7 @@
 //                           label
 //                           className="drop-shadow-lg"
 //                         >
-//                           {transportData.map((entry, index) => (
+//                           {transportData.map((_entry, index) => (
 //                             <Cell
 //                               key={`cell-${index}`}
 //                               fill={COLORS[index % COLORS.length]}
@@ -1075,22 +1171,7 @@
 //                             padding: "8px",
 //                             border: "1px solid #e2e8f0",
 //                           }}
-//                           formatter={(value, name, props) => {
-//                             const entry = transportData.find(item => item.name === name);
-//                             if (entry && entry.transportNumbers.length > 0) {
-//                               return [
-//                                 <div key="tooltip">
-//                                   <div>Количество: {value}</div>
-//                                   <div className="text-sm text-gray-500">
-//                                     {entry.transportNumbers.map(num => (
-//                                       <div key={num}>№: {num}</div>
-//                                     ))}
-//                                   </div>
-//                                 </div>
-//                               ];
-//                             }
-//                             return value;
-//                           }}
+//                           formatter={(value) => formatNumber(Number(value))}
 //                         />
 //                         <Legend />
 //                       </PieChart>
@@ -1098,62 +1179,90 @@
 //                   </div>
 //                 </div>
 
-//                 {selectedFirm && (
-//                   <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//                     <div className="flex items-center justify-between mb-6">
-//                       <div className="flex items-center">
-//                         <Package className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
-//                         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-//                           {`${selectedFirm.firm_name} - ${t("dashboard.productDistribution")}`}
-//                         </h3>
-//                       </div>
-//                       <div className="text-sm text-gray-500 dark:text-gray-400">
-//                         {`${t("dashboard.totalQuantity")}: ${
-//                           firmProductData.reduce((sum, item) => sum + item.value, 0)
-//                         }`}
-//                       </div>
+//                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+//                   <div className="flex items-center justify-between mb-6">
+//                     <div className="flex items-center">
+//                       <Package className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
+//                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+//                         {selectedFirm 
+//                           ? `${selectedFirm.firm_name} - ${t("dashboard.productDistribution")}`
+//                           : t("dashboard.productDistribution")}
+//                       </h3>
 //                     </div>
-//                     <div className="h-[300px]">
-//                       <ResponsiveContainer width="100%" height="100%">
-//                         <PieChart>
-//                           <Pie
-//                             data={firmProductData}
-//                             dataKey="value"
-//                             nameKey="name"
-//                             cx="50%"
-//                             cy="50%"
-//                             outerRadius={100}
-//                             label
-//                             className="drop-shadow-lg"
-//                           >
-//                             {firmProductData.map((entry, index) => (
-//                               <Cell
-//                                 key={`cell-${index}`}
-//                                 fill={COLORS[index % COLORS.length]}
-//                                 className="hover:opacity-80 transition-opacity"
-//                               />
-//                             ))}
-//                           </Pie>
-//                           <Tooltip
-//                             contentStyle={{
-//                               backgroundColor: "white",
-//                               borderRadius: "8px",
-//                               padding: "8px",
-//                               border: "1px solid #e2e8f0",
-//                             }}
-//                             formatter={(value, name) => [
-//                               <div key="tooltip">
-//                                 <div>{`${t("dashboard.quantity")}: ${value}`}</div>
-//                                 <div>{`${t("dashboard.product")}: ${name}`}</div>
-//                               </div>
-//                             ]}
-//                           />
-//                           <Legend />
-//                         </PieChart>
-//                       </ResponsiveContainer>
+//                     <div className="text-sm text-gray-500 dark:text-gray-400">
+//                       {`${t("dashboard.totalQuantity")}: ${
+//                         firmProductData.reduce((sum, item) => sum + item.value, 0)
+//                       }`}
 //                     </div>
 //                   </div>
-//                 )}
+//                   <div className="h-[300px]">
+//                     <ResponsiveContainer width="100%" height="100%">
+//                       <PieChart>
+//                         <Pie
+//                           data={firmProductData}
+//                           dataKey="value"
+//                           nameKey="name"
+//                           cx="50%"
+//                           cy="50%"
+//                           outerRadius={100}
+//                           label={({ name, percent }) => 
+//                             percent > 0.05 ? `${name} (${(percent * 100).toFixed(1)}%)` : ''
+//                           }
+//                           className="drop-shadow-lg"
+//                           labelLine={({ percent }) => percent > 0.05}
+//                         >
+//                           {firmProductData.map((_entry, index) => (
+//                             <Cell
+//                               key={`cell-${index}`}
+//                               fill={COLORS[index % COLORS.length]}
+//                               className="hover:opacity-80 transition-opacity"
+//                             />
+//                           ))}
+//                         </Pie>
+//                         <Tooltip
+//                           contentStyle={{
+//                             backgroundColor: "white",
+//                             borderRadius: "8px",
+//                             padding: "8px",
+//                             border: "1px solid #e2e8f0",
+//                           }}
+//                           formatter={(value, name, entry) => {
+//                             const item = entry.payload;
+//                             const percent = (item.value / firmProductData.reduce((sum, i) => sum + i.value, 0) * 100).toFixed(1);
+                            
+//                             if (item.items) { // This is the "Others" category
+//                               return [
+//                                 <div key="tooltip" className="space-y-2">
+//                                   <div className="font-semibold">{`${t("dashboard.others")} (${item.items.length} ${t("dashboard.products")})`}</div>
+//                                   <div>{`${t("dashboard.totalQuantity")}: ${formatNumber(value)}`}</div>
+//                                   <div>{`${t("dashboard.percentage")}: ${percent}%`}</div>
+//                                   <div className="text-sm max-h-40 overflow-y-auto">
+//                                     {item.items.map((subItem: any, idx: number) => (
+//                                       <div key={idx} className="flex justify-between gap-4">
+//                                         <span>{subItem.name}:</span>
+//                                         <span>{formatNumber(subItem.value)}</span>
+//                                       </div>
+//                                     ))}
+//                                   </div>
+//                                 </div>
+//                               ];
+//                             }
+                            
+//                             return [
+//                               <div key="tooltip">
+//                                 <div>{`${t("dashboard.quantity")}: ${formatNumber(value)}`}</div>
+//                                 <div>{`${t("dashboard.percentage")}: ${percent}%`}</div>
+//                                 <div>{`${t("dashboard.product")}: ${name}`}</div>
+//                                 <div>{`${t("dashboard.applications")}: ${item.applicationCount}`}</div>
+//                               </div>
+//                             ];
+//                           }}
+//                         />
+//                         <Legend />
+//                       </PieChart>
+//                     </ResponsiveContainer>
+//                   </div>
+//                 </div>
 
 //                 <div className="col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
 //                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -1242,6 +1351,9 @@
 //                             {t("dashboard.quantity")}
 //                           </th>
 //                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+//                             {t("dashboard.applications")}
+//                           </th>
+//                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
 //                             {t("dashboard.storage")}
 //                           </th>
 //                         </tr>
@@ -1257,6 +1369,9 @@
 //                             </td>
 //                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
 //                               {formatNumber(product.quantity)}
+//                             </td>
+//                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+//                               {firmProductData.find(item => item.name === product.name)?.applicationCount || 0}
 //                             </td>
 //                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
 //                               {product.storage}
@@ -1358,9 +1473,10 @@
 //                     type="date"
 //                     value={dateFrom}
 //                     onChange={(e) => {
-//                       setDateFrom(e.target.value);
+//                       const newDate = e.target.value;
+//                       setDateFrom(newDate);
+//                       handleDateChange(newDate, dateTo);
 //                     }}
-//                     onBlur={handleDateChange}
 //                     className="w-full p-3 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600"
 //                   />
 //                 </div>
@@ -1372,9 +1488,10 @@
 //                     type="date"
 //                     value={dateTo}
 //                     onChange={(e) => {
-//                       setDateTo(e.target.value);
+//                       const newDate = e.target.value;
+//                       setDateTo(newDate);
+//                       handleDateChange(dateFrom, newDate);
 //                     }}
-//                     onBlur={handleDateChange}
 //                     className="w-full p-3 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600"
 //                   />
 //                 </div>
@@ -1503,7 +1620,7 @@
 //                         label
 //                         className="drop-shadow-lg"
 //                       >
-//                         {statusData.map((entry, index) => (
+//                         {statusData.map((_entry, index) => (
 //                           <Cell
 //                             key={`cell-${index}`}
 //                             fill={COLORS[index % COLORS.length]}
@@ -1600,7 +1717,7 @@
 //                         label
 //                         className="drop-shadow-lg"
 //                       >
-//                         {transportData.map((entry, index) => (
+//                         {transportData.map((_entry, index) => (
 //                           <Cell
 //                             key={`cell-${index}`}
 //                             fill={COLORS[index % COLORS.length]}
@@ -1615,22 +1732,7 @@
 //                           padding: "8px",
 //                           border: "1px solid #e2e8f0",
 //                         }}
-//                         formatter={(value, name, props) => {
-//                           const entry = transportData.find(item => item.name === name);
-//                           if (entry && entry.transportNumbers.length > 0) {
-//                             return [
-//                               <div key="tooltip">
-//                                 <div>Количество: {value}</div>
-//                                 <div className="text-sm text-gray-500">
-//                                   {entry.transportNumbers.map(num => (
-//                                     <div key={num}>№: {num}</div>
-//                                   ))}
-//                                 </div>
-//                               </div>
-//                             ];
-//                           }
-//                           return value;
-//                         }}
+//                         formatter={(value) => formatNumber(Number(value))}
 //                       />
 //                       <Legend />
 //                     </PieChart>
@@ -1638,62 +1740,90 @@
 //                 </div>
 //               </div>
 
-//               {selectedFirm && (
-//                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//                   <div className="flex items-center justify-between mb-6">
-//                     <div className="flex items-center">
-//                       <Package className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
-//                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-//                         {`${selectedFirm.firm_name} - ${t("dashboard.productDistribution")}`}
-//                       </h3>
-//                     </div>
-//                     <div className="text-sm text-gray-500 dark:text-gray-400">
-//                       {`${t("dashboard.totalQuantity")}: ${
-//                         firmProductData.reduce((sum, item) => sum + item.value, 0)
-//                       }`}
-//                     </div>
+//               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+//                 <div className="flex items-center justify-between mb-6">
+//                   <div className="flex items-center">
+//                     <Package className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
+//                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+//                       {selectedFirm 
+//                         ? `${selectedFirm.firm_name} - ${t("dashboard.productDistribution")}`
+//                         : t("dashboard.productDistribution")}
+//                     </h3>
 //                   </div>
-//                   <div className="h-[300px]">
-//                     <ResponsiveContainer width="100%" height="100%">
-//                       <PieChart>
-//                         <Pie
-//                           data={firmProductData}
-//                           dataKey="value"
-//                           nameKey="name"
-//                           cx="50%"
-//                           cy="50%"
-//                           outerRadius={100}
-//                           label
-//                           className="drop-shadow-lg"
-//                         >
-//                           {firmProductData.map((entry, index) => (
-//                             <Cell
-//                               key={`cell-${index}`}
-//                               fill={COLORS[index % COLORS.length]}
-//                               className="hover:opacity-80 transition-opacity"
-//                             />
-//                           ))}
-//                         </Pie>
-//                         <Tooltip
-//                           contentStyle={{
-//                             backgroundColor: "white",
-//                             borderRadius: "8px",
-//                             padding: "8px",
-//                             border: "1px solid #e2e8f0",
-//                           }}
-//                           formatter={(value, name) => [
-//                             <div key="tooltip">
-//                               <div>{`${t("dashboard.quantity")}: ${value}`}</div>
-//                               <div>{`${t("dashboard.product")}: ${name}`}</div>
-//                             </div>
-//                           ]}
-//                         />
-//                         <Legend />
-//                       </PieChart>
-//                     </ResponsiveContainer>
+//                   <div className="text-sm text-gray-500 dark:text-gray-400">
+//                     {`${t("dashboard.totalQuantity")}: ${
+//                       firmProductData.reduce((sum, item) => sum + item.value, 0)
+//                     }`}
 //                   </div>
 //                 </div>
-//               )}
+//                 <div className="h-[300px]">
+//                   <ResponsiveContainer width="100%" height="100%">
+//                     <PieChart>
+//                       <Pie
+//                         data={firmProductData}
+//                         dataKey="value"
+//                         nameKey="name"
+//                         cx="50%"
+//                         cy="50%"
+//                         outerRadius={100}
+//                         label={({ name, percent }) => 
+//                           percent > 0.05 ? `${name} (${(percent * 100).toFixed(1)}%)` : ''
+//                         }
+//                         className="drop-shadow-lg"
+//                         labelLine={({ percent }) => percent > 0.05}
+//                       >
+//                         {firmProductData.map((_entry, index) => (
+//                           <Cell
+//                             key={`cell-${index}`}
+//                             fill={COLORS[index % COLORS.length]}
+//                             className="hover:opacity-80 transition-opacity"
+//                           />
+//                         ))}
+//                       </Pie>
+//                       <Tooltip
+//                         contentStyle={{
+//                           backgroundColor: "white",
+//                           borderRadius: "8px",
+//                           padding: "8px",
+//                           border: "1px solid #e2e8f0",
+//                         }}
+//                         formatter={(value, name, entry) => {
+//                           const item = entry.payload;
+//                           const percent = (item.value / firmProductData.reduce((sum, i) => sum + i.value, 0) * 100).toFixed(1);
+                          
+//                           if (item.items) { // This is the "Others" category
+//                             return [
+//                               <div key="tooltip" className="space-y-2">
+//                                 <div className="font-semibold">{`${t("dashboard.others")} (${item.items.length} ${t("dashboard.products")})`}</div>
+//                                 <div>{`${t("dashboard.totalQuantity")}: ${formatNumber(value)}`}</div>
+//                                 <div>{`${t("dashboard.percentage")}: ${percent}%`}</div>
+//                                 <div className="text-sm max-h-40 overflow-y-auto">
+//                                   {item.items.map((subItem: any, idx: number) => (
+//                                     <div key={idx} className="flex justify-between gap-4">
+//                                       <span>{subItem.name}:</span>
+//                                       <span>{formatNumber(subItem.value)}</span>
+//                                     </div>
+//                                   ))}
+//                                 </div>
+//                               </div>
+//                             ];
+//                           }
+                          
+//                           return [
+//                             <div key="tooltip">
+//                               <div>{`${t("dashboard.quantity")}: ${formatNumber(value)}`}</div>
+//                               <div>{`${t("dashboard.percentage")}: ${percent}%`}</div>
+//                               <div>{`${t("dashboard.product")}: ${name}`}</div>
+//                               <div>{`${t("dashboard.applications")}: ${item.applicationCount}`}</div>
+//                             </div>
+//                           ];
+//                         }}
+//                       />
+//                       <Legend />
+//                     </PieChart>
+//                   </ResponsiveContainer>
+//                 </div>
+//               </div>
 
 //               <div className="col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
 //                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -1782,6 +1912,9 @@
 //                           {t("dashboard.quantity")}
 //                         </th>
 //                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+//                           {t("dashboard.applications")}
+//                         </th>
+//                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
 //                           {t("dashboard.storage")}
 //                         </th>
 //                       </tr>
@@ -1797,6 +1930,9 @@
 //                           </td>
 //                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
 //                             {formatNumber(product.quantity)}
+//                           </td>
+//                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+//                             {firmProductData.find(item => item.name === product.name)?.applicationCount || 0}
 //                           </td>
 //                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
 //                             {product.storage}
