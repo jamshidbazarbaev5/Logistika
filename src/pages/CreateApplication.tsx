@@ -262,7 +262,7 @@ const PhotoReportTab: React.FC<TabPanelProps> = ({ onSuccess, setSelectedTab }) 
 
 const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   const { formData, setFormData } = useFormContext();
-  const [quantity, setQuantity] = useState<number>(0);
+  const [quantity, setQuantity] = useState<number | string>('');
   const [selectedProduct, setSelectedProduct] = useState<number>(0);
   const [selectedStorage, setSelectedStorage] = useState<number>(0);
   const [products, setProducts] = useState<Product[]>([]);
@@ -338,10 +338,10 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   };
 
   const handleAddProduct = () => {
-    if (!quantity || !selectedProduct || !selectedStorage) return;
+    if (!selectedProduct || !selectedStorage || !quantity) return;
 
     const newProduct = {
-      quantity,
+      quantity: parseFloat(quantity.toString()), // Convert to float
       product_id: selectedProduct,
       storage_id: selectedStorage
     };
@@ -352,7 +352,7 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
     }));
 
     // Reset form fields
-    setQuantity(0);
+    setQuantity('');
     setSelectedProduct(0);
     setSelectedStorage(0);
     setProductSearch('');
@@ -711,9 +711,16 @@ const ProductsTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
           </label>
           <input
             type="number"
-            value={quantity || ''}
-            onChange={(e) => setQuantity(Number(e.target.value))}
-            min="1"
+            value={quantity}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Allow decimal numbers
+              if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                setQuantity(value);
+              }
+            }}
+            min="0.1"
+            step="0.1"
             className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 
               px-3 py-2 text-sm focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
               focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 text-gray-900 
@@ -1163,9 +1170,15 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
                       </label>
                       <input
                         type="number"
-                        min="0"
+                        min="0.1"
                         value={getSelectedKeepingService(service.keeping_services_id)}
-                        onChange={(e) => handleKeepingServiceChange(service.keeping_services_id, parseInt(e.target.value) || 0)}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          // Allow decimal numbers and handle empty input
+                          if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                            handleKeepingServiceChange(service.keeping_services_id, parseFloat(value) || 0);
+                          }
+                        }}
                         className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 
                           rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 
                           dark:text-gray-100 focus:ring-2 focus:ring-[#6C5DD3] 
@@ -1236,9 +1249,16 @@ const ServicesTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
                       <div className="flex items-center space-x-3">
                         <input
                           type="number"
-                          min="0"
+                          min="0.1"
+                          step="0.1"
                           value={getSelectedWorkingService(service.tariff_id)}
-                          onChange={(e) => handleWorkingServiceChange(service.tariff_id, parseInt(e.target.value) || 0)}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            // Allow decimal numbers and handle empty input
+                            if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                              handleWorkingServiceChange(service.tariff_id, parseFloat(value) || 0);
+                            }
+                          }}
                           className="w-24 px-3 py-2 border border-gray-300 dark:border-gray-600 
                             rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 
                             dark:text-gray-100 focus:ring-2 focus:ring-[#6C5DD3] 

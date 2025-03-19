@@ -62,7 +62,7 @@ interface ProductsTabProps {
 
 const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, products: initialProducts, storages, onSuccess, readOnly = false }) => {
   const { t } = useTranslation();
-  const [quantity, setQuantity] = useState<number>(0);
+  const [quantity, setQuantity] = useState<string>('');
   const [selectedProduct, setSelectedProduct] = useState<number>(0);
   const [selectedStorage, setSelectedStorage] = useState<number>(0);
   const [productSearch, setProductSearch] = useState('');
@@ -192,7 +192,8 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
   };
 
   const handleAddProduct = () => {
-    if (!quantity || !selectedProduct || !selectedStorage) return;
+    const numericQuantity = parseFloat(quantity);
+    if (!numericQuantity || !selectedProduct || !selectedStorage) return;
 
     console.log('Current formData.products:', formData.products);
     console.log('Current formData.upload_products:', formData.upload_products);
@@ -209,7 +210,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
     }
 
     const newProduct: MappedProduct = {
-      quantity,
+      quantity: numericQuantity,
       product_id: selectedProduct,
       storage_id: selectedStorage,
       application_id: formData.id,
@@ -218,7 +219,6 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
     };
 
     setFormData((prev: ApplicationFormData): ApplicationFormData => {
-      // Handle existing products
       const existingProducts = prev.products.map((product: Product): MappedProduct | null => {
         const productFromList = products.find(p => 
           p.name === product.product_name || 
@@ -254,8 +254,7 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
       return updatedFormData;
     });
 
-    // Reset form fields
-    setQuantity(0);
+    setQuantity('');
     setSelectedProduct(0);
     setSelectedStorage(0);
     setProductSearch('');
@@ -428,19 +427,22 @@ const ProductsTab: React.FC<ProductsTabProps> = ({ formData, setFormData, produc
           </select>
         </div>
 
-        <div className="space-y-2 sm:space-y-4">
-          <label className="block text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-300">
+        <div className="space-y-1 sm:space-y-2">
+          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             {t('editApplication.quantity')}
           </label>
-          <div className="flex gap-4">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
             <input
               type="number"
+              step="0.1"
               min="0"
               value={quantity}
-              onChange={(e) => setQuantity(Number(e.target.value))}
-              className={`flex-1 rounded-md border border-gray-300 dark:border-gray-600 
-                px-3 py-2 text-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]
-                bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 ${readOnly ? 'cursor-not-allowed bg-gray-50' : ''}`}
+              onChange={(e) => setQuantity(e.target.value)}
+              className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 
+                px-3 sm:px-4 py-2 sm:py-2.5 text-sm focus:border-[#6C5DD3] focus:ring-1 
+                focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 
+                text-gray-900 dark:text-gray-100 transition-colors"
+              placeholder={t('editApplication.quantity')}
               disabled={readOnly}
             />
             <button

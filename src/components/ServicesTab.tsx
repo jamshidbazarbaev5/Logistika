@@ -131,23 +131,25 @@ const ServicesTab: React.FC<ServicesTabProps> = ({
     fetchWorkingServiceNames();
   }, []);
 
-  const handleKeepingServiceChange = (serviceId: number, amount: number) => {
+  const handleKeepingServiceChange = (serviceId: number, amount: string) => {
     const currentServices = formData.upload_keeping_services_quantity || [];
+    const numericAmount = parseFloat(amount) || 0;
+    
     const existingIndex = currentServices.findIndex(
       (s: KeepingServiceQuantity) => s.service_type_id === serviceId
     );
 
     let updatedServices = [...currentServices];
     if (existingIndex >= 0) {
-      if (amount === 0) {
+      if (numericAmount === 0) {
         updatedServices = updatedServices.filter(
           (s: KeepingServiceQuantity) => s.service_type_id !== serviceId
         );
       } else {
-        updatedServices[existingIndex] = { ...updatedServices[existingIndex], amount };
+        updatedServices[existingIndex] = { ...updatedServices[existingIndex], amount: numericAmount };
       }
-    } else if (amount > 0) {
-      updatedServices.push({ service_type_id: serviceId, amount });
+    } else if (numericAmount > 0) {
+      updatedServices.push({ service_type_id: serviceId, amount: numericAmount });
     }
 
     setFormData({
@@ -156,48 +158,43 @@ const ServicesTab: React.FC<ServicesTabProps> = ({
     });
   };
 
-  const handleWorkingServiceChange = (serviceId: number, quantity: number) => {
+  const handleWorkingServiceChange = (serviceId: number, quantity: string) => {
     const currentServices = formData.upload_working_services_quantity || [];
+    const numericQuantity = parseFloat(quantity) || 0;
     
     // Find the service details from workingServices array
     const serviceDetails = workingServices.find(s => s.id === serviceId);
     
-    if (quantity > 0 && serviceDetails) {
+    if (numericQuantity >= 0 && serviceDetails) {
       const existingIndex = currentServices.findIndex(
         (s: WorkingServiceQuantity) => s.service_id === serviceId
       );
 
       let updatedServices = [...currentServices];
       if (existingIndex >= 0) {
-        updatedServices[existingIndex] = { 
-          service_id: serviceId, 
-          quantity: quantity,
-          // Store the service name along with the service
-          service_name: serviceDetails.service ? 
-            workingServiceNames.get(serviceDetails.service) : 
-            serviceDetails.service_name
-        };
-      } else {
+        if (numericQuantity === 0) {
+          updatedServices = updatedServices.filter(
+            (s: WorkingServiceQuantity) => s.service_id !== serviceId
+          );
+        } else {
+          updatedServices[existingIndex] = { 
+            service_id: serviceId, 
+            quantity: numericQuantity,
+            service_name: serviceDetails.service ? 
+              workingServiceNames.get(serviceDetails.service) : 
+              serviceDetails.service_name
+          };
+        }
+      } else if (numericQuantity > 0) {
         updatedServices.push({ 
           service_id: serviceId, 
-          quantity: quantity,
-          // Store the service name along with the service
+          quantity: numericQuantity,
           service_name: serviceDetails.service ? 
             workingServiceNames.get(serviceDetails.service) : 
             serviceDetails.service_name
         });
       }
 
-      setFormData({
-        ...formData,
-        upload_working_services_quantity: updatedServices
-      });
-    } else {
-      // If quantity is 0 or invalid, remove the service from the array
-      const updatedServices = currentServices.filter(
-        (s: WorkingServiceQuantity) => s.service_id !== serviceId
-      );
-      
       setFormData({
         ...formData,
         upload_working_services_quantity: updatedServices
@@ -239,9 +236,10 @@ const ServicesTab: React.FC<ServicesTabProps> = ({
                 </div>
                 <input
                   type="number"
+                  step="0.1"
                   min="0"
                   value={existingService?.amount || ''}
-                  onChange={(e) => handleKeepingServiceChange(service.keeping_services_id!, parseInt(e.target.value))}
+                  onChange={(e) => handleKeepingServiceChange(service.keeping_services_id!, e.target.value)}
                   className="w-32 rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
                     focus:border-[#6C5DD3] focus:ring-[#6C5DD3] dark:bg-gray-700 
                     dark:text-gray-100"
@@ -279,9 +277,10 @@ const ServicesTab: React.FC<ServicesTabProps> = ({
                 </div>
                 <input
                   type="number"
+                  step="0.1"
                   min="0"
                   value={existingService?.quantity || ''}
-                  onChange={(e) => handleWorkingServiceChange(service.id!, parseInt(e.target.value))}
+                  onChange={(e) => handleWorkingServiceChange(service.id!, e.target.value)}
                   className="w-32 rounded-md border-gray-300 dark:border-gray-600 shadow-sm 
                     focus:border-[#6C5DD3] focus:ring-[#6C5DD3] dark:bg-gray-700 
                     dark:text-gray-100"
