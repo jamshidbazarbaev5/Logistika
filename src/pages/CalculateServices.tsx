@@ -720,10 +720,7 @@
                                 <span>{t('calculateServices.requestedAmount')}:</span>
                                 <span className="font-medium">{service.requested_amount}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span>{t('calculateServices.totalAmount')}:</span>
-                                <span className="font-medium">{service.total_amount}</span>
-                              </div>
+                           
                               <div className="flex justify-between">
                                 <span>{t('calculateServices.price')}:</span>
                                 <span className="font-medium">{service.price.toLocaleString()} сум</span>
@@ -757,10 +754,7 @@
                                   <span>{t('calculateServices.requestedAmount')}:</span>
                                   <span className="font-medium">{requestedAmount}</span>
                                 </div>
-                                <div className="flex justify-between">
-                                  <span>{t('calculateServices.totalAmount')}:</span>
-                                  <span className="font-medium">{service.total_amount}</span>
-                                </div>
+                              
                                 <div className="flex justify-between">
                                   <span>{t('calculateServices.price')}:</span>
                                   <span className="font-medium">{service.price.toLocaleString()} сум</span>

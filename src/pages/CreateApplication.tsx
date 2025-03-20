@@ -2263,7 +2263,7 @@ export default function CreateApplication() {
                 <div className="mt-6 flex justify-end">
                   <button
                     type="button"
-                    onClick={() => setSelectedTab(4)}
+                    onClick={() => setSelectedTab(5)}
                     className="bg-[#6C5DD3] text-white px-6 py-2 rounded-lg hover:bg-[#5b4eb3]
                       focus:outline-none focus:ring-2 focus:ring-[#6C5DD3] focus:ring-offset-2
                       dark:focus:ring-offset-gray-800"

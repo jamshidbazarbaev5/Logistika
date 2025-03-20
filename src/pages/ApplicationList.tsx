@@ -94,6 +94,7 @@ interface SearchParams extends Record<string, string> {
   coming_date_gte: string;
   coming_date_lte: string;
   products: string;
+  status: string;
 }
 
 // Add interfaces for API responses
@@ -199,6 +200,7 @@ export default function ApplicationList() {
     coming_date_gte: '',
     coming_date_lte: '',
     products: '',
+    status: '',
   });
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -291,6 +293,18 @@ export default function ApplicationList() {
       type: 'date',
       className: 'col-span-12 sm:col-span-6 lg:col-span-4',
     },
+    {
+      name: 'status',
+      label: t('applicationList.STATUS'),
+      placeholder: t('applicationList.STATUS'),
+      type: 'select',
+      options: [
+        { value: 'active', label: t('applicationList.status.active', 'Active') },
+        { value: 'completed', label: t('applicationList.status.completed', 'Completed') },
+        { value: 'unpaid', label: t('applicationList.status.unpaid', 'Unpaid') }
+      ],
+      className: 'col-span-12 sm:col-span-12 lg:col-span-4',
+    },
   ];
 
   const fetchApplications = async () => {
@@ -298,7 +312,9 @@ export default function ApplicationList() {
       const params = new URLSearchParams();
       
       Object.entries(searchParams).forEach(([key, value]) => {
-        params.append(key, value || '');
+        if (value) {
+          params.append(key, value);
+        }
       });
       
       params.append('page', currentPage.toString());
@@ -500,10 +516,8 @@ export default function ApplicationList() {
       return 'active';
     } else if (totalPaid === 0) {
       return 'unpaid';
-    } else if (application.total_price && totalPaid >= application.total_price) {
-      return 'completed';
     } else {
-      return 'active';
+      return 'completed';
     }
   };
 
@@ -646,7 +660,12 @@ export default function ApplicationList() {
   };
 
   const filteredApplications = applications
-    .filter(app => isRelevantStatus(app.status))
+    .filter(app => {
+      if (searchParams.status) {
+        return getApplicationStatus(app) === searchParams.status;
+      }
+      return true; // Show all if no status filter
+    })
     .sort((a, b) => {
       // Sort by coming_date in descending order (newest first)
       return new Date(b.coming_date).getTime() - new Date(a.coming_date).getTime();
@@ -781,7 +800,9 @@ export default function ApplicationList() {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusClasses(getApplicationStatus(application) as ApplicationStatus)}`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      getStatusClasses(getApplicationStatus(application) as ApplicationStatus)
+                    }`}>
                       {t(`applicationList.status.${getApplicationStatus(application)}`, getApplicationStatus(application))}
                     </span>
                   </td>

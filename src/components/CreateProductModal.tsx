@@ -122,7 +122,7 @@ export default function CreateProductModal({
 
                 <form onSubmit={handleSubmit} className="mt-4 space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       {t('createProduct.name')}
                     </label>
                     <input
@@ -130,20 +130,26 @@ export default function CreateProductModal({
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+                      className="rounded-md border border-gray-300 dark:border-gray-600 
+                        bg-white dark:bg-gray-700 p-2 text-gray-900 dark:text-gray-100
+                        focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]
+                        w-full"
                       required
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       {t('createProduct.category')}
                     </label>
                     <select
                       name="category_id"
                       value={formData.category_id}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+                      className="rounded-md border border-gray-300 dark:border-gray-600 
+                        bg-white dark:bg-gray-700 p-2 text-gray-900 dark:text-gray-100
+                        focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]
+                        w-full"
                       required
                     >
                       <option value="">{t('createProduct.selectCategory')}</option>
@@ -156,14 +162,17 @@ export default function CreateProductModal({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       {t('createProduct.measurement')}
                     </label>
                     <select
                       name="measurement_id"
                       value={formData.measurement_id}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+                      className="rounded-md border border-gray-300 dark:border-gray-600 
+                        bg-white dark:bg-gray-700 p-2 text-gray-900 dark:text-gray-100
+                        focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]
+                        w-full"
                       required
                     >
                       <option value="">{t('createProduct.selectMeasurement')}</option>
@@ -176,7 +185,7 @@ export default function CreateProductModal({
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       {t('createProduct.description')}
                     </label>
                     <textarea
@@ -184,12 +193,15 @@ export default function CreateProductModal({
                       value={formData.description}
                       onChange={handleChange}
                       rows={3}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+                      className="rounded-md border border-gray-300 dark:border-gray-600 
+                        bg-white dark:bg-gray-700 p-2 text-gray-900 dark:text-gray-100
+                        focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]
+                        w-full"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                       {t('createProduct.tnvedCode')}
                     </label>
                     <input
@@ -197,7 +209,10 @@ export default function CreateProductModal({
                       name="tnved_code"
                       value={formData.tnved_code}
                       onChange={handleChange}
-                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#6C5DD3] focus:ring-[#6C5DD3]"
+                      className="rounded-md border border-gray-300 dark:border-gray-600 
+                        bg-white dark:bg-gray-700 p-2 text-gray-900 dark:text-gray-100
+                        focus:ring-[#6C5DD3] dark:focus:ring-[#8B7BE8] focus:border-[#6C5DD3] dark:focus:border-[#8B7BE8]
+                        w-full"
                     />
                   </div>
 

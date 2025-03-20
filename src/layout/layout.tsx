@@ -192,10 +192,10 @@ export default function Layout() {
         className={`fixed left-0 top-0 h-full ${
           isMenuOpen ? "w-64" : "w-16"
         } transform transition-all duration-300 flex flex-col border-r 
-        border-gray-200 dark:border-gray-700 bg-white dark:bg-[#070229] z-40`}
+        border-gray-200 dark:border-gray-700 bg-white dark:bg-[#101933] z-40`}
       >
         <nav className={`flex-1 space-y-2 p-4 pt-24 overflow-y-auto ${
-          isDarkMode ? 'bg-[#070229]' : 'bg-blue-500'
+          isDarkMode ? 'bg-[#101933]' : 'bg-[#101933]'
         }`}>
           {Object.entries(menuSections).map(([section, items]) => (
             <div key={section} className="space-y-1">
@@ -203,8 +203,8 @@ export default function Layout() {
                 onClick={() => toggleSection(section)}
                 className={`w-full flex items-center ${
                   isMenuOpen ? "gap-3 px-4" : "justify-center"
-                } py-2 rounded-xl font-medium hover:bg-[#2a2167]
-                text-gray-100 dark:text-white`}
+                } py-2 rounded-xl font-medium hover:bg-[#1a2747] hover:text-gray-100
+                text-gray-300`}
               >
                 {isMenuOpen ? (
                   <>
@@ -228,23 +228,23 @@ export default function Layout() {
                       to={item.href}
                       className={`w-full flex items-center ${
                         isMenuOpen ? "gap-3 px-4" : "justify-center"
-                      } py-2 rounded-xl font-medium hover:bg-[#2a2167]
+                      } py-2 rounded-xl font-medium hover:bg-[#1a2747]
                       ${
                         window.location.pathname === item.href
-                          ? "text-[#6C5DD3] bg-[#6C5DD3]/10 dark:text-[#8B80F9] dark:bg-[#2a2167]"
-                          : "text-gray-100 dark:text-white"
+                          ? "bg-[#24428e] text-white"
+                          : "text-gray-300 hover:text-gray-100"
                       }`}
                       title={!isMenuOpen ? t(item.name) : undefined}
                     >
                       <item.icon className={`h-5 w-5 ${
                         window.location.pathname === item.href
-                          ? "text-[#ffffff] dark:text-[#8B80F9]"
-                          : "text-gray-100 dark:text-white"
+                          ? "text-white"
+                          : "text-gray-300 group-hover:text-gray-100"
                       }`} />
                       {isMenuOpen && (
                         <span className={window.location.pathname === item.href
-                          ? "text-[#ffffff] dark:text-[#8B80F9]"
-                          : "text-gray-100 dark:text-white"
+                          ? "text-white"
+                          : "text-gray-300 group-hover:text-gray-100"
                         }>{t(item.name)}</span>
                       )}
                     </Link>

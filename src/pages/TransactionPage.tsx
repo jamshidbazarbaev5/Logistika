@@ -54,7 +54,9 @@ interface WorkingService {
 }
 
 const formatNumber = (num: number) => {
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const parts = num.toFixed(2).split('.');
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  return parts.join('.');
 };
 
 export default function Transaction() {
@@ -330,7 +332,7 @@ export default function Transaction() {
         .map((service: Service) => ({
           service_type: service.service_type_id,
           amount: service.requested_amount,
-          price: service.price
+          price: Number(service.price.toFixed(2))
         }));
       console.log('Services to submit:', servicesToSubmit);
 
@@ -338,7 +340,7 @@ export default function Transaction() {
         ? workingServices.map((service: WorkingService) => ({
             service_type: service.service_type_id,
             quantity: service.requested_amount,
-            price: service.price
+            price: Number(service.price.toFixed(2))
           }))
         : [];
       console.log('Working services to submit:', workingServicesToSubmit);
@@ -364,7 +366,7 @@ export default function Transaction() {
 
       const payload = {
         application_id: applicationId,
-        total_price: totalPrice,
+        total_price: Number(totalPrice.toFixed(2)),
         keeping_services: servicesToSubmit,
         working_services: workingServicesToSubmit,
         ...(formData.full_name && { full_name: formData.full_name }),
@@ -487,18 +489,17 @@ export default function Transaction() {
                   <span>
                     {service.service_name} × {service.requested_amount}
                   </span>
-                  <span>{formatNumber(service.price)} сум</span>
+                  <span>{formatNumber(Number(service.price))} сум</span>
                 </div>
               ))}
             
             {/* Working Services */}
-            {console.log('Working services before display:', workingServices)}
             {workingServices && workingServices.length > 0 && workingServices.map((service: WorkingService, index: number) => (
               <div key={`working-${index}`} className="flex justify-between">
                 <span>
                   {service.service_name} × {service.amount}
                 </span>
-                <span>{formatNumber(service.price)} сум</span>
+                <span>{formatNumber(Number(service.price))} сум</span>
               </div>
             ))}
             
@@ -538,13 +539,13 @@ export default function Transaction() {
                     <div className="flex items-center space-x-2">
                       <input
                         type="number"
-                        min="1"
+                        min="0.1"
+                        step="0.1"
                         max={product.quantity}
-                        value={products.find(p => p.product_id === product.product_id)?.quantity || 1}
-                        onChange={(e) => handleProductQuantityChange(product.product_id, parseInt(e.target.value))}
+                        value={products.find(p => p.product_id === product.product_id)?.quantity }
+                        onChange={(e) => handleProductQuantityChange(product.product_id, parseFloat(e.target.value))}
                         className="w-20 rounded-md border p-2 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                       />
-                      {/* <span className="text-sm text-gray-500">units</span> */}
                     </div>
                   )}
                 </div>

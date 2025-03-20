@@ -671,6 +671,7 @@ export default function EditApplication() {
                       value={formData.coming_date || ''}
                       onChange={(e) => handleDateChange(e, 'coming_date')}
                       className={inputClassName}
+                      disabled
                     />
                   </div>
 
