@@ -151,9 +151,7 @@ const getStatusClasses = (status: ApplicationStatus) => {
   }
 };
 
-const isRelevantStatus = (status: string) => {
-  return status === 'active' || status === 'unpaid';
-};
+
 
 const formatNumber = (num: number | string) => {
   if (typeof num === 'string') {
