@@ -220,8 +220,8 @@ export default function ApplicationList() {
   const [transportTypes, setTransportTypes] = useState<Record<number, string>>({});
 
   // Add new state variables
-  const [payments, setPayments] = useState<Record<number, Payment[]>>({});
-  const [transactions, setTransactions] = useState<Record<number, Transaction[]>>({});
+  const [_payments, setPayments] = useState<Record<number, Payment[]>>({});
+  const [_transactions, setTransactions] = useState<Record<number, Transaction[]>>({});
 
   useEffect(() => {
     const fetchProducts = async () => {
