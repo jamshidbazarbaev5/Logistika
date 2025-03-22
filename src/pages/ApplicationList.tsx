@@ -502,23 +502,6 @@ export default function ApplicationList() {
     }
   };
 
-  // Add function to determine application status
-  const getApplicationStatus = (application: Application) => {
-    const hasTransactions = transactions[application.id]?.length > 0;
-    const applicationPayments = payments[application.id] || [];
-    const totalPaid = applicationPayments.reduce((sum, payment) => 
-      sum + parseFloat(payment.amount), 0
-    );
-
-    if (!hasTransactions) {
-      return 'active';
-    } else if (totalPaid === 0) {
-      return 'unpaid';
-    } else {
-      return 'completed';
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-[400px]">
@@ -660,7 +643,7 @@ export default function ApplicationList() {
   const filteredApplications = applications
     .filter(app => {
       if (searchParams.status) {
-        return getApplicationStatus(app) === searchParams.status;
+        return app.status === searchParams.status;
       }
       return true; // Show all if no status filter
     })
@@ -799,9 +782,9 @@ export default function ApplicationList() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      getStatusClasses(getApplicationStatus(application) as ApplicationStatus)
+                      getStatusClasses(application.status as ApplicationStatus)
                     }`}>
-                      {t(`applicationList.status.${getApplicationStatus(application)}`, getApplicationStatus(application))}
+                      {t(`applicationList.status.${application.status}`, application.status)}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">

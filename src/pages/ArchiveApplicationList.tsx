@@ -273,6 +273,7 @@ export default function ArchiveApplicationList() {
       });
       
       params.append('page', currentPage.toString());
+      params.append('status', 'completed');
 
       const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse, transportTypesResponse] = await Promise.all([
         api.get<PaginatedResponse<Application>>(`/application/?${params.toString()}`),
@@ -282,8 +283,8 @@ export default function ArchiveApplicationList() {
         api.get('/transport/type/')
       ]);
 
-      const completedApplications = Array.isArray(applicationsResponse.data?.results) 
-        ? applicationsResponse.data.results.filter(app => app.status === 'completed')
+      const applications = Array.isArray(applicationsResponse.data?.results) 
+        ? applicationsResponse.data.results
         : [];
 
       const firmsData = Array.isArray(firmsResponse.data?.results) ? firmsResponse.data.results : [];
@@ -313,10 +314,10 @@ export default function ArchiveApplicationList() {
         ? availableModesResponse.data.results 
         : []);
       setTransportTypes(transportTypesResponse.data.results);
-      setApplications(completedApplications);
+      setApplications(applications);
       setLoading(false);
 
-      setTotalPages(Math.ceil(completedApplications.length / applicationsResponse.data.page_size));
+      setTotalPages(applicationsResponse.data.total_pages);
     } catch (err) {
       console.error('Error fetching data:', err);
       setError(t("applicationList.errorLoading", "Error loading applications"));
