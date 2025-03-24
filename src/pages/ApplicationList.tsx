@@ -297,8 +297,8 @@ export default function ApplicationList() {
       placeholder: t('applicationList.STATUS'),
       type: 'select',
       options: [
+        { value: '', label: t('applicationList.status.all', 'All') },
         { value: 'active', label: t('applicationList.status.active', 'Active') },
-        { value: 'completed', label: t('applicationList.status.completed', 'Completed') },
         { value: 'unpaid', label: t('applicationList.status.unpaid', 'Unpaid') }
       ],
       className: 'col-span-12 sm:col-span-12 lg:col-span-4',
@@ -642,10 +642,15 @@ export default function ApplicationList() {
 
   const filteredApplications = applications
     .filter(app => {
+      // First filter out completed statuses
+      if (app.status === 'completed') {
+        return false;
+      }
+      // Then apply status filter if one is selected
       if (searchParams.status) {
         return app.status === searchParams.status;
       }
-      return true; // Show all if no status filter
+      return true; // Show all non-completed if no status filter
     })
     .sort((a, b) => {
       // Sort by coming_date in descending order (newest first)
