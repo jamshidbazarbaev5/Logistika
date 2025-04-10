@@ -310,14 +310,21 @@ export default function Transaction() {
   }, [applicationId, navigate]);
 
   useEffect(() => {
-    
-    
-    if (!calculatedServices?.length || !applicationId) {
-      console.log('Navigating to application-list due to missing data');
-      navigate('/application-list');
-      return;
-    }
-  }, [calculatedServices, workingServices, totalPrice, applicationId, navigate]);
+  // Check if we have either calculated services or working services
+  const hasServices = 
+    (calculatedServices?.length > 0 || workingServices?.length > 0) && 
+    applicationId;
+
+  if (!hasServices) {
+    console.log('Navigating to application-list due to missing data', {
+      calculatedServices,
+      workingServices,
+      applicationId
+    });
+    navigate('/application-list');
+    return;
+  }
+}, [calculatedServices, workingServices, totalPrice, applicationId, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
