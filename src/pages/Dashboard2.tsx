@@ -898,7 +898,7 @@ export default function Dashboard2() {
                 padding: '8px',
                 border: '1px solid #e2e8f0',
               }}
-              formatter={(value, name, entry) => [
+              formatter={(value, _name, entry) => [
                 `${formatNumber(Number(value))}`,
                 entry.payload.name
               ]}
