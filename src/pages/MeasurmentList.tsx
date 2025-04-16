@@ -7,10 +7,25 @@ import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import ConfirmModal from "../components/ConfirmModal";
+import { Pagination } from '../components/ui/pagination';
 
 interface Measurement {
   id: number;
   name: string;
+}
+
+interface PaginatedResponse {
+  links: {
+    first: string | null;
+    last: string | null;
+    next: string | null;
+    previous: string | null;
+  };
+  total_pages: number;
+  current_page: number;
+  page_range: number[];
+  page_size: number;
+  results: Measurement[];
 }
 
 export default function MeasurementList() {
@@ -24,12 +39,15 @@ export default function MeasurementList() {
   const [editingMeasurement, setEditingMeasurement] = useState<Measurement | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [measurementToDelete, setMeasurementToDelete] = useState<Measurement | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchMeasurements = async () => {
+  const fetchMeasurements = async (page: number = 1) => {
     try {
-      const response = await api.get('/items/measurement/');
-      const sortedMeasurements = response.data.results.sort((a: Measurement, b: Measurement) => a.id - b.id);
-      setMeasurements(sortedMeasurements);
+      const response = await api.get<PaginatedResponse>(`/items/measurement/?page=${page}`);
+      setMeasurements(response.data.results);
+      setTotalPages(response.data.total_pages);
+      setCurrentPage(response.data.current_page);
       setLoading(false);
     } catch (err) {
       setError(t('measurementList.errorLoading', 'Error loading measurements'));
@@ -38,8 +56,12 @@ export default function MeasurementList() {
   };
 
   useEffect(() => {
-    fetchMeasurements();
-  }, [t]);
+    fetchMeasurements(currentPage);
+  }, [currentPage, t]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const handleDelete = async (id: number, name: string) => {
     setMeasurementToDelete({ id, name } as Measurement);
@@ -227,6 +249,15 @@ export default function MeasurementList() {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          className="mt-4"
+        />
+      )}
 
       <SuccessModal
         isOpen={showSuccessModal}

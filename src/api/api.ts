@@ -187,7 +187,7 @@ export const apiService = {
     api.get('/items/measurement/').then(response => response.data),
 
   getFirms: async (queryString: string = "") => {
-    const response = await api.get(`/firms/${queryString ? `?${queryString}` : ""}`);
+    const response = await api.get(`/firms/firm/${queryString ? `?${queryString}` : ""}`);
     return response.data;
   },
 

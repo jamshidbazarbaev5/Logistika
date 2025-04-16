@@ -7,11 +7,26 @@ import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import ConfirmModal from "../components/ConfirmModal";
+import { Pagination } from '../components/ui/pagination';
 
 interface Mode {
   id: number;
   name_mode: string;
   code_mode: string;
+}
+
+interface PaginatedResponse {
+  links: {
+    first: string | null;
+    last: string | null;
+    next: string | null;
+    previous: string | null;
+  };
+  total_pages: number;
+  current_page: number;
+  page_range: number[];
+  page_size: number;
+  results: Mode[];
 }
 
 export default function ModeList() {
@@ -25,11 +40,15 @@ export default function ModeList() {
   const [editingMode, setEditingMode] = useState<Mode | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [modeToDelete, setModeToDelete] = useState<Mode | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchModes = async () => {
+  const fetchModes = async (page: number = 1) => {
     try {
-      const response = await api.get('/modes/modes/');
+      const response = await api.get<PaginatedResponse>(`/modes/modes/?page=${page}`);
       setModes(response.data.results);
+      setTotalPages(response.data.total_pages);
+      setCurrentPage(response.data.current_page);
       setLoading(false);
     } catch (err) {
       setError(t('modeList.errorLoading', 'Error loading modes'));
@@ -38,8 +57,12 @@ export default function ModeList() {
   };
 
   useEffect(() => {
-    fetchModes();
-  }, [t]);
+    fetchModes(currentPage);
+  }, [currentPage, t]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const handleDelete = async (id: number, name: string) => {
     setModeToDelete({ id, name_mode: name } as Mode);
@@ -245,6 +268,15 @@ export default function ModeList() {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          className="mt-4"
+        />
+      )}
 
       <SuccessModal
         isOpen={showSuccessModal}

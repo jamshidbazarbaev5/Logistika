@@ -9,6 +9,7 @@ import SuccessModal from "../components/SuccessModal";
 import { Dialog } from "@headlessui/react";
 import { SearchBar, type SearchField } from '../components/SearchBar';
 import { apiService } from "../api/api";
+import { Pagination } from "@/components/ui/pagination";
 
 interface Product {
   id: number;
@@ -28,20 +29,19 @@ interface Category {
   name: string;
 }
 
-// interface ProductResponse {
-//   links: {
-//     first: string | null;
-//     last: string | null;
-//     next: string | null;
-//     previous: string | null;
-//   };
-//   total_pages: number;
-//   current_page: number;
-//   page_range: number[];
-//   page_size: number;
-//   results: Product[];
-//   count: number;
-// }
+interface PaginationResponse {
+  links: {
+    first: number;
+    last: number;
+    next: string | null;
+    previous: string | null;
+  };
+  total_pages: number;
+  current_page: number;
+  page_range: number[];
+  page_size: number;
+  results: Product[];
+}
 
 export default function ProductList() {
   const { t } = useTranslation();
@@ -69,6 +69,8 @@ export default function ProductList() {
   const [measurements, setMeasurements] = useState<Measurement[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [ordering] = useState("id");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const searchFields: SearchField[] = [
     {
@@ -89,13 +91,17 @@ export default function ProductList() {
 
   const fetchProducts = async () => {
     try {
+      setLoading(true);
       const queryParams = new URLSearchParams();
       if (searchParams.name) queryParams.append("product_name", searchParams.name);
       if (searchParams.tnved_code) queryParams.append("tnved_code", searchParams.tnved_code);
       queryParams.append("ordering", ordering);
+      queryParams.append("page", currentPage.toString());
       
-      const response = await apiService.getProducts(queryParams.toString());
+      const response: PaginationResponse = await apiService.getProducts(queryParams.toString());
       setProducts(response.results);
+      setTotalPages(response.total_pages);
+      setCurrentPage(response.current_page);
       setLoading(false);
     } catch (err) {
       setError(t("productList.errorLoading", "Error loading products"));
@@ -119,7 +125,7 @@ export default function ProductList() {
   useEffect(() => {
     fetchProducts();
     fetchMeasurementsAndCategories();
-  }, [searchParams, ordering, t]);
+  }, [searchParams, currentPage, ordering, t]);
 
   if (loading) {
     return (
@@ -197,6 +203,11 @@ export default function ProductList() {
       ...prev,
       [name]: name.includes('_id') ? Number(value) : value
     }));
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
   };
 
   return (
@@ -319,6 +330,13 @@ export default function ProductList() {
           </tbody>
         </table>
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        className="mt-6"
+      />
 
       <ConfirmModal
         isOpen={showDeleteModal}

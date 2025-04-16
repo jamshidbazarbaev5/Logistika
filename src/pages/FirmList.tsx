@@ -8,6 +8,7 @@ import ConfirmModal from "../components/ConfirmModal";
 import SuccessModal from "../components/SuccessModal";
 import { Dialog } from "@headlessui/react";
 import { SearchBar, type SearchField } from '../components/SearchBar';
+import { Pagination } from "@/components/ui/pagination";
 
 interface Firm {
   id: number;
@@ -20,12 +21,28 @@ interface Firm {
   phoneNumber_trustee: string;
 }
 
+interface PaginationResponse {
+  links: {
+    first: number;
+    last: number;
+    next: string | null;
+    previous: string | null;
+  };
+  total_pages: number;
+  current_page: number;
+  page_range: number[];
+  page_size: number;
+  results: Firm[];
+}
+
 export default function FirmList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [firms, setFirms] = useState<Firm[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [firmToDelete, setFirmToDelete] = useState<Firm | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -68,9 +85,12 @@ export default function FirmList() {
       const queryParams = new URLSearchParams();
       if (searchParams.firm_name) queryParams.append("firm_name", searchParams.firm_name);
       if (searchParams.INN) queryParams.append("inn", searchParams.INN);
+      queryParams.append("page", currentPage.toString());
       
-      const response = await apiService.getFirms(queryParams.toString());
+      const response: PaginationResponse = await apiService.getFirms(queryParams.toString());
       setFirms(response.results);
+      setTotalPages(response.total_pages);
+      setCurrentPage(response.current_page);
       setLoading(false);
     } catch (err) {
       setError(t("firmList.errorLoading", "Error loading firms"));
@@ -80,7 +100,7 @@ export default function FirmList() {
 
   useEffect(() => {
     fetchFirms();
-  }, [searchParams, t]);
+  }, [searchParams, currentPage, t]);
 
   console.log(firms);
   if (loading) {
@@ -155,6 +175,11 @@ export default function FirmList() {
       ...prev,
       [name]: value
     }));
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo(0, 0);
   };
 
   return (
@@ -301,7 +326,14 @@ export default function FirmList() {
               ))}
             </tbody>
           </table>
-        </div>
+          </div>
+
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          className="mt-6"
+        />
 
       <ConfirmModal
         isOpen={showDeleteModal}

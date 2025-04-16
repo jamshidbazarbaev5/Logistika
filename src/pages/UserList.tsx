@@ -5,7 +5,7 @@ import ConfirmModal from '../components/ConfirmModal';
 import SuccessModal from '../components/SuccessModal';
 import { useTranslation } from 'react-i18next';
 
-interface User {
+interface User {  
   id: number;
   username: string;
   email: string;

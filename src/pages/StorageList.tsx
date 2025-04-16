@@ -7,11 +7,26 @@ import { Menu, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import ConfirmModal from "../components/ConfirmModal";
+import { Pagination } from '../components/ui/pagination';
 
 interface Storage {
   id: number;
   storage_name: string;
   storage_location: string;
+}
+
+interface PaginatedResponse {
+  links: {
+    first: string | null;
+    last: string | null;
+    next: string | null;
+    previous: string | null;
+  };
+  total_pages: number;
+  current_page: number;
+  page_range: number[];
+  page_size: number;
+  results: Storage[];
 }
 
 export default function StorageList() {
@@ -25,11 +40,15 @@ export default function StorageList() {
   const [editingStorage, setEditingStorage] = useState<Storage | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [storageToDelete, setStorageToDelete] = useState<Storage | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
-  const fetchStorages = async () => {
+  const fetchStorages = async (page: number = 1) => {
     try {
-      const response = await api.get('/storage/');
+      const response = await api.get<PaginatedResponse>(`/storage/?page=${page}`);
       setStorages(response.data.results);
+      setTotalPages(response.data.total_pages);
+      setCurrentPage(response.data.current_page);
       setLoading(false);
     } catch (err) {
       setError(t('storageList.errorLoading', 'Error loading storages'));
@@ -38,8 +57,12 @@ export default function StorageList() {
   };
 
   useEffect(() => {
-    fetchStorages();
-  }, [t]);
+    fetchStorages(currentPage);
+  }, [currentPage, t]);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
 
   const handleDelete = async (id: number, name: string) => {
     setStorageToDelete({ id, storage_name: name } as Storage);
@@ -245,6 +268,15 @@ export default function StorageList() {
           </tbody>
         </table>
       </div>
+
+      {totalPages > 1 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+          className="mt-4"
+        />
+      )}
 
       <SuccessModal
         isOpen={showSuccessModal}

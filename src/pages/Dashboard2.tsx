@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../api/api";
 import {
@@ -197,6 +197,11 @@ export default function Dashboard2() {
   const [dateFrom, setDateFrom] = useState<string>("");
   const [dateTo, setDateTo] = useState<string>("");
 
+  const [productPage, setProductPage] = useState(1);
+  const [productsPerPage] = useState(10);
+  const [legendScroll, setLegendScroll] = useState(0);
+  const legendRef = useRef<HTMLDivElement>(null);
+
   const searchFirms = async (query: string) => {
     if (!query) {
       setFirms([]);
@@ -204,7 +209,7 @@ export default function Dashboard2() {
     }
     try {
       const response = await api.get<{ results: Firm[] }>(
-        `https://cargo-calc.uz/api/v1/firms/?firm_name=${query}`
+        `https://cargo-calc.uz/api/v1/firms/firm/?firm_name=${query}`
       );
       setFirms(response.data.results);
     } catch (error) {
@@ -312,6 +317,9 @@ export default function Dashboard2() {
   const fetchData = async (fromDate?: string, toDate?: string) => {
     try {
       setLoading(true);
+      
+      // Add console.log to debug data fetching
+      console.log('Fetching data with dates:', { fromDate, toDate });
 
       const params = new URLSearchParams({
         firm_name: "",
@@ -355,6 +363,10 @@ export default function Dashboard2() {
         "https://cargo-calc.uz/api/v1/application/pay/"
       );
       setPayments(paymentsResponse.data.results);
+
+      console.log('Fetched applications:', applicationsResponse.data.results);
+      console.log('Fetched transactions:', transactionsResponse.data.results);
+      
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -500,45 +512,81 @@ export default function Dashboard2() {
   }, [selectedFirm, transactions, transactionHistory, applications]);
 
   const firmProductData = useMemo(() => {
-    const dataSource = selectedFirm ? transactionHistory : transactions;
+    console.log('Computing firmProductData with:', {
+      selectedFirm: selectedFirm?.id,
+      applicationsCount: applications.length,
+      transactionsCount: transactionHistory.length,
+      transactionsSourceCount: transactions.length
+    });
+
+    // Only consider completed applications
     const relevantApplications = selectedFirm
-      ? applications.filter((app) => app.firm_id === selectedFirm.id && app.status === "completed")
+      ? applications.filter(app => app.firm_id === selectedFirm.id && app.status === "completed")
       : applications.filter(app => app.status === "completed");
 
     const relevantApplicationIds = new Set(
       relevantApplications.map((app) => app.id)
     );
 
-    let productData = dataSource
-      .filter((transaction) => relevantApplicationIds.has(transaction.application_id))
-      .reduce((acc: { [key: string]: { value: number, applications: Set<number> } }, transaction) => {
-        transaction.products.forEach((product) => {
-          const productName = product.product.name;
-          if (!acc[productName]) {
-            acc[productName] = { value: 0, applications: new Set() };
-          }
-          acc[productName].value += product.quantity;
-          acc[productName].applications.add(transaction.application_id);
-        });
-        return acc;
-      }, {});
+    console.log('Relevant application IDs:', Array.from(relevantApplicationIds));
 
-    let result = Object.entries(productData)
-      .map(([name, data]) => ({
+    // Create a map to track both quantity and application count
+    const productStats = new Map();
+
+    // First process applications' products
+    relevantApplications.forEach(app => {
+      app.products.forEach(product => {
+        const productName = product.product_name;
+        if (!productStats.has(productName)) {
+          productStats.set(productName, {
+            value: 0,
+            applications: new Set()
+          });
+        }
+        const stats = productStats.get(productName);
+        stats.value += product.quantity;
+        stats.applications.add(app.id);
+      });
+    });
+
+    // Then process transactions if any
+    const dataSource = selectedFirm ? transactionHistory : transactions;
+    dataSource
+      .filter(transaction => relevantApplicationIds.has(transaction.application_id))
+      .forEach(transaction => {
+        transaction.products.forEach(product => {
+          const productName = product.product?.name;
+          if (!productName) return;
+          
+          if (!productStats.has(productName)) {
+            productStats.set(productName, {
+              value: 0,
+              applications: new Set()
+            });
+          }
+          const stats = productStats.get(productName);
+          stats.value += product.quantity;
+          stats.applications.add(transaction.application_id);
+        });
+      });
+
+    // Convert map to array and sort by value
+    const result = Array.from(productStats.entries())
+      .map(([name, stats]) => ({
         name,
-        value: data.value,
-        applicationCount: data.applications.size
+        value: stats.value,
+        applicationCount: stats.applications.size
       }))
       .filter(item => item.value > 0)
       .sort((a, b) => b.value - a.value);
 
+    console.log('Processed product data:', result);
+
     if (selectedProduct) {
-      result = result.filter(item => item.name === selectedProduct.name);
-    } else {
-      result = result.slice(0, productDisplayLimit);
+      return result.filter(item => item.name === selectedProduct.name);
     }
 
-    return result;
+    return result.slice(0, productDisplayLimit);
   }, [
     selectedFirm,
     applications,
@@ -549,21 +597,16 @@ export default function Dashboard2() {
   ]);
 
   const getFilteredProductData = () => {
-    let filtered = [...productData];
+    const filtered = firmProductData.map(item => ({
+      name: item.name.length > 20 ? item.name.substring(0, 20) + '...' : item.name,
+      fullName: item.name,
+      quantity: item.value,
+      applications: item.applicationCount,
+      storage: "-"
+    }));
 
-    if (selectedProduct) {
-      filtered = filtered.filter((product) => 
-        product.name === selectedProduct.name
-      );
-    } else {
-      filtered.sort((a, b) => {
-        if (sortBy === "quantity") {
-          return b.quantity - a.quantity;
-        }
-        return a.name.localeCompare(b.name);
-      });
-
-      filtered = filtered.slice(0, productDisplayLimit);
+    if (sortBy === "name") {
+      filtered.sort((a, b) => a.fullName.localeCompare(b.fullName));
     }
 
     return filtered;
@@ -769,10 +812,20 @@ export default function Dashboard2() {
 
   const fetchProducts = async () => {
     try {
-      const response = await api.get<PaginatedResponse<Product>>(
-        "https://cargo-calc.uz/api/v1/items/product/"
-      );
-      setProducts(response.data.results);
+      let allProducts: Product[] = [];
+      let nextPage = 'https://cargo-calc.uz/api/v1/items/product/';
+      
+      while (nextPage) {
+        console.log('Fetching products from:', nextPage);
+        const response = await api.get<PaginatedResponse<Product>>(nextPage);
+        console.log('Products response:', response.data);
+        
+        allProducts = [...allProducts, ...response.data.results];
+        nextPage = response.data.links?.next || '';
+      }
+  
+      console.log('Total products fetched:', allProducts.length);
+      setProducts(allProducts);
     } catch (error) {
       console.error("Error fetching products:", error);
     }
@@ -792,6 +845,163 @@ export default function Dashboard2() {
       fetchData(dateFromToUse, dateToToUse);
     }
   };
+
+  const handleLegendScroll = (direction: 'left' | 'right') => {
+    if (legendRef.current) {
+      const scrollAmount = 100;
+      const newScroll = direction === 'left' 
+        ? legendScroll - scrollAmount 
+        : legendScroll + scrollAmount;
+      
+      setLegendScroll(newScroll);
+      legendRef.current.scrollLeft = newScroll;
+    }
+  };
+
+  const indexOfLastProduct = productPage * productsPerPage;
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+  const currentProducts = getFilteredProductData().slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(getFilteredProductData().length / productsPerPage);
+
+  const renderProductDistributionChart = () => (
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center">
+          <Package className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            {selectedFirm 
+              ? `${selectedFirm.firm_name} - ${t("dashboard.productDistribution")}`
+              : t("dashboard.productDistribution")}
+          </h3>
+        </div>
+      </div>
+      <div className="h-[400px]">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={firmProductData.slice(0, 15)} // Show only top 15 products in chart
+              dataKey="value"
+              nameKey="name"
+              cx="50%"
+              cy="50%"
+              outerRadius={150}
+              label={({ name, percent }) => `${name.substring(0, 15)}... (${(percent * 100).toFixed(0)}%)`}
+            >
+              {firmProductData.map((_entry, index) => (
+                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'white',
+                borderRadius: '8px',
+                padding: '8px',
+                border: '1px solid #e2e8f0',
+              }}
+              formatter={(value, name, entry) => [
+                `${formatNumber(Number(value))}`,
+                entry.payload.name
+              ]}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="mt-4 relative">
+        <button
+          onClick={() => handleLegendScroll('left')}
+          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
+        >
+          ←
+        </button>
+        <div
+          ref={legendRef}
+          className="overflow-x-auto scrollbar-hide mx-8"
+          style={{
+            scrollBehavior: 'smooth'
+          }}
+        >
+          <div className="flex gap-4 py-2">
+            {firmProductData.map((entry, index) => (
+              <div key={index} className="flex items-center whitespace-nowrap">
+                <div
+                  className="w-3 h-3 rounded-full mr-2"
+                  style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                />
+                <span className="text-sm">{entry.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <button
+          onClick={() => handleLegendScroll('right')}
+          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white dark:bg-gray-700 p-2 rounded-full shadow-md z-10"
+        >
+          →
+        </button>
+      </div>
+    </div>
+  );
+
+  const renderProductTable = () => (
+    <div className="mt-8">
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead>
+          <tr>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {t("dashboard.productName")}
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {t("dashboard.quantity")}
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {t("dashboard.applications")}
+            </th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+              {t("dashboard.storage")}
+            </th>
+          </tr>
+        </thead>
+        <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+          {currentProducts.map((product, index) => (
+            <tr key={index} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+              <td className="px-6 py-4 whitespace-normal text-sm text-gray-900 dark:text-gray-300">
+                <span title={product.fullName}>{product.name}</span>
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                {formatNumber(product.quantity)}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                {product.applications}
+              </td>
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
+                {product.storage}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="mt-4 flex justify-between items-center">
+        <div className="text-sm text-gray-700 dark:text-gray-300">
+          {t("dashboard.showing")} {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, getFilteredProductData().length)} {t("dashboard.of")} {getFilteredProductData().length}
+        </div>
+        <div className="flex gap-2">
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setProductPage(i + 1)}
+              className={`px-3 py-1 rounded ${
+                productPage === i + 1
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 dark:bg-gray-700'
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -1144,62 +1354,7 @@ export default function Dashboard2() {
                   </div>
                 </div>
 
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center">
-                      <Package className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                        {selectedFirm 
-                          ? `${selectedFirm.firm_name} - ${t("dashboard.productDistribution")}`
-                          : t("dashboard.productDistribution")}
-                      </h3>
-                    </div>
-                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                      {`${t("dashboard.totalQuantity")}: ${
-                        firmProductData.reduce((sum, item) => sum + item.value, 0)
-                      }`}
-                    </div>
-                  </div>
-                  <div className="h-[300px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={firmProductData}
-                          dataKey="value"
-                          nameKey="name"
-                          cx="50%"
-                          cy="50%"
-                          outerRadius={100}
-                          label
-                          className="drop-shadow-lg"
-                        >
-                          {firmProductData.map((_entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={COLORS[index % COLORS.length]}
-                              className="hover:opacity-80 transition-opacity"
-                            />
-                          ))}
-                        </Pie>
-                        <Tooltip
-                          contentStyle={{
-                            backgroundColor: "white",
-                            borderRadius: "8px",
-                            padding: "8px",
-                            border: "1px solid #e2e8f0",
-                          }}
-                          formatter={(value, name) => [
-                            <div key="tooltip">
-                              <div>{`${t("dashboard.quantity")}: ${value}`}</div>
-                              <div>{`${t("dashboard.product")}: ${name}`}</div>
-                            </div>
-                          ]}
-                        />
-                        <Legend />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
+                {renderProductDistributionChart()}
 
                 <div className="col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -1277,47 +1432,7 @@ export default function Dashboard2() {
                     </ResponsiveContainer>
                   </div>
 
-                  <div className="mt-8 overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                      <thead>
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {t("dashboard.productName")}
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {t("dashboard.quantity")}
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {t("dashboard.applications")}
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                            {t("dashboard.storage")}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                        {getFilteredProductData().map((product, index) => (
-                          <tr
-                            key={index}
-                            className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                          >
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                              {product.name}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                              {formatNumber(product.quantity)}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                              {firmProductData.find(item => item.name === product.name)?.applicationCount || 0}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                              {product.storage}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                  {renderProductTable()}
                 </div>
               </div>
             </>
@@ -1677,62 +1792,7 @@ export default function Dashboard2() {
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center">
-                    <Package className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                      {selectedFirm 
-                        ? `${selectedFirm.firm_name} - ${t("dashboard.productDistribution")}`
-                        : t("dashboard.productDistribution")}
-                    </h3>
-                  </div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">
-                    {`${t("dashboard.totalQuantity")}: ${
-                      firmProductData.reduce((sum, item) => sum + item.value, 0)
-                    }`}
-                  </div>
-                </div>
-                <div className="h-[300px]">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={firmProductData}
-                        dataKey="value"
-                        nameKey="name"
-                        cx="50%"
-                        cy="50%"
-                        outerRadius={100}
-                        label
-                        className="drop-shadow-lg"
-                      >
-                        {firmProductData.map((_entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                            className="hover:opacity-80 transition-opacity"
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: "white",
-                          borderRadius: "8px",
-                          padding: "8px",
-                          border: "1px solid #e2e8f0",
-                        }}
-                        formatter={(value, name) => [
-                          <div key="tooltip">
-                            <div>{`${t("dashboard.quantity")}: ${value}`}</div>
-                            <div>{`${t("dashboard.product")}: ${name}`}</div>
-                          </div>
-                        ]}
-                      />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
+              {renderProductDistributionChart()}
 
               <div className="col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -1810,47 +1870,7 @@ export default function Dashboard2() {
                   </ResponsiveContainer>
                 </div>
 
-                <div className="mt-8 overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead>
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          {t("dashboard.productName")}
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          {t("dashboard.quantity")}
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          {t("dashboard.applications")}
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                          {t("dashboard.storage")}
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                      {getFilteredProductData().map((product, index) => (
-                        <tr
-                          key={index}
-                          className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                        >
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                            {product.name}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                            {formatNumber(product.quantity)}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                            {firmProductData.find(item => item.name === product.name)?.applicationCount || 0}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-                            {product.storage}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                {renderProductTable()}
               </div>
             </div>
           </>

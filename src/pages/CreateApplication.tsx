@@ -1780,7 +1780,7 @@ export default function CreateApplication() {
         setShowFirmDropdown(false);
         return;
       }
-      const response = await api.get(`/firms/?firm_name=${searchTerm}`);
+      const response = await api.get(`/firms/firm/?firm_name=${searchTerm}`);
       setFirms(response.data.results || []);
       setShowFirmDropdown(true);
     } catch (error) {

@@ -1,4 +1,4 @@
-   import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
     import { useParams } from "react-router-dom";
     import { useTranslation } from "react-i18next";
     import { api } from "../api/api";
@@ -78,9 +78,9 @@
     useEffect(() => {
         const fetchData = async () => {
         try {
+            // First fetch the application and other data
             const [
             applicationRes,
-            firmsRes,
             keepingServicesRes,
             workingServicesTariffRes,
             transportTypesRes,
@@ -89,7 +89,6 @@
             modesRes
             ] = await Promise.all([
             api.get(`/application/${id}/`),
-            api.get('/firms/'),
             api.get('/keeping_service/keeping_service_price/'),
             api.get('/working_service/tariff/'),
             api.get('/transport/type/'),
@@ -97,6 +96,16 @@
             api.get('/items/product/'),
             api.get('/modes/modes/')
             ]); 
+
+            // Fetch all firms data with pagination
+            let allFirms: Array<{ id: number; firm_name: string }> = [];
+            let nextPage = 'https://cargo-calc.uz/api/v1/firms/firm/';
+
+            while (nextPage) {
+                const firmsRes = await api.get(nextPage);
+                allFirms = [...allFirms, ...firmsRes.data.results];
+                nextPage = firmsRes.data.links.next;
+            }
 
             const applicationData = applicationRes.data;
             
@@ -130,7 +139,7 @@
             }
 
             setFormData(applicationData);
-            setFirms(firmsRes.data.results);
+            setFirms(allFirms);
             setKeepingServices(keepingServicesRes.data.results);
             setWorkingServices(workingServicesTariffRes.data.results);
             setTransportTypes(transportTypesRes.data.results);

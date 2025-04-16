@@ -91,7 +91,7 @@ export default function EditApplication() {
           modesRes
         ] = await Promise.all([
           api.get(`/application/${id}/`),
-          api.get('/firms/'),
+          api.get('/firms/firm/'),
           api.get('/keeping_service/keeping_service_price/'),
           api.get('/working_service/tariff/'),
           api.get('/transport/type/'),

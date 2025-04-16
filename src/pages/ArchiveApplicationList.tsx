@@ -144,15 +144,14 @@ const STATUS_CONFIG = {
   }
 } as const;
 
-const formatNumber = (num: number | null): string => {
-  if (num === null) return '0';
-  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-};
+
 
 interface TransportType {
   id: number;
   transport_type: string;
 }
+
+
 
 export default function ArchiveApplicationList() {
   const { t } = useTranslation();
@@ -275,9 +274,30 @@ export default function ArchiveApplicationList() {
       params.append('page', currentPage.toString());
       params.append('status', 'completed');
 
-      const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse, transportTypesResponse] = await Promise.all([
+      // First get all firms by fetching all pages
+      const firmsMap: Record<number, string> = {};
+      let nextFirmsPage = 1;
+      let hasMoreFirms = true;
+
+      while (hasMoreFirms) {
+        const firmsResponse = await api.get<PaginatedResponse<FirmResponse>>(`/firms/firm/?page=${nextFirmsPage}`);
+        const firmsData = Array.isArray(firmsResponse.data?.results) ? firmsResponse.data.results : [];
+        
+        firmsData.forEach((firm: FirmResponse) => {
+          if (firm && typeof firm.id === 'number' && typeof firm.firm_name === 'string') {
+            firmsMap[firm.id] = firm.firm_name;
+          }
+        });
+
+        if (firmsResponse.data.links.next) {
+          nextFirmsPage++;
+        } else {
+          hasMoreFirms = false;
+        }
+      }
+
+      const [applicationsResponse, modesResponse, availableModesResponse, transportTypesResponse] = await Promise.all([
         api.get<PaginatedResponse<Application>>(`/application/?${params.toString()}`),
-        api.get<PaginatedResponse<FirmResponse>>('/firms/'),
         api.get<PaginatedResponse<ApplicationMode>>('/modes/application_modes/'),
         api.get<ModesResponse>('/modes/modes/'),
         api.get('/transport/type/')
@@ -286,14 +306,6 @@ export default function ArchiveApplicationList() {
       const applications = Array.isArray(applicationsResponse.data?.results) 
         ? applicationsResponse.data.results
         : [];
-
-      const firmsData = Array.isArray(firmsResponse.data?.results) ? firmsResponse.data.results : [];
-      const firmMap = firmsData.reduce((acc: Record<number, string>, firm: FirmResponse) => {
-        if (firm && typeof firm.id === 'number' && typeof firm.firm_name === 'string') {
-          acc[firm.id] = firm.firm_name;
-        }
-        return acc;
-      }, {});
 
       const modesData = Array.isArray(modesResponse.data?.results) ? modesResponse.data.results : [];
       const modesMap = modesData.reduce((acc: Record<number, ApplicationMode[]>, mode: ApplicationMode) => {
@@ -308,7 +320,7 @@ export default function ArchiveApplicationList() {
         return acc;
       }, {});
 
-      setFirms(firmMap);
+      setFirms(firmsMap);
       setModes(modesMap);
       setAvailableModes(Array.isArray(availableModesResponse.data.results) 
         ? availableModesResponse.data.results 
@@ -523,9 +535,7 @@ export default function ArchiveApplicationList() {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("applicationList.table.vipStatus", "VIP Status")}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                {t("applicationList.totalCost")}
-              </th>
+             
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 {t("applicationList.table.dates", "Dates")}
               </th>
@@ -570,9 +580,7 @@ export default function ArchiveApplicationList() {
                       </div>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                    {formatNumber(application.total_price)} сум
-                  </td>
+                
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     <div>{t("applicationList.comingDate", "Coming")}: {application.coming_date}</div>
                     <div className="text-gray-500 dark:text-gray-400">

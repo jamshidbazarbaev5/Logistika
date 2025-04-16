@@ -7,6 +7,7 @@ import { api } from "../api/api";
 import ConfirmModal from "../components/ConfirmModal";
 import SuccessModal from "../components/SuccessModal";
 import { SearchBar, SearchField } from "../components/SearchBar";
+import { Pagination } from "../components/ui/pagination";
 import { Crown, User, Download, Edit, Calculator, FileDown, Trash2 } from "lucide-react";
 
 interface ApplicationMode {
@@ -178,6 +179,7 @@ interface Transaction {
   // ... other fields not needed for this check
 }
 
+
 export default function ApplicationList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -221,7 +223,7 @@ export default function ApplicationList() {
 
   // Add new state variables
   const [_payments, setPayments] = useState<Record<number, Payment[]>>({});
-  const [_transactions, setTransactions] = useState<Record<number, Transaction[]>>({});
+  const [_transactions, ] = useState<Record<number, Transaction[]>>({});
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -317,23 +319,37 @@ export default function ApplicationList() {
       
       params.append('page', currentPage.toString());
 
-      const [applicationsResponse, firmsResponse, modesResponse, availableModesResponse, transportTypesResponse, paymentsResponse] = await Promise.all([
+      // First get all firms by fetching all pages
+      const firmsMap: Record<number, string> = {};
+      let nextFirmsPage = 1;
+      let hasMoreFirms = true;
+
+      while (hasMoreFirms) {
+        const firmsResponse = await api.get<PaginatedResponse<FirmResponse>>(`/firms/firm/?page=${nextFirmsPage}`);
+        const firmsData = Array.isArray(firmsResponse.data?.results) ? firmsResponse.data.results : [];
+        
+        firmsData.forEach((firm: FirmResponse) => {
+          if (firm && typeof firm.id === 'number' && typeof firm.firm_name === 'string') {
+            firmsMap[firm.id] = firm.firm_name;
+          }
+        });
+
+        if (firmsResponse.data.links.next) {
+          nextFirmsPage++;
+        } else {
+          hasMoreFirms = false;
+        }
+      }
+
+      const [applicationsResponse, modesResponse, availableModesResponse, transportTypesResponse, paymentsResponse] = await Promise.all([
         api.get<PaginatedResponse<Application>>(`/application/?${params.toString()}`),
-        api.get<PaginatedResponse<FirmResponse>>('/firms/'),
         api.get<PaginatedResponse<ApplicationMode>>('/modes/application_modes/'),
         api.get<ModesResponse>('/modes/modes/'),
         api.get('/transport/type/'),
         api.get('/application/pay/')
       ]);
 
-      const firmsData = Array.isArray(firmsResponse.data?.results) ? firmsResponse.data.results : [];
-      const firmMap = firmsData.reduce((acc: Record<number, string>, firm: FirmResponse) => {
-        if (firm && typeof firm.id === 'number' && typeof firm.firm_name === 'string') {
-          acc[firm.id] = firm.firm_name;
-        }
-        return acc;
-      }, {});
-
+      // Your existing code for handling other responses
       const modesData = Array.isArray(modesResponse.data?.results) ? modesResponse.data.results : [];
       const modesMap = modesData.reduce((acc: Record<number, ApplicationMode[]>, mode: ApplicationMode) => {
         if (mode && mode.application_id) {
@@ -351,7 +367,6 @@ export default function ApplicationList() {
         acc[type.id] = type.transport_type;
         return acc;
       }, {});
-      setTransportTypes(transportTypesMap);
 
       // Group payments by application ID
       const paymentsMap = paymentsResponse.data.results.reduce((acc: Record<number, Payment[]>, payment: Payment) => {
@@ -363,27 +378,12 @@ export default function ApplicationList() {
       }, {});
 
       setPayments(paymentsMap);
-
-      // Fetch transactions for each application
-      const applicationIds = applicationsResponse.data.results.map(app => app.id);
-      const transactionPromises = applicationIds.map(id => 
-        api.get(`/transactions/history/${id}`).catch(() => ({ data: [] }))
-      );
-      const transactionResponses = await Promise.all(transactionPromises);
-
-      const transactionsMap = transactionResponses.reduce((acc: Record<number, Transaction[]>, response, index) => {
-        const appId = applicationIds[index];
-        acc[appId] = response.data;
-        return acc;
-      }, {});
-
-      setTransactions(transactionsMap);
-
-      setFirms(firmMap);
+      setFirms(firmsMap);
       setModes(modesMap);
       setAvailableModes(Array.isArray(availableModesResponse.data.results) 
         ? availableModesResponse.data.results 
         : []);
+      setTransportTypes(transportTypesMap);
       setApplications(Array.isArray(applicationsResponse.data?.results) 
         ? applicationsResponse.data.results 
         : []);
@@ -534,45 +534,6 @@ export default function ApplicationList() {
     }
     setShowDeleteModal(false);
     setApplicationToDelete(null);
-  };
-
-  const PaginationControls = () => {
-    const pageNumbers = [];
-    for (let i = 1; i <= totalPages; i++) {
-      pageNumbers.push(i);
-    }
-
-    return (
-      <div className="flex justify-center items-center space-x-2 mt-4">
-        <button
-          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className="px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700 disabled:opacity-50"
-        >
-          {t("applicationList.previous")}
-        </button>
-        {pageNumbers.map(number => (
-          <button
-            key={number}
-            onClick={() => setCurrentPage(number)}
-            className={`px-3 py-1 rounded-md ${
-              currentPage === number
-                ? 'bg-[#6C5DD3] text-white'
-                : 'bg-gray-100 dark:bg-gray-700'
-            }`}
-          >
-            {number}
-          </button>
-        ))}
-        <button
-          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 rounded-md bg-gray-100 dark:bg-gray-700 disabled:opacity-50"
-        >
-          {t("applicationList.next")}
-        </button>
-      </div>
-    );
   };
 
   const handleEditClick = (application: Application) => {
@@ -974,10 +935,10 @@ export default function ApplicationList() {
                                           {originalService?.service_name || service.service_name || `Service ${service.service_type_id}`}
                                         </h3>
                                         <div className="space-y-2 text-sm">
-                                          <div className="flex justify-between">
+                                          {/* <div className="flex justify-between">
                                             <span>{t('calculateServices.requestedAmount')}:</span>
                                             <span className="font-medium">{service.requested_amount}</span>
-                                          </div>
+                                          </div> */}
                                           <div className="flex justify-between">
                                             <span>{t('calculateServices.totalQuantity')}:</span>
                                             <span className="font-medium">{service.total_amount}</span>
@@ -1026,7 +987,11 @@ export default function ApplicationList() {
         </table>
       </div>
 
-      <PaginationControls />
+      <Pagination 
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
 
       <ConfirmModal
         isOpen={showDeleteModal}
