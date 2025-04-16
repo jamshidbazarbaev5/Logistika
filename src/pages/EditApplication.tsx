@@ -80,9 +80,9 @@ export default function EditApplication() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // First fetch the application and other data
         const [
           applicationRes,
-          firmsRes,
           keepingServicesRes,
           workingServicesTariffRes,
           transportTypesRes,
@@ -91,7 +91,6 @@ export default function EditApplication() {
           modesRes
         ] = await Promise.all([
           api.get(`/application/${id}/`),
-          api.get('/firms/firm/'),
           api.get('/keeping_service/keeping_service_price/'),
           api.get('/working_service/tariff/'),
           api.get('/transport/type/'),
@@ -100,8 +99,22 @@ export default function EditApplication() {
           api.get('/modes/modes/')
         ]); 
 
+        // Fetch all firms data with pagination
+        let allFirms: Array<{ id: number; firm_name: string }> = [];
+        let nextPage = '/firms/firm/';
+
+        while (nextPage) {
+          const firmsRes = await api.get(nextPage);
+          allFirms = [...allFirms, ...firmsRes.data.results];
+          nextPage = firmsRes.data.links.next ? firmsRes.data.links.next.replace('https://cargo-calc.uz/api/v1', '') : null;
+        }
+
         const applicationData = applicationRes.data;
         
+        // Ensure firm_id is set properly
+        applicationData.firm_id = applicationData.firm?.id || applicationData.firm_id || 0;
+
+        // Rest of data processing
         if (!applicationData.status) {
           applicationData.status = 'active';
         }
@@ -137,7 +150,9 @@ export default function EditApplication() {
         }
 
         setFormData(applicationData);
-        setFirms(firmsRes.data.results);
+        setFirms(allFirms); // Set all firms from pagination
+        console.log('All Firms:', allFirms);
+        console.log('Selected firm_id:', applicationData.firm_id);
         setKeepingServices(keepingServicesRes.data.results);
         setWorkingServices(workingServicesTariffRes.data.results);
         setTransportTypes(transportTypesRes.data.results);

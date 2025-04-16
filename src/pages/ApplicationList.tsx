@@ -226,18 +226,26 @@ export default function ApplicationList() {
   const [_transactions, ] = useState<Record<number, Transaction[]>>({});
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchAllProducts = async () => {
       try {
-        const response = await api.get<ProductApiResponse>('/items/product/');
-        if (response.data && Array.isArray(response.data.results)) {
-          setProductsList(response.data.results);
+        let allProducts: ProductResponse[] = [];
+        let nextPage: string | null = '/items/product/';
+        
+        while (nextPage) {
+          const response:any = await api.get<ProductApiResponse>(nextPage);
+          if (response.data && Array.isArray(response.data.results)) {
+            allProducts = [...allProducts, ...response.data.results];
+          }
+          nextPage = response.data.links.next;
         }
+        
+        setProductsList(allProducts);
       } catch (error) {
         console.error('Error fetching products:', error);
       }
     };
 
-    fetchProducts();
+    fetchAllProducts();
   }, []);
 
   const searchFields: SearchField[] = [
