@@ -136,7 +136,7 @@ export const apiService = {
   
   // Firms
   createFirm: (data: Omit<Firm, 'id'>) => 
-    api.post('/firms/', data),
+    api.post('/firms/firm/', data),
   
   // Storage
   createStorage: (data: Storage) => 
