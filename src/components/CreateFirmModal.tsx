@@ -48,7 +48,7 @@ export default function CreateFirmModal({ isOpen, onClose, onFirmCreated }: Crea
         }
       });
 
-      const response = await api.post('/firms/', formDataToSend, {
+      const response = await api.post('/firms/firm/', formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data', // Set content type to multipart/form-data
         }

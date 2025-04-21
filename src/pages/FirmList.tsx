@@ -124,7 +124,7 @@ export default function FirmList() {
     if (!firmToDelete) return;
 
     try {
-      await api.delete(`/firms/${firmToDelete.id}/`);
+      await api.delete(`/firms/firm/${firmToDelete.id}/`);
       setModalMessage(t("firmList.deleteSuccess", "Firm deleted successfully"));
       setShowSuccessModal(true);
       fetchFirms();

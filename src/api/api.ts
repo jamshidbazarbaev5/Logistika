@@ -209,7 +209,7 @@ export const apiService = {
     api.delete(`/firms/${id}/`),
 
   updateFirm: (id: number, data: Omit<Firm, 'id'>) =>
-    api.put(`/firms/${id}/`, data),
+    api.put(`/firms/firm/${id}/`, data),
 
   // Product methods
   getProducts: (queryString: string = "") => 
