@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { apiService } from "../api/api";
 import SuccessModal from "../components/SuccessModal";
+import { useNavigate } from "react-router-dom";
 
 interface FirmFormData {
   INN: string;
@@ -25,7 +26,7 @@ export default function CreateFirm() {
     phoneNumber_trustee: "",
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-
+  const navigate = useNavigate();
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -42,7 +43,9 @@ export default function CreateFirm() {
           phoneNumber_trustee: "",
         });
         setShowSuccessModal(true);
+       
       }
+      navigate('/firm-list')
     } catch (error: any) {
       console.error('Error creating firm:', error);
       let errorMessage = t('createFirm.errorMessage', 'Failed to create firm. Please try again.');

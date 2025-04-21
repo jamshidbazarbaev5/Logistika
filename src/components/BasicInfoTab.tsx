@@ -22,7 +22,7 @@ const BasicInfoTab: React.FC<TabPanelProps> = ({ onSuccess }) => {
   useEffect(() => {
     const fetchFirms = async () => {
       try {
-        const response = await api.get('/firms/');
+        const response = await api.get('/firms');
         setFirms(response.data.results || []);
       } catch (error) {
         console.error('Error fetching firms:', error);

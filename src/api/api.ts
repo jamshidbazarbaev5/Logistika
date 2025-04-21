@@ -206,7 +206,7 @@ export const apiService = {
     api.post('/items/category/', data),
 
   deleteFirm: (id: number) =>
-    api.delete(`/firms/${id}/`),
+    api.delete(`/firms/firm/${id}/`),
 
   updateFirm: (id: number, data: Omit<Firm, 'id'>) =>
     api.put(`/firms/firm/${id}/`, data),
