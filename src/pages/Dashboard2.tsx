@@ -138,6 +138,7 @@ interface PaginatedPaymentResponse {
   next: string | null;
   previous: string | null;
   results: Payment[];
+  links:any;
 }
 
 interface Product {
@@ -318,38 +319,31 @@ export default function Dashboard2() {
     try {
       setLoading(true);
       
-      // Add console.log to debug data fetching
-      console.log('Fetching data with dates:', { fromDate, toDate });
+      // Fetch all completed applications across all pages
+      let allApplications: Application[] = [];
+      let nextPage = 'https://cargo-calc.uz/api/v1/application/?status=completed';
+      
+      while (nextPage) {
+        const response = await api.get<PaginatedResponse<Application>>(nextPage);
+        allApplications = [...allApplications, ...response.data.results];
+        nextPage = response.data.links?.next || '';
+      }
 
-      const params = new URLSearchParams({
-        firm_name: "",
-        decloration_number: "",
-        number_of_application: "",
-        firm_INN: "",
-        coming_date_gte: fromDate || "",
-        coming_date_lte: toDate || "",
-        products: "",
-        page: "1",
-      });
+      // Fetch all active applications
+      let activeApplications: Application[] = [];
+      nextPage = 'https://cargo-calc.uz/api/v1/application/?status=active';
+      
+      while (nextPage) {
+        const response = await api.get<PaginatedResponse<Application>>(nextPage);
+        activeApplications = [...activeApplications, ...response.data.results];
+        nextPage = response.data.links?.next || '';
+      }
 
-      const applicationsResponse = await api.get<PaginatedResponse<Application>>(
-        `https://cargo-calc.uz/api/v1/application/?${params.toString()}`
-      );
-      setApplications(applicationsResponse.data.results);
-
-      const transactionsResponse = await api.get<
-        PaginatedResponse<Transaction>
-      >("https://cargo-calc.uz/api/v1/transactions/");
-
-      const filteredTransactions = transactionsResponse.data.results.filter(transaction => {
+      // Combine and filter applications by date if specified
+      const filteredCompletedApps = allApplications.filter(app => {
         if (!fromDate && !toDate) return true;
         
-        const application = applicationsResponse.data.results.find(
-          app => app.id === transaction.application_id
-        );
-        if (!application) return false;
-
-        const appDate = new Date(application.coming_date);
+        const appDate = new Date(app.coming_date.split('.').reverse().join('-'));
         const fromDateDate = fromDate ? new Date(fromDate) : null;
         const toDateDate = toDate ? new Date(toDate) : null;
 
@@ -357,15 +351,49 @@ export default function Dashboard2() {
                (!toDateDate || appDate <= toDateDate);
       });
 
-      setTransactions(filteredTransactions);
+      const filteredActiveApps = activeApplications.filter(app => {
+        if (!fromDate && !toDate) return true;
+        
+        const appDate = new Date(app.coming_date.split('.').reverse().join('-'));
+        const fromDateDate = fromDate ? new Date(fromDate) : null;
+        const toDateDate = toDate ? new Date(toDate) : null;
 
-      const paymentsResponse = await api.get<PaginatedPaymentResponse>(
-        "https://cargo-calc.uz/api/v1/application/pay/"
-      );
-      setPayments(paymentsResponse.data.results);
+        return (!fromDateDate || appDate >= fromDateDate) && 
+               (!toDateDate || appDate <= toDateDate);
+      });
 
-      console.log('Fetched applications:', applicationsResponse.data.results);
-      console.log('Fetched transactions:', transactionsResponse.data.results);
+      setApplications([...filteredActiveApps, ...filteredCompletedApps]);
+
+      // Fetch payments for completed applications
+      const completedAppIds = new Set(filteredCompletedApps.map(app => app.id));
+      let allPayments: Payment[] = [];
+      nextPage = 'https://cargo-calc.uz/api/v1/application/pay/';
+      
+      while (nextPage) {
+        const paymentsResponse = await api.get<PaginatedPaymentResponse>(nextPage);
+        const relevantPayments = paymentsResponse.data.results.filter(
+          payment => completedAppIds.has(payment.application)
+        );
+        allPayments = [...allPayments, ...relevantPayments];
+        nextPage = paymentsResponse.data.links?.next || '';
+      }
+
+      setPayments(allPayments);
+
+      // Fetch transactions
+      let allTransactions: Transaction[] = [];
+      nextPage = 'https://cargo-calc.uz/api/v1/transactions/';
+      
+      while (nextPage) {
+        const transactionsResponse = await api.get<PaginatedResponse<Transaction>>(nextPage);
+        const filteredTransactions = transactionsResponse.data.results.filter(
+          transaction => completedAppIds.has(transaction.application_id)
+        );
+        allTransactions = [...allTransactions, ...filteredTransactions];
+        nextPage = transactionsResponse.data.links?.next || '';
+      }
+
+      setTransactions(allTransactions);
       
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -625,17 +653,30 @@ export default function Dashboard2() {
   }, [payments, applications]);
 
   const { totalBrutto, totalNetto } = useMemo(() => {
+    // Only consider completed applications
     const completedApplications = applications.filter(
       (app) => app.status === "completed"
     );
+    console.log('Total completed applications:', completedApplications.length);
+
     const relevantApplications = selectedFirm
       ? completedApplications.filter((app) => app.firm_id === selectedFirm.id)
       : completedApplications;
+    
+    console.log('Relevant applications for brutto/netto calc:', relevantApplications.length);
 
-    return relevantApplications.reduce(
+    const totals = relevantApplications.reduce(
       (acc, app) => {
-        const brutto = typeof app.brutto === "number" ? app.brutto : 0;
-        const netto = typeof app.netto === "number" ? app.netto : 0;
+        const brutto = parseFloat(app.brutto?.toString() || "0");
+        const netto = parseFloat(app.netto?.toString() || "0");
+
+        console.log(`Application ID ${app.id}:`, {
+          brutto,
+          netto,
+          status: app.status,
+          firmId: app.firm_id,
+          firmName: app.firm_info.firm_name
+        });
 
         acc.totalBrutto += brutto;
         acc.totalNetto += netto;
@@ -644,6 +685,13 @@ export default function Dashboard2() {
       },
       { totalBrutto: 0, totalNetto: 0 }
     );
+
+    console.log('Final totals:', {
+      totalBrutto: totals.totalBrutto,
+      totalNetto: totals.totalNetto
+    });
+
+    return totals;
   }, [applications, selectedFirm]);
 
   const transportData = useMemo(() => {
@@ -783,26 +831,55 @@ export default function Dashboard2() {
     try {
       setLoading(true);
 
-      const params = new URLSearchParams({
-        firm_name: "",
-        decloration_number: "",
-        number_of_application: "",
-        firm_INN: "",
-        coming_date_gte: "",
-        coming_date_lte: "",
-        products: "",
-        page: "1",
-      });
+      // Fetch all completed applications
+      let allApplications: Application[] = [];
+      let nextPage = 'https://cargo-calc.uz/api/v1/application/?status=completed';
+      
+      while (nextPage) {
+        const response = await api.get<PaginatedResponse<Application>>(nextPage);
+        allApplications = [...allApplications, ...response.data.results];
+        nextPage = response.data.links?.next || '';
+      }
 
-      const applicationsResponse = await api.get<
-        PaginatedResponse<Application>
-      >(`https://cargo-calc.uz/api/v1/application/?${params.toString()}`);
-      setApplications(applicationsResponse.data.results);
+      // Fetch all active applications
+      let activeApplications: Application[] = [];
+      nextPage = 'https://cargo-calc.uz/api/v1/application/?status=active';
+      
+      while (nextPage) {
+        const response = await api.get<PaginatedResponse<Application>>(nextPage);
+        activeApplications = [...activeApplications, ...response.data.results];
+        nextPage = response.data.links?.next || '';
+      }
 
-      const transactionsResponse = await api.get<
-        PaginatedResponse<Transaction>
-      >("https://cargo-calc.uz/api/v1/transactions/");
-      setTransactions(transactionsResponse.data.results);
+      // Combine all applications
+      setApplications([...activeApplications, ...allApplications]);
+
+      // Fetch all transactions
+      let allTransactions: Transaction[] = [];
+      nextPage = 'https://cargo-calc.uz/api/v1/transactions/';
+      
+      while (nextPage) {
+        const response = await api.get<PaginatedResponse<Transaction>>(nextPage);
+        allTransactions = [...allTransactions, ...response.data.results];
+        nextPage = response.data.links?.next || '';
+      }
+      setTransactions(allTransactions);
+
+      // Fetch all payments for completed applications
+      const completedAppIds = new Set(allApplications.map(app => app.id));
+      let allPayments: Payment[] = [];
+      nextPage = 'https://cargo-calc.uz/api/v1/application/pay/';
+      
+      while (nextPage) {
+        const paymentsResponse = await api.get<PaginatedPaymentResponse>(nextPage);
+        const relevantPayments = paymentsResponse.data.results.filter(
+          payment => completedAppIds.has(payment.application)
+        );
+        allPayments = [...allPayments, ...relevantPayments];
+        nextPage = paymentsResponse.data.links?.next || '';
+      }
+      setPayments(allPayments);
+
     } catch (error) {
       console.error("Error resetting data:", error);
     } finally {

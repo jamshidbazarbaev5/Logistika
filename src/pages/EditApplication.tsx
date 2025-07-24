@@ -228,6 +228,8 @@ export default function EditApplication() {
       if (response.status === 200) {
         setModalMessage(t('editApplication.successMessage'));
         setShowSuccessModal(true);
+        navigate('/application-list')
+        
       }
     } catch (error: any) {
       console.error('Error updating application:', error);
