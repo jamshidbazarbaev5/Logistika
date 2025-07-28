@@ -229,14 +229,14 @@ const Dashboard = () => {
             </div>
             <div className="flex gap-2 items-center">
               <input
-                type="date"
+                type="datetime-local"
                 className="px-3 py-2 border dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 value={filters.coming_date_gte || ''}
                 onChange={(e) => setFilters(prev => ({ ...prev, coming_date_gte: e.target.value || undefined }))}
               />
               <span className="text-gray-500 dark:text-gray-400">{t("dashboard.to")}</span>
               <input
-                type="date"
+                type="datetime-local"
                 className="px-3 py-2 border dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 value={filters.coming_date_lte || ''}
                 onChange={(e) => setFilters(prev => ({ ...prev, coming_date_lte: e.target.value || undefined }))}
@@ -263,14 +263,14 @@ const Dashboard = () => {
             </div>
             <div className="flex gap-2 items-center">
               <input
-                type="date"
+                type="datetime-local"
                   className="px-3 py-2 border dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 value={filters.created_at_gte || ''}
                 onChange={(e) => setFilters(prev => ({ ...prev, created_at_gte: e.target.value || undefined }))}
               />
               <span className="text-gray-500 dark:text-gray-400">{t("dashboard.to")}</span>
               <input
-                type="date"
+                type="datetime-local"
                  className="px-3 py-2 border dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 value={filters.created_at_lte || ''}
                 onChange={(e) => setFilters(prev => ({ ...prev, created_at_lte: e.target.value || undefined }))}
