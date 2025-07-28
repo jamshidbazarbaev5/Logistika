@@ -64,12 +64,21 @@ interface DashboardData {
   products: Product[];
 }
 
+interface Product {
+  id: number;
+  name: string;
+  measurement_id: number;
+  category_id: number;
+  tnved_code: string;
+}
+
 type DateFilterType = {
   coming_date_gte: string | undefined;
   coming_date_lte: string | undefined;
   created_at_gte: string | undefined;
   created_at_lte: string | undefined;
   firm_name: string | undefined;
+  product_id: number | undefined;
   top: number;
 };
 
@@ -115,14 +124,50 @@ const Dashboard = () => {
   const isDarkMode = useSystemTheme();
   const [data, setData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState<DateFilterType>({
     coming_date_gte: undefined,
     coming_date_lte: undefined,
     created_at_gte: undefined,
     created_at_lte: undefined,
     firm_name: undefined,
+    product_id: undefined,
     top: 10,
   });
+
+  const fetchProducts = async () => {
+    try {
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        console.error('No access token found');
+        return;
+      }
+
+      let allProducts: Product[] = [];
+      let nextPage = 'https://cargo-calc.uz/api/v1/items/product/?page=1';
+      
+      while (nextPage) {
+        const response = await fetch(nextPage, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        allProducts = [...allProducts, ...data.results];
+        nextPage = data.links.next;
+      }
+      
+      setProducts(allProducts);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -134,6 +179,7 @@ const Dashboard = () => {
       if (filters.created_at_gte) params.append('created_at_gte', filters.created_at_gte);
       if (filters.created_at_lte) params.append('created_at_lte', filters.created_at_lte);
       if (filters.firm_name) params.append('firm_name', filters.firm_name);
+      if (filters.product_id) params.append('products', filters.product_id.toString());
       if (filters.top) params.append('top', filters.top.toString());
 
       const url = `https://cargo-calc.uz/api/v1/reports/application_count/${params.toString() ? `?${params.toString()}` : ''}`;
@@ -149,6 +195,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchData();
+    fetchProducts();
   }, []);
 
   if (loading || !data) {
@@ -197,7 +244,20 @@ const Dashboard = () => {
             </div>
           </div>
           <div>
+             <div className="mt-4">
             <div className="flex items-center gap-2 mb-2">
+              <Building2 className="h-4 w-4 text-gray-500" />
+              <h3 className="text-sm font-semibold">{t("dashboard.firmName")}</h3>
+            </div>
+            <input
+              type="text"
+              className="w-full px-3 py-2 border dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              placeholder={t("dashboard.enterFirmName")}
+              value={filters.firm_name || ''}
+              onChange={(e) => setFilters(prev => ({ ...prev, firm_name: e.target.value || undefined }))}
+            />
+          </div>
+            {/* <div className="flex items-center gap-2 mb-2">
               <Calendar className="h-4 w-4 text-gray-500" />
               <h3 className="text-sm font-semibold">{t("dashboard.createdDateRange")}</h3>
             </div>
@@ -215,22 +275,28 @@ const Dashboard = () => {
                 value={filters.created_at_lte || ''}
                 onChange={(e) => setFilters(prev => ({ ...prev, created_at_lte: e.target.value || undefined }))}
               />
-            </div>
+            </div> */}
           </div>
         </div>
         <div className="mt-4">
+         
           <div className="mt-4">
             <div className="flex items-center gap-2 mb-2">
-              <Building2 className="h-4 w-4 text-gray-500" />
-              <h3 className="text-sm font-semibold">{t("dashboard.firmName")}</h3>
+              <Package className="h-4 w-4 text-gray-500" />
+              <h3 className="text-sm font-semibold">{t("dashboard.product")}</h3>
             </div>
-            <input
-              type="text"
+            <select
               className="w-full px-3 py-2 border dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
-              placeholder={t("dashboard.enterFirmName")}
-              value={filters.firm_name || ''}
-              onChange={(e) => setFilters(prev => ({ ...prev, firm_name: e.target.value || undefined }))}
-            />
+              value={filters.product_id || ''}
+              onChange={(e) => setFilters(prev => ({ ...prev, product_id: e.target.value ? parseInt(e.target.value) : undefined }))}
+            >
+              <option value="">{t("dashboard.allProducts")}</option>
+              {products.map((product) => (
+                <option key={product.id} value={product.id}>
+                  {product.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="mt-4">
             <Button onClick={handleApplyFilters} className="bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200">

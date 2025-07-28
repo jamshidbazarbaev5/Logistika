@@ -828,7 +828,7 @@
     "totalIncome":"Общий доход",
     "dateFilters": "Фильтры по Дате",
     "createdDateRange": "Диапазон Дат Создания",
-    "comingDateRange":"Диапазон дат прибытия",
+    "comingDateRange":"Диапазон дат",
     "to": "до",
     "all":"Все",
     "completed":"Завершенные",
