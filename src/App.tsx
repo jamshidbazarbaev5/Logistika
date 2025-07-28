@@ -46,7 +46,7 @@ import ArchiveApplicationList from "./pages/ArchiveApplicationList";
 import ArchiveApplicationShowDetails from "./pages/ArchiveApplicationShowDetails";
 import ArchiveDalolatnoma from './pages/ArchiveDalolotnoma'
 // import { Dashboard } from "./pages/Dashboard";
-import Dashboard2 from "./pages/Dashboard2";
+// import Dashboard2 from "./pages/Dashboard2";
 import Dashboard from "./pages/Dashboard";
 const queryClient = new QueryClient();
 
