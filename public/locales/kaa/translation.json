@@ -1,4 +1,5 @@
 {
+ 
   "createFirm": {
     "title": "Jańa Organizatsiya Jaratıw",
     "subtitle": "Jańa organizatsiyani dizimnen ótkiziw ushın barlıq mag'lıwmatlardı toltırıń",
@@ -555,6 +556,24 @@
     "paymentId":"Tólem",
     "paymentMethod":"Tólem usılı"
 
+  },
+  "dashboard":{
+    "dateFilters": "Sáne filteri",
+    "topProducts": "Kóp ótinishli ónimler",
+    "comingDateRange": "Keliw sánesi aralıǵı",
+    "createdDateRange": "Jaratılǵan sáne aralıǵı",
+    "applyFilters": "Filtrdi qollanıw",
+    "activeApplications": "Aktiv ótinishler",
+    "completedApplications": "Tamamlanǵan ótinishler",
+    "totalApplications": "Barlıq ótinishler",
+    "totalBrutto": "Jámi brutto",
+    "totalNetto": "Jámi netto",
+    "totalIncome": "Jámi kiris",
+    "applicationStatus": "Ótinish statusı",
+    "topOrganizations": "Kóp ótinishli shólkemler",
+    "active": "Aktiv",
+    "completed": "Tamamlanǵan",
+    "all": "Barlıǵı"
   },
   "menu": {
     "mainMenu": "BAS MENYU",

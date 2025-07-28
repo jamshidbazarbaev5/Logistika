@@ -1,4 +1,5 @@
 {
+  
   "createFirm": {
     "title": "Yangi Organizatsiya Yaratish",
     "subtitle": "Yangi organizatsiyani ro'yxatdan o'tkazish uchun barcha ma'lumotlarni to'ldiring",
@@ -535,6 +536,7 @@
   "menu": {
     "mainMenu": "ASOSIY MENYU",
     "dashboard": "Dashboard",
+    "topProducts":"Eng Ko'p Sotilgan Mahsulotlar",
     "general": "UMUMIY",
     "main":"Asosiy",
     "archiveApplication": "Arxiv Arizalar",
@@ -815,6 +817,24 @@
     "phoneNumber": "Telefon Raqami"
   },
   "dashboard": {
+     "dateFilters": "Sana filtrlari",
+    "comingDateRange": "Kelish sanasi oralig'i",
+    "createdDateRange": "Yaratilgan sana oralig'i",
+    "applyFilters": "Filtrlarni qo'llash",
+    "activeApplications": "Faol arizalar",
+    "completedApplications": "Yakunlangan arizalar",
+    "totalApplications": "Jami arizalar",
+    "totalBrutto": "Jami brutto",
+    "totalNetto": "Jami netto",
+    "totalIncome": "Jami daromad",
+    "applicationStatus": "Ariza holati",
+    "topOrganizations": "Ko'p arizali tashkilotlar",
+    "active": "Faol",
+    "completed": "Yakunlangan",
+    "all": "Hammasi",
+    "to": "gacha",
+    "transportDistribution": "Transport taqsimoti",
+    "topOrganizationsByAmount": "Tashkilotlar miqdori bo'yicha",
     "title": "Boshqaruv paneli",
     "subtitle": "Tahlil va statistika",
     "selectFirm": "Tashkilotni tanlang",

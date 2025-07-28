@@ -47,6 +47,7 @@ import ArchiveApplicationShowDetails from "./pages/ArchiveApplicationShowDetails
 import ArchiveDalolatnoma from './pages/ArchiveDalolotnoma'
 // import { Dashboard } from "./pages/Dashboard";
 import Dashboard2 from "./pages/Dashboard2";
+import Dashboard from "./pages/Dashboard";
 const queryClient = new QueryClient();
 
 
@@ -102,7 +103,7 @@ function App() {
                 <Route path="/archive-application-list" element={<ArchiveApplicationList/>}/>
                 <Route path="/archive/:id" element={<ArchiveApplicationShowDetails/>}/>
                 <Route path="/archive/:id/dalolatnoma" element={<ArchiveDalolatnoma />} />
-                <Route path="/dashboard" element={<Dashboard2/>}/>
+                <Route path="/dashboard" element={<Dashboard/>}/>
               </Route>
             </Routes>
           </Router>

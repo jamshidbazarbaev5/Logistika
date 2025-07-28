@@ -1,1952 +1,540 @@
-// import { useState, useEffect, useMemo } from "react";
-// import { useTranslation } from "react-i18next";
-// import { api } from "../api/api";
-// import {
-//   BarChart,
-//   Bar,
-//   XAxis,
-//   YAxis,
-//   CartesianGrid,
-//   Tooltip,
-//   Legend,
-//   PieChart,
-//   Pie,
-//   Cell,
-//   ResponsiveContainer,
-// } from "recharts";
-// import {
-//   TrendingUp,
-//   Users,
-//   CheckCircle,
-//   Package,
-//   Building2,
-//   ChartBar,
-// } from "lucide-react";
-
-// interface Application {
-//   id: number;
-//   firm_id: number;
-//   firm_info: {
-//     firm_name: string;
-//     director_name: string;
-//   };
-//   status: "active" | "completed" | "unpaid";
-//   total_price: number;
-//   brutto: number;
-//   netto: number;
-//   products: Array<{
-//     quantity: number;
-//     product_name: string;
-//   }>;
-//   transport: Transport[];
-//   coming_date: string;
-// }
-
-// interface Transaction {
-//   id: number;
-//   application_id: number;
-//   full_name: string;
-//   keeping_services: Array<{
-//     service_type: number;
-//     amount: number;
-//     price: string;
-//   }>;
-//   working_services: Array<{
-//     service_type: string;
-//     quantity: number;
-//     price: string;
-//   }>;
-//   products: Array<{
-//     quantity: number;
-//     product: {
-//       id: number;
-//       name: string;
-//     };
-//   }>;
-// }
-
-// interface TransactionHistory {
-//   id: number;
-//   user: number;
-//   application_id: number;
-//   full_name: string;
-//   phone_number: string;
-//   car_number: string;
-//   date_of_transaction: string;
-//   products: Array<{
-//     quantity: number;
-//     product: {
-//       id: number;
-//       name: string;
-//     };
-//     storage: {
-//       id: number;
-//       storage_name: string;
-//       storage_location: string;
-//     };
-//   }>;
-//   keeping_services: Array<{
-//     service_type: number;
-//     amount: number;
-//     price: string;
-//   }>;
-//   working_services: Array<{
-//     service_type: string;
-//     quantity: number;
-//     price: string;
-//   }>;
-// }
-
-// interface SearchParams {
-//   date_from: string;
-//   date_to: string;
-//   firm_name: string;
-// }
-
-// interface PaginatedResponse<T> {
-//   links: {
-//     first: string | null;
-//     last: string | null;
-//     next: string | null;
-//     previous: string | null;
-//   };
-//   total_pages: number;
-//   current_page: number;
-//   page_range: number[];
-//   page_size: number;
-//   results: T[];
-// }
-
-// interface Firm {
-//   id: number;
-//   firm_name: string;
-//   INN: number;
-//   full_name_director: string;
-// }
-
-// interface Payment {
-//   id: number;
-//   application: number;
-//   payment_method: number;
-//   amount: string;
-//   comment: string;
-//   created_at: string;
-// }
-
-// interface PaginatedPaymentResponse {
-//   count: number;
-//   next: string | null;
-//   previous: string | null;
-//   results: Payment[];
-// }
-
-// interface Product {
-//   id: number;
-//   name: string;
-//   measurement_id: number;
-//   category_id: number;
-//   tnved_code: string;
-// }
-
-// interface Transport {
-//   id: number;
-//   transport_number: string;
-//   transport_type: number;
-//   application_id: number;
-// }
-
-// interface TransportType {
-//   id: number;
-//   transport_type: string;
-// }
-
-// const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8"];
-
-// const formatNumber = (num: number) => {
-//   return new Intl.NumberFormat("uz-UZ", {
-//     style: "decimal",
-//     minimumFractionDigits: 0,
-//     maximumFractionDigits: 0,
-//   }).format(num);
-// };
-
-// export default function Dashboard2() {
-//   const { t } = useTranslation();
-//   const [applications, setApplications] = useState<Application[]>([]);
-//   const [transactions, setTransactions] = useState<Transaction[]>([]);
-//   const [loading, setLoading] = useState(true);
-//   const [, setSearchParams] = useState<SearchParams>({
-//     date_from: "",
-//     date_to: "",
-//     firm_name: "",
-//   });
-//   const [, setSelectedProducts] = useState<string[]>([]);
-//   const [productDisplayLimit, setProductDisplayLimit] = useState(10);
-//   const [sortBy, setSortBy] = useState<"quantity" | "name">("quantity");
-//   const [loadingProgress] = useState(0);
-//   const [firms, setFirms] = useState<Firm[]>([]);
-//   const [selectedFirm, setSelectedFirm] = useState<Firm | null>(null);
-//   const [firmSearchQuery, setFirmSearchQuery] = useState("");
-//   const [transactionHistory, setTransactionHistory] = useState<
-//     TransactionHistory[]
-//   >([]);
-//   const [payments, setPayments] = useState<Payment[]>([]);
-//   const [products, setProducts] = useState<Product[]>([]);
-//   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-//   const [transportTypes, setTransportTypes] = useState<TransportType[]>([]);
-//   const [dateFrom, setDateFrom] = useState<string>("");
-//   const [dateTo, setDateTo] = useState<string>("");
-
-//   const searchFirms = async (query: string) => {
-//     if (!query) {
-//       setFirms([]);
-//       return;
-//     }
-//     try {
-//       const response = await api.get<{ results: Firm[] }>(
-//         `https://cargo-calc.uz/api/v1/firms/?firm_name=${query}`
-//       );
-//       setFirms(response.data.results);
-//     } catch (error) {
-//       console.error("Error fetching firms:", error);
-//     }
-//   };
-
-//   const handleFirmSelect = (firm: Firm) => {
-//     setSelectedFirm(firm);
-//     setFirmSearchQuery("");
-//     setFirms([]);
-//     setSearchParams({
-//       date_from: "",
-//       date_to: "",
-//       firm_name: firm.firm_name,
-//     });
-
-//     fetchDataForFirm(firm.id);
-//   };
-
-//   const fetchDataForFirm = async (firmId: number, fromDate?: string, toDate?: string) => {
-//     try {
-//       setLoading(true);
-
-//       const firm = firms.find((f) => f.id === firmId) || selectedFirm;
-//       const firmName = firm?.firm_name;
-
-//       if (!firmName) {
-//         console.error("No firm name available");
-//         return;
-//       }
-
-//       const params = new URLSearchParams({
-//         firm_name: firmName,
-//         decloration_number: "",
-//         number_of_application: "",
-//         firm_INN: "",
-//         coming_date_gte: fromDate || "",
-//         coming_date_lte: toDate || "",
-//         products: "",
-//         page: "1",
-//       });
-
-//       const applicationsResponse = await api.get<
-//         PaginatedResponse<Application>
-//       >(`https://cargo-calc.uz/api/v1/application/?${params.toString()}`);
-
-//       setApplications(applicationsResponse.data.results);
-
-//       const allApplicationsParams = new URLSearchParams({
-//         firm_name: firmName,
-//         decloration_number: "",
-//         number_of_application: "",
-//         firm_INN: "",
-//         products: "",
-//         page: "1",
-//       });
-
-//       const allApplicationsResponse = await api.get<PaginatedResponse<Application>>(
-//         `https://cargo-calc.uz/api/v1/application/?${allApplicationsParams.toString()}`
-//       );
-
-//       const allApplicationIds = allApplicationsResponse.data.results.map(
-//         (app) => app.id
-//       );
-
-//       const allTransactionHistory: TransactionHistory[] = [];
-
-//       await Promise.all(
-//         allApplicationIds.map(async (appId) => {
-//           try {
-//             const transactionResponse = await api.get<TransactionHistory[]>(
-//               `https://cargo-calc.uz/api/v1/transactions/history/${appId}`
-//             );
-//             allTransactionHistory.push(...transactionResponse.data);
-//           } catch (error) {
-//             console.error(
-//               `Error fetching transactions for application ${appId}:`,
-//               error
-//             );
-//           }
-//         })
-//       );
-
-//       const filteredTransactions = allTransactionHistory.filter(transaction => {
-//         if (!fromDate && !toDate) return true;
-        
-//         const transactionDate = new Date(transaction.date_of_transaction);
-//         const fromDateDate = fromDate ? new Date(fromDate) : null;
-//         const toDateDate = toDate ? new Date(toDate) : null;
-
-//         return (!fromDateDate || transactionDate >= fromDateDate) && 
-//                (!toDateDate || transactionDate <= toDateDate);
-//       });
-
-//       setTransactionHistory(filteredTransactions);
-
-//     } catch (error) {
-//       console.error("Error fetching data for firm:", error);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const fetchData = async (fromDate?: string, toDate?: string) => {
-//     try {
-//       setLoading(true);
-
-//       const params = new URLSearchParams({
-//         firm_name: "",
-//         decloration_number: "",
-//         number_of_application: "",
-//         firm_INN: "",
-//         coming_date_gte: fromDate || "",
-//         coming_date_lte: toDate || "",
-//         products: "",
-//         page: "1",
-//       });
-
-//       const applicationsResponse = await api.get<PaginatedResponse<Application>>(
-//         `https://cargo-calc.uz/api/v1/application/?${params.toString()}`
-//       );
-//       setApplications(applicationsResponse.data.results);
-
-//       const transactionsResponse = await api.get<
-//         PaginatedResponse<Transaction>
-//       >("https://cargo-calc.uz/api/v1/transactions/");
-
-//       const filteredTransactions = transactionsResponse.data.results.filter(transaction => {
-//         if (!fromDate && !toDate) return true;
-        
-//         const application = applicationsResponse.data.results.find(
-//           app => app.id === transaction.application_id
-//         );
-//         if (!application) return false;
-
-//         const appDate = new Date(application.coming_date);
-//         const fromDateDate = fromDate ? new Date(fromDate) : null;
-//         const toDateDate = toDate ? new Date(toDate) : null;
-
-//         return (!fromDateDate || appDate >= fromDateDate) && 
-//                (!toDateDate || appDate <= toDateDate);
-//       });
-
-//       setTransactions(filteredTransactions);
-
-//       const paymentsResponse = await api.get<PaginatedPaymentResponse>(
-//         "https://cargo-calc.uz/api/v1/application/pay/"
-//       );
-//       setPayments(paymentsResponse.data.results);
-//     } catch (error) {
-//       console.error("Error fetching data:", error);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const fetchTransportTypes = async () => {
-//     try {
-//       const response = await api.get<{
-//         results: TransportType[];
-//       }>("https://cargo-calc.uz/api/v1/transport/type/");
-//       setTransportTypes(response.data.results);
-//     } catch (error) {
-//       console.error("Error fetching transport types:", error);
-//     }
-//   };
-
-//   useEffect(() => {
-//     const debounceTimer = setTimeout(() => {
-//       searchFirms(firmSearchQuery);
-//     }, 300);
-
-//     return () => clearTimeout(debounceTimer);
-//   }, [firmSearchQuery]);
-
-//   useEffect(() => {
-//     if (selectedFirm) {
-//       setSearchParams({
-//         date_from: "",
-//         date_to: "",
-//         firm_name: selectedFirm.firm_name,
-//       });
-//     }
-//   }, [selectedFirm]);
-
-//   useEffect(() => {
-//     handleDateChange();
-//     fetchTransportTypes();
-//   }, []);
-
-//   const applicationStats = useMemo(() => {
-//     let relevantApplications = selectedFirm
-//       ? applications.filter((app) => app.firm_id === selectedFirm.id)
-//       : applications;
-
-//     // Filter by selected product if any
-//     if (selectedProduct) {
-//       relevantApplications = relevantApplications.filter(app => 
-//         app.products.some(p => p.product_name === selectedProduct.name)
-//       );
-//     }
-
-//     return {
-//       total: relevantApplications.length,
-//       active: relevantApplications.filter((app) => app.status === "active").length,
-//       completed: relevantApplications.filter((app) => app.status === "completed").length,
-//     };
-//   }, [applications, selectedFirm, selectedProduct]);
-
-//   const statusData = useMemo(
-//     () => [
-//       { name: t("dashboard.active"), value: applicationStats.active },
-//       { name: t("dashboard.completed"), value: applicationStats.completed },
-//     ],
-//     [applicationStats, t]
-//   );
-
-//   const topFirmsData = useMemo(() => {
-//     if (selectedFirm) {
-//       const firmApplicationIds = new Set(
-//         applications
-//           .filter(
-//             (app) =>
-//               app.status === "completed" && app.firm_id === selectedFirm.id
-//           )
-//           .map((app) => app.id)
-//       );
-
-//       const totalRevenue = payments
-//         .filter((payment) => firmApplicationIds.has(payment.application))
-//         .reduce((total, payment) => total + parseFloat(payment.amount), 0);
-
-//       return [
-//         {
-//           name: selectedFirm.firm_name,
-//           value: totalRevenue,
-//         },
-//       ];
-//     }
-
-//     const firmRevenues = applications
-//       .filter((app) => app.status === "completed")
-//       .reduce((acc: { [key: string]: number }, app) => {
-//         const firmName = app.firm_info.firm_name;
-//         if (!acc[firmName]) acc[firmName] = 0;
-
-//         const applicationPayments = payments
-//           .filter((payment) => payment.application === app.id)
-//           .reduce((sum, payment) => sum + parseFloat(payment.amount), 0);
-
-//         acc[firmName] += applicationPayments;
-//         return acc;
-//       }, {});
-
-//     return Object.entries(firmRevenues)
-//       .map(([name, value]) => ({ name, value }))
-//       .sort((a, b) => b.value - a.value)
-//       .slice(0, 10);
-//   }, [selectedFirm, applications, payments]);
-
-//   const productData = useMemo(() => {
-//     const dataSource = selectedFirm ? transactionHistory : transactions;
-//     const relevantApplications = selectedFirm
-//       ? applications.filter((app) => app.firm_id === selectedFirm.id)
-//       : applications;
-
-//     const relevantApplicationIds = new Set(
-//       relevantApplications.map((app) => app.id)
-//     );
-
-//     return dataSource
-//       .filter((transaction) =>
-//         relevantApplicationIds.has(transaction.application_id)
-//       )
-//       .reduce((acc: any[], transaction) => {
-//         transaction.products.forEach((product) => {
-//           const existingProduct = acc.find(
-//             (p) => p.name === product.product.name
-//           );
-//           if (existingProduct) {
-//             existingProduct.quantity += product.quantity;
-//           } else {
-//             acc.push({
-//               name: product.product.name,
-//               quantity: product.quantity,
-//               storage: "-",
-//             });
-//           }
-//         });
-//         return acc;
-//       }, []);
-//   }, [selectedFirm, transactions, transactionHistory, applications]);
-
-//   const firmProductData = useMemo(() => {
-//     const dataSource = selectedFirm ? transactionHistory : transactions;
-//     const relevantApplications = selectedFirm
-//       ? applications.filter(app => app.firm_id === selectedFirm.id && app.status === "completed")
-//       : applications.filter(app => app.status === "completed");
-
-//     const relevantApplicationIds = new Set(
-//       relevantApplications.map((app) => app.id)
-//     );
-
-//     let productData = dataSource
-//       .filter((transaction) => relevantApplicationIds.has(transaction.application_id))
-//       .reduce((acc: { [key: string]: { value: number, applications: Set<number> } }, transaction) => {
-//         transaction.products.forEach((product) => {
-//           const productName = product.product.name;
-//           if (!acc[productName]) {
-//             acc[productName] = { value: 0, applications: new Set() };
-//           }
-//           acc[productName].value += product.quantity;
-//           acc[productName].applications.add(transaction.application_id);
-//         });
-//         return acc;
-//       }, {});
-
-//     // Convert to array and sort by value
-//     let result = Object.entries(productData)
-//       .map(([name, data]) => ({
-//         name,
-//         value: data.value,
-//         applicationCount: data.applications.size
-//       }))
-//       .filter(item => item.value > 0)
-//       .sort((a, b) => b.value - a.value);
-
-//     if (selectedProduct) {
-//       result = result.filter(item => item.name === selectedProduct.name);
-//     } else {
-//       // Calculate total value
-//       const totalValue = result.reduce((sum, item) => sum + item.value, 0);
-      
-//       // Set threshold for grouping (e.g., items less than 1% of total)
-//       const threshold = totalValue * 0.01;
-      
-//       // Separate items into main items and others
-//       const mainItems = result.filter(item => item.value >= threshold);
-//       const smallItems = result.filter(item => item.value < threshold);
-      
-//       // If we have small items, group them into "Others"
-//       if (smallItems.length > 0) {
-//         const othersValue = smallItems.reduce((sum, item) => sum + item.value, 0);
-//         const othersApplications = new Set(
-//           smallItems.flatMap(item => Array.from(productData[item.name].applications))
-//         );
-        
-//         result = [
-//           ...mainItems,
-//           {
-//             name: t("dashboard.others"),
-//             value: othersValue,
-//             applicationCount: othersApplications.size,
-//             items: smallItems // Store original items for tooltip
-//           }
-//         ];
-//       }
-
-//       // Limit to display limit (excluding "Others" which is always shown)
-//       const mainItemsLimit = productDisplayLimit - (smallItems.length > 0 ? 1 : 0);
-//       result = [
-//         ...result.slice(0, mainItemsLimit),
-//         ...(smallItems.length > 0 ? [result[result.length - 1]] : [])
-//       ];
-//     }
-
-//     return result;
-//   }, [
-//     selectedFirm,
-//     applications,
-//     transactionHistory,
-//     transactions,
-//     selectedProduct,
-//     productDisplayLimit,
-//     t
-//   ]);
-
-//   const getFilteredProductData = () => {
-//     let filtered = [...productData];
-
-//     if (selectedProduct) {
-//       filtered = filtered.filter((product) => 
-//         product.name === selectedProduct.name
-//       );
-//     } else {
-//       filtered.sort((a, b) => {
-//         if (sortBy === "quantity") {
-//           return b.quantity - a.quantity;
-//         }
-//         return a.name.localeCompare(b.name);
-//       });
-
-//       filtered = filtered.slice(0, productDisplayLimit);
-//     }
-
-//     return filtered;
-//   };
-
-//   const totalRevenue = useMemo(() => {
-//     const completedApplicationIds = new Set(
-//       applications
-//         .filter((app) => app.status === "completed")
-//         .map((app) => app.id)
-//     );
-
-//     return payments
-//       .filter((payment) => completedApplicationIds.has(payment.application))
-//       .reduce((total, payment) => total + parseFloat(payment.amount), 0);
-//   }, [payments, applications]);
-
-//   const { totalBrutto, totalNetto } = useMemo(() => {
-//     const completedApplications = applications.filter(
-//       (app) => app.status === "completed"
-//     );
-//     const relevantApplications = selectedFirm
-//       ? completedApplications.filter((app) => app.firm_id === selectedFirm.id)
-//       : completedApplications;
-
-//     return relevantApplications.reduce(
-//       (acc, app) => {
-//         const brutto = typeof app.brutto === "number" ? app.brutto : 0;
-//         const netto = typeof app.netto === "number" ? app.netto : 0;
-
-//         acc.totalBrutto += brutto;
-//         acc.totalNetto += netto;
-
-//         return acc;
-//       },
-//       { totalBrutto: 0, totalNetto: 0 }
-//     );
-//   }, [applications, selectedFirm]);
-
-//   const transportData = useMemo(() => {
-//     const relevantApplications = selectedFirm
-//       ? applications.filter(app => app.firm_id === selectedFirm.id && app.status === "completed")
-//       : applications.filter(app => app.status === "completed");
-
-//     const transportCounts = new Map<number, number>();
+            import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts';
+import { Card } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { 
+  Calendar,
+  DollarSign,
+  Package,
+  Building2,
+  Truck,
+  PieChart as PieChartIcon,
+  Filter,
+  RefreshCcw
+} from 'lucide-react';
+// import { DatePicker } from '@/components/ui/date-picker';
+
+interface ApplicationStatus {
+  status: string;
+  count: number;
+}
+
+interface Metrics {
+  total_brutto: number;
+  total_netto: number;
+  incomes: number;
+}
+
+interface Organization {
+  firm_id: number;
+  firm_id__firm_name: string;
+  total_amount: number;
+}
+
+interface Transport {
+  transport_type: number;
+  transport_type__transport_type: string;
+  count: number;
+}
+
+interface Product {
+  product_id: number;
+  product_id__name: string;
+  amount: number;
+}
+
+interface DashboardData {
+  applications: ApplicationStatus[];
+  metriks: Metrics[];
+  organizations: Organization[];
+  transport: Transport[];
+  products: Product[];
+}
+
+type DateFilterType = {
+  coming_date_gte: string | undefined;
+  coming_date_lte: string | undefined;
+  created_at_gte: string | undefined;
+  created_at_lte: string | undefined;
+  firm_name: string | undefined;
+  top: number;
+};
+
+const COLORS = ['#60a5fa', '#4ade80', '#fbbf24', '#f43f5e', '#a78bfa'];
+
+const chartTheme = {
+  dark: {
+    text: {
+      fill: '#e5e7eb', // gray-200
+    },
+    cartesianGrid: {
+      stroke: '#374151', // gray-700
+    },
+  },
+  light: {
+    text: {
+      fill: '#111827', // gray-900
+    },
+    cartesianGrid: {
+      stroke: '#e5e7eb', // gray-200
+    },
+  },
+};
+
+const useSystemTheme = () => {
+  const [isDark, setIsDark] = useState(
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = (e: MediaQueryListEvent) => setIsDark(e.matches);
     
-//     relevantApplications.forEach(app => {
-//       app.transport?.forEach(transport => {
-//         const count = transportCounts.get(transport.transport_type) || 0;
-//         transportCounts.set(transport.transport_type, count + 1);
-//       });
-//     });
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
 
-//     return transportTypes.map(type => ({
-//       name: type.transport_type,
-//       value: transportCounts.get(type.id) || 0
-//     })).filter(item => item.value > 0);
-//   }, [applications, selectedFirm, transportTypes]);
+  return isDark;
+};
 
-//   const statsGroups = {
-//     applications: {
-//       title: t("dashboard.applications"),
-//       stats: [
-//         {
-//           title: t("dashboard.totalApplications"),
-//           value: formatNumber(applicationStats.total),
-//           icon: (
-//             <TrendingUp className="h-6 w-6 text-purple-600 dark:text-purple-400" />
-//           ),
-//           color: "purple",
-//         },
-//         {
-//           title: t("dashboard.activeApplications"),
-//           value: formatNumber(applicationStats.active),
-//           icon: (
-//             <Users className="h-6 w-6 text-green-600 dark:text-green-400" />
-//           ),
-//           color: "green",
-//         },
-//         {
-//           title: t("dashboard.completedApplications"),
-//           value: formatNumber(applicationStats.completed),
-//           icon: (
-//             <CheckCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
-//           ),
-//           color: "blue",
-//         },
-//       ],
-//     },
-//     metrics: {
-//       title: t("dashboard.metrics"),
-//       stats: [
-//         {
-//           title: t("dashboard.totalRevenue"),
-//           value: `${formatNumber(totalRevenue)} UZS`,
-//           icon: (
-//             <svg
-//               className="h-6 w-6 text-yellow-600 dark:text-yellow-400"
-//               fill="none"
-//               stroke="currentColor"
-//               viewBox="0 0 24 24"
-//             >
-//               <path
-//                 strokeLinecap="round"
-//                 strokeLinejoin="round"
-//                 strokeWidth={2}
-//                 d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-//               />
-//             </svg>
-//           ),
-//           color: "yellow",
-//         },
-//         {
-//           title: t("dashboard.totalBrutto"),
-//           value: `${formatNumber(totalBrutto)} kg`,
-//           icon: (
-//             <svg
-//               className="h-6 w-6 text-pink-600 dark:text-pink-400"
-//               fill="none"
-//               stroke="currentColor"
-//               viewBox="0 0 24 24"
-//             >
-//               <path
-//                 strokeLinecap="round"
-//                 strokeLinejoin="round"
-//                 strokeWidth={2}
-//                 d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
-//               />
-//             </svg>
-//           ),
-//           color: "pink",
-//         },
-//         {
-//           title: t("dashboard.totalNetto"),
-//           value: `${formatNumber(totalNetto)} kg`,
-//           icon: (
-//             <svg
-//               className="h-6 w-6 text-indigo-600 dark:text-indigo-400"
-//               fill="none"
-//               stroke="currentColor"
-//               viewBox="0 0 24 24"
-//             >
-//               <path
-//                 strokeLinecap="round"
-//                 strokeLinejoin="round"
-//                 strokeWidth={2}
-//                 d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"
-//               />
-//             </svg>
-//           ),
-//           color: "indigo",
-//         },
-//       ],
-//     },
-//   };
+const Dashboard = () => {
+  const { t } = useTranslation();
+  const isDarkMode = useSystemTheme();
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState<DateFilterType>({
+    coming_date_gte: undefined,
+    coming_date_lte: undefined,
+    created_at_gte: undefined,
+    created_at_lte: undefined,
+    firm_name: undefined,
+    top: 10,
+  });
 
-//   const handleFirmReset = async () => {
-//     setSelectedFirm(null);
-//     setFirmSearchQuery("");
-//     setDateFrom("");
-//     setDateTo("");
-//     setSearchParams({
-//       date_from: "",
-//       date_to: "",
-//       firm_name: "",
-//     });
-//     setSelectedProduct(null);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const params = new URLSearchParams();
+      
+      if (filters.coming_date_gte) params.append('coming_date_gte', filters.coming_date_gte);
+      if (filters.coming_date_lte) params.append('coming_date_lte', filters.coming_date_lte);
+      if (filters.created_at_gte) params.append('created_at_gte', filters.created_at_gte);
+      if (filters.created_at_lte) params.append('created_at_lte', filters.created_at_lte);
+      if (filters.firm_name) params.append('firm_name', filters.firm_name);
+      if (filters.top) params.append('top', filters.top.toString());
 
-//     setApplications([]);
-//     setTransactions([]);
-//     setTransactionHistory([]);
-//     setSelectedProducts([]);
+      const url = `https://cargo-calc.uz/api/v1/reports/application_count/${params.toString() ? `?${params.toString()}` : ''}`;
+      const response = await fetch(url);
+      const result = await response.json();
+      setData(result);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-//     try {
-//       setLoading(true);
+  useEffect(() => {
+    fetchData();
+  }, []);
 
-//       const params = new URLSearchParams({
-//         firm_name: "",
-//         decloration_number: "",
-//         number_of_application: "",
-//         firm_INN: "",
-//         coming_date_gte: "",
-//         coming_date_lte: "",
-//         products: "",
-//         page: "1",
-//       });
+  if (loading || !data) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50 dark:bg-gray-900">
+        <div className="flex flex-col items-center gap-4">
+          <RefreshCcw className="h-8 w-8 text-blue-500 dark:text-blue-400 animate-spin" />
+          <p className="text-lg text-gray-600 dark:text-gray-400">Loading dashboard data...</p>
+        </div>
+      </div>
+    );
+  }
 
-//       const applicationsResponse = await api.get<
-//         PaginatedResponse<Application>
-//       >(`https://cargo-calc.uz/api/v1/application/?${params.toString()}`);
-//       setApplications(applicationsResponse.data.results);
+  const handleApplyFilters = () => {
+    fetchData();
+  };
 
-//       const transactionsResponse = await api.get<
-//         PaginatedResponse<Transaction>
-//       >("https://cargo-calc.uz/api/v1/transactions/");
-//       setTransactions(transactionsResponse.data.results);
-//     } catch (error) {
-//       console.error("Error resetting data:", error);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
+  return (
+    <div className="p-4 bg-gray-50 dark:bg-gray-900 min-h-screen space-y-6">
+      {/* Date Filters */}
+      <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+        <div className="flex items-center gap-2 mb-4">
+          <Filter className="h-6 w-6 text-blue-500 dark:text-blue-400" />
+          <h2 className="text-xl font-bold dark:text-gray-100">{t("dashboard.dateFilters")}</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Calendar className="h-4 w-4 text-gray-500" />
+              <h3 className="text-sm font-semibold">{t("dashboard.comingDateRange")}</h3>
+            </div>
+            <div className="flex gap-2 items-center">
+              <input
+                type="date"
+                className="px-3 py-2 border dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                value={filters.coming_date_gte || ''}
+                onChange={(e) => setFilters(prev => ({ ...prev, coming_date_gte: e.target.value || undefined }))}
+              />
+              <span className="text-gray-500 dark:text-gray-400">{t("dashboard.to")}</span>
+              <input
+                type="date"
+                className="px-3 py-2 border dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                value={filters.coming_date_lte || ''}
+                onChange={(e) => setFilters(prev => ({ ...prev, coming_date_lte: e.target.value || undefined }))}
+              />
+            </div>
+          </div>
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Calendar className="h-4 w-4 text-gray-500" />
+              <h3 className="text-sm font-semibold">{t("dashboard.createdDateRange")}</h3>
+            </div>
+            <div className="flex gap-2 items-center">
+              <input
+                type="date"
+                  className="px-3 py-2 border dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                value={filters.created_at_gte || ''}
+                onChange={(e) => setFilters(prev => ({ ...prev, created_at_gte: e.target.value || undefined }))}
+              />
+              <span className="text-gray-500 dark:text-gray-400">{t("dashboard.to")}</span>
+              <input
+                type="date"
+                 className="px-3 py-2 border dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                value={filters.created_at_lte || ''}
+                onChange={(e) => setFilters(prev => ({ ...prev, created_at_lte: e.target.value || undefined }))}
+              />
+            </div>
+          </div>
+        </div>
+        <div className="mt-4">
+          <div className="mt-4">
+            <div className="flex items-center gap-2 mb-2">
+              <Building2 className="h-4 w-4 text-gray-500" />
+              <h3 className="text-sm font-semibold">{t("dashboard.firmName")}</h3>
+            </div>
+            <input
+              type="text"
+              className="w-full px-3 py-2 border dark:border-gray-600 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+              placeholder={t("dashboard.enterFirmName")}
+              value={filters.firm_name || ''}
+              onChange={(e) => setFilters(prev => ({ ...prev, firm_name: e.target.value || undefined }))}
+            />
+          </div>
+          <div className="mt-4">
+            <Button onClick={handleApplyFilters} className="bg-blue-500 text-white hover:bg-blue-600 transition-colors duration-200">
+              <RefreshCcw className="h-4 w-4 mr-2" />
+              {t("dashboard.applyFilters")}
+            </Button>
+          </div>
+        </div>
+      </Card>
 
-//   const fetchProducts = async () => {
-//     try {
-//       const response = await api.get<PaginatedResponse<Product>>(
-//         "https://cargo-calc.uz/api/v1/items/product/"
-//       );
-//       setProducts(response.data.results);
-//     } catch (error) {
-//       console.error("Error fetching products:", error);
-//     }
-//   };
+      {/* Application Status Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-emerald-100 dark:bg-emerald-900 rounded-lg">
+              <div className="h-5 w-5 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">A</div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("dashboard.activeApplications")}</h3>
+          </div>
+          <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{data.applications.find(a => a.status === 'active')?.count || 0}</p>
+        </Card>
+        <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-sky-100 dark:bg-sky-900 rounded-lg">
+              <div className="h-5 w-5 text-sky-600 dark:text-sky-400 flex items-center justify-center font-bold">C</div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("dashboard.completedApplications")}</h3>
+          </div>
+          <p className="text-2xl font-bold text-sky-600 dark:text-sky-400">{data.applications.find(a => a.status === 'completed')?.count || 0}</p>
+        </Card>
+        <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
+              <div className="h-5 w-5 text-indigo-600 dark:text-indigo-400 flex items-center justify-center font-bold">T</div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("dashboard.totalApplications")}</h3>
+          </div>
+          <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{data.applications.find(a => a.status === 'all')?.count || 0}</p>
+        </Card>
+      </div>
 
-//   useEffect(() => {
-//     fetchProducts();
-//   }, []);
+      {/* Metrics Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-pink-100 dark:bg-pink-900 rounded-lg">
+              <Package className="h-5 w-5 text-pink-600 dark:text-pink-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("dashboard.totalBrutto")}</h3>
+          </div>
+          <p className="text-2xl font-bold text-pink-600 dark:text-pink-400">{data.metriks[0].total_brutto.toLocaleString()} kg</p>
+        </Card>
+        <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-lg">
+              <Package className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("dashboard.totalNetto")}</h3>
+          </div>
+          <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{data.metriks[0].total_netto.toLocaleString()} kg</p>
+        </Card>
+        <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-lg">
+              <DollarSign className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">{t("dashboard.totalIncome")}</h3>
+          </div>
+          <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{data.metriks[0].incomes.toLocaleString()} UZS</p>
+        </Card>
+      </div>
 
-//   const handleDateChange = (newDateFrom?: string, newDateTo?: string) => {
-//     const dateFromToUse = newDateFrom ?? dateFrom;
-//     const dateToToUse = newDateTo ?? dateTo;
-    
-//     if (selectedFirm) {
-//       fetchDataForFirm(selectedFirm.id, dateFromToUse, dateToToUse);
-//     } else {
-//       fetchData(dateFromToUse, dateToToUse);
-//     }
-//   };
+      {/* Application Status and Top Products */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Application Status */}
+        <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-amber-100 dark:bg-amber-900 rounded-lg">
+              <PieChartIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t("dashboard.applicationStatus")}</h2>
+          </div>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data.applications}
+                  dataKey="count"
+                  nameKey="status"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label={({ name, percent }) => (
+                    <text fill={isDarkMode ? '#e5e7eb' : '#111827'}>
+                      {`${name} ${(percent * 100).toFixed(0)}%`}
+                    </text>
+                  )}
+                >
+                  {data.applications.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={{ backgroundColor:"white" }} />
+                <Legend 
+                  formatter={(value) => (
+                    <span style={{ color:'black' }}>
+                      {t(`dashboard.${value?.toLowerCase()}`)}
+                    </span>
+                  )}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
 
-//   if (loading) {
-//     return (
-//       <div className="p-4 bg-gray-50 dark:bg-gray-900 min-h-screen">
-//         <div className="max-w-7xl mx-auto space-y-6">
-//           <div className="grid grid-cols-1 gap-6">
-//             <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
-//                 <div>
-//                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-//                     {t("dashboard.title")}
-//                   </h1>
-//                   <p className="mt-2 text-gray-600 dark:text-gray-400">
-//                     {t("dashboard.subtitle")}
-//                   </p>
-//                 </div>
+        {/* Top Products */}
+        <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 bg-teal-100 dark:bg-teal-900 rounded-lg">
+              <PieChartIcon className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+            </div>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t("dashboard.topProducts")}</h2>
+          </div>
+          <div className="h-[300px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data.products}
+                  dataKey="amount"
+                  nameKey="product_id__name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label={({ name, percent }) => (
+                    <text fill={isDarkMode ? '#e5e7eb' : '#111827'}>
+                      {`${name} ${(percent * 100).toFixed(0)}%`}
+                    </text>
+                  )}
+                >
+                  {data.products.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip contentStyle={{ backgroundColor:'white'}} />
+                <Legend 
+                  formatter={(value) => (
+                    <div
+                      style={{
+                        position: 'relative',
+                        display: 'inline-block',
+                        // color: isDarkMode ? '#e5e7eb' : '#111827',
+                      }}
+                      onMouseEnter={(e) => {
+                        const tooltip = e.currentTarget.querySelector('.tooltip') as HTMLElement;
+                        if (tooltip) {
+                          tooltip.style.visibility = 'visible';
+                          tooltip.style.opacity = '1';
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        const tooltip = e.currentTarget.querySelector('.tooltip') as HTMLElement;
+                        if (tooltip) {
+                          tooltip.style.visibility = 'hidden';
+                          tooltip.style.opacity = '0';
+                        }
+                      }}
+                    >
+                      <span style={{
+                        display: 'inline-block',
+                        maxWidth: '120px',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        verticalAlign: 'bottom'
+                      }}>
+                        {value}
+                      </span>
+                      <div
+                        className="tooltip"
+                        style={{
+                          visibility: 'hidden',
+                          opacity: '0',
+                          position: 'absolute',
+                          bottom: '100%',
+                          left: '50%',
+                          transform: 'translateX(-50%)',
+                          padding: '4px 8px',
+                          backgroundColor: isDarkMode ? '#374151' : '#ffffff',
+                          border: '1px solid ' + (isDarkMode ? '#4B5563' : '#E5E7EB'),
+                          borderRadius: '4px',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                          whiteSpace: 'nowrap',
+                          zIndex: 1000,
+                          transition: 'all 0.2s ease',
+                          fontSize: '12px',
+                          color: isDarkMode ? '#e5e7eb' : '#111827',
+                        }}
+                      >
+                        {value}
+                      </div>
+                    </div>
+                  )}
+                  wrapperStyle={{
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    overflowX: 'hidden',
+                    paddingRight: '10px'
+                  }}
+                />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+      </div>
 
-//                 <div className="relative">
-//                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-//                     {t("dashboard.selectFirm")}
-//                   </label>
-//                   <input
-//                     type="text"
-//                     value={firmSearchQuery}
-//                     onChange={(e) => setFirmSearchQuery(e.target.value)}
-//                     placeholder={t("dashboard.searchFirm")}
-//                     className="w-full p-3 border rounded-lg"
-//                   />
-//                   {firms.length > 0 && (
-//                     <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-700 border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-//                       {firms.map((firm) => (
-//                         <div
-//                           key={firm.id}
-//                           onClick={() => handleFirmSelect(firm)}
-//                           className="p-3 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer border-b last:border-b-0 dark:border-gray-600"
-//                         >
-//                           <div className="font-medium">{firm.firm_name}</div>
-//                           <div className="text-sm text-gray-500 dark:text-gray-400">
-//                             INN: {firm.INN}
-//                           </div>
-//                         </div>
-//                       ))}
-//                     </div>
-//                   )}
-//                   {selectedFirm && (
-//                     <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex justify-between items-center">
-//                       <div>
-//                         <div className="font-medium text-blue-700 dark:text-blue-300">
-//                           {selectedFirm.firm_name}
-//                         </div>
-//                         <div className="text-sm text-blue-600 dark:text-blue-400">
-//                           INN: {selectedFirm.INN}
-//                         </div>
-//                       </div>
-//                       <button
-//                         onClick={handleFirmReset}
-//                         className="p-1 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-full"
-//                       >
-//                         <svg
-//                           className="w-5 h-5 text-blue-700 dark:text-blue-300"
-//                           fill="none"
-//                           stroke="currentColor"
-//                           viewBox="0 0 24 24"
-//                         >
-//                           <path
-//                             strokeLinecap="round"
-//                             strokeLinejoin="round"
-//                             strokeWidth={2}
-//                             d="M6 18L18 6M6 6l12 12"
-//                           />
-//                         </svg>
-//                       </button>
-//                     </div>
-//                   )}
-//                 </div>
+      {/* Top Organizations */}
+      <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-violet-100 dark:bg-violet-900 rounded-lg">
+            <Building2 className="h-5 w-5 text-violet-600 dark:text-violet-400" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t("dashboard.topOrganizations")}</h2>
+        </div>
+        <div className="h-[400px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={data.organizations}
+              layout="vertical"
+              margin={{ top: 5, right: 30, left: 250, bottom: 5 }}
+            >
+              <CartesianGrid 
+                strokeDasharray="3 3" 
+                stroke={isDarkMode ? chartTheme.dark.cartesianGrid.stroke : chartTheme.light.cartesianGrid.stroke} 
+              />
+              <XAxis 
+                type="number" 
+                tick={{ fill: 'black' }} 
+              />
+              <YAxis
+                type="category"
+                dataKey="firm_id__firm_name"
+                width={240}
+                tick={{ 
+                  fontSize: 12, 
+                //   fill: isDarkMode ? chartTheme.dark.text.fill : '#000000',
+                  fontWeight: 600
+                }}
+              />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: isDarkMode ? '#1f2937' : '#ffffff',
+                  color: 'white',
+                  border: isDarkMode ? '1px solid #374151' : '1px solid #e5e7eb'
+                }} 
+              />
+              <Bar dataKey="total_amount" fill="#8b5cf6" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
 
-//                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-//                   <div>
-//                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-//                       {t("dashboard.dateFrom")}
-//                     </label>
-//                     <input
-//                       type="date"
-//                       value={dateFrom}
-//                       onChange={(e) => {
-//                         const newDate = e.target.value;
-//                         setDateFrom(newDate);
-//                         handleDateChange(newDate, dateTo);
-//                       }}
-//                       className="w-full p-3 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600"
-//                     />
-//                   </div>
-//                   <div>
-//                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-//                       {t("dashboard.dateTo")}
-//                     </label>
-//                     <input
-//                       type="date"
-//                       value={dateTo}
-//                       onChange={(e) => {
-//                         const newDate = e.target.value;
-//                         setDateTo(newDate);
-//                         handleDateChange(dateFrom, newDate);
-//                       }}
-//                       className="w-full p-3 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600"
-//                     />
-//                   </div>
-//                 </div>
+      {/* Transport Types */}
+      <Card className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="p-2 bg-orange-100 dark:bg-orange-900 rounded-lg">
+            <Truck className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">{t("dashboard.transportDistribution")}</h2>
+        </div>
+        <div className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data.transport}
+                dataKey="count"
+                nameKey="transport_type__transport_type"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                label={({ name, percent }) => (
+                  <text fill={isDarkMode ? '#e5e7eb' : '#111827'}>
+                    {`${name} ${(percent * 100).toFixed(0)}%`}
+                  </text>
+                )}
+              >
+                {data.transport.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip contentStyle={{ backgroundColor: 'white' }} />
+              <Legend 
+                formatter={(value) => (
+                  <span style={{ color:'black' }}>
+                    {value}
+                  </span>
+                )}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
 
-//                 <div className="relative">
-//                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-//                     {t("dashboard.selectProduct")}
-//                   </label>
-//                   <select
-//                     value={selectedProduct?.id || ""}
-//                     onChange={(e) => {
-//                       const product = products.find(
-//                         (p) => p.id === Number(e.target.value)
-//                       );
-//                       setSelectedProduct(product || null);
-//                     }}
-//                     className="w-full p-3 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600"
-//                   >
-//                     <option value="">{t("dashboard.allProducts")}</option>
-//                     {products.map((product) => (
-//                       <option key={product.id} value={product.id}>
-//                         {product.name}
-//                       </option>
-//                     ))}
-//                   </select>
-//                 </div>
-//               </div>
+    </div>
+  );
+};
 
-//               {loading && (
-//                 <div className="mt-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
-//                   <div className="flex items-center gap-3">
-//                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 dark:border-blue-400"></div>
-//                     <div className="text-gray-600 dark:text-gray-400">
-//                       {selectedFirm ? (
-//                         <div className="flex flex-col">
-//                           <span className="font-medium">{`Loading ${selectedFirm.firm_name} data...`}</span>
-//                           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-2">
-//                             <div
-//                               className="bg-blue-600 dark:bg-blue-400 h-2.5 rounded-full transition-all duration-300"
-//                               style={{
-//                                 width: `${Math.round(loadingProgress)}%`,
-//                               }}
-//                             ></div>
-//                           </div>
-//                           <span className="text-sm mt-1">{`${Math.round(
-//                             loadingProgress
-//                           )}% complete`}</span>
-//                         </div>
-//                       ) : (
-//                         "Loading data..."
-//                       )}
-//                     </div>
-//                   </div>
-//                 </div>
-//               )}
-//             </div>
-//           </div>
-
-//           {!loading && (
-//             <>
-//               <div className="grid grid-cols-1 gap-6">
-//                 {Object.entries(statsGroups).map(([key, group]) => (
-//                   <div
-//                     key={key}
-//                     className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
-//                   >
-//                     <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-//                       {group.title}
-//                     </h2>
-//                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-//                       {group.stats.map((stat, index) => (
-//                         <div
-//                           key={index}
-//                           className={`
-//                           p-6 rounded-lg border
-//                           bg-gradient-to-br from-${stat.color}-50 to-white dark:from-gray-800 dark:to-gray-800
-//                           transition-all duration-300 hover:shadow-md hover:scale-[1.02]
-//                           flex items-center space-x-4
-//                         `}
-//                         >
-//                           <div
-//                             className={`p-3 rounded-lg bg-${stat.color}-100 dark:bg-${stat.color}-900 flex-shrink-0`}
-//                           >
-//                             {stat.icon}
-//                           </div>
-//                           <div>
-//                             <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-//                               {stat.title}
-//                             </p>
-//                             <p
-//                               className={`text-2xl font-bold text-${stat.color}-600 dark:text-${stat.color}-400`}
-//                             >
-//                               {stat.value}
-//                             </p>
-//                           </div>
-//                         </div>
-//                       ))}
-//                     </div>
-//                   </div>
-//                 ))}
-//               </div>
-
-//               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-//                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//                   <div className="flex items-center mb-6">
-//                     <ChartBar className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
-//                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-//                       {selectedFirm
-//                         ? `${selectedFirm.firm_name} - ${t(
-//                             "dashboard.applicationStatus"
-//                           )}`
-//                         : t("dashboard.applicationStatus")}
-//                     </h3>
-//                   </div>
-//                   <div className="h-[300px]">
-//                     <ResponsiveContainer width="100%" height="100%">
-//                       <PieChart>
-//                         <Pie
-//                           data={statusData}
-//                           dataKey="value"
-//                           nameKey="name"
-//                           cx="50%"
-//                           cy="50%"
-//                           outerRadius={100}
-//                           label
-//                           className="drop-shadow-lg"
-//                         >
-//                           {statusData.map((_entry, index) => (
-//                             <Cell
-//                               key={`cell-${index}`}
-//                               fill={COLORS[index % COLORS.length]}
-//                               className="hover:opacity-80 transition-opacity"
-//                             />
-//                           ))}
-//                         </Pie>
-//                         <Tooltip
-//                           contentStyle={{
-//                             backgroundColor: "white",
-//                             borderRadius: "8px",
-//                             padding: "8px",
-//                             border: "1px solid #e2e8f0",
-//                           }}
-//                         />
-//                         <Legend />
-//                       </PieChart>
-//                     </ResponsiveContainer>
-//                   </div>
-//                 </div>
-
-//                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//                   <div className="flex items-center mb-6">
-//                     <Building2 className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
-//                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-//                       {t("dashboard.topFirms")}
-//                     </h3>
-//                   </div>
-//                   <div className="h-[300px]">
-//                     <ResponsiveContainer width="100%" height="100%">
-//                       <BarChart data={topFirmsData} layout="vertical">
-//                         <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-//                         <XAxis
-//                           type="number"
-//                           tickFormatter={(value) => formatNumber(value)}
-//                         />
-//                         <YAxis
-//                           dataKey="name"
-//                           type="category"
-//                           width={150}
-//                           tick={{ fill: "#4b5563", fontSize: 12 }}
-//                         />
-//                         <Tooltip
-//                           contentStyle={{
-//                             backgroundColor: "white",
-//                             borderRadius: "8px",
-//                             padding: "8px",
-//                             border: "1px solid #e2e8f0",
-//                           }}
-//                           formatter={(value) =>
-//                             `${formatNumber(Number(value))} sum`
-//                           }
-//                         />
-//                         <Bar
-//                           dataKey="value"
-//                           fill="#6C5DD3"
-//                           radius={[0, 4, 4, 0]}
-//                           className="hover:opacity-80 transition-opacity"
-//                         />
-//                       </BarChart>
-//                     </ResponsiveContainer>
-//                   </div>
-//                 </div>
-
-//                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//                   <div className="flex items-center mb-6">
-//                     <svg
-//                       className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2"
-//                       fill="none"
-//                       stroke="currentColor"
-//                       viewBox="0 0 24 24"
-//                     >
-//                       <path
-//                         strokeLinecap="round"
-//                         strokeLinejoin="round"
-//                         strokeWidth={2}
-//                         d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"
-//                       />
-//                     </svg>
-//                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-//                       {t("dashboard.transportDistribution")}
-//                     </h3>
-//                   </div>
-//                   <div className="h-[300px]">
-//                     <ResponsiveContainer width="100%" height="100%">
-//                       <PieChart>
-//                         <Pie
-//                           data={transportData}
-//                           dataKey="value"
-//                           nameKey="name"
-//                           cx="50%"
-//                           cy="50%"
-//                           outerRadius={100}
-//                           label
-//                           className="drop-shadow-lg"
-//                         >
-//                           {transportData.map((_entry, index) => (
-//                             <Cell
-//                               key={`cell-${index}`}
-//                               fill={COLORS[index % COLORS.length]}
-//                               className="hover:opacity-80 transition-opacity"
-//                             />
-//                           ))}
-//                         </Pie>
-//                         <Tooltip
-//                           contentStyle={{
-//                             backgroundColor: "white",
-//                             borderRadius: "8px",
-//                             padding: "8px",
-//                             border: "1px solid #e2e8f0",
-//                           }}
-//                           formatter={(value) => formatNumber(Number(value))}
-//                         />
-//                         <Legend />
-//                       </PieChart>
-//                     </ResponsiveContainer>
-//                   </div>
-//                 </div>
-
-//                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//                   <div className="flex items-center justify-between mb-6">
-//                     <div className="flex items-center">
-//                       <Package className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
-//                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-//                         {selectedFirm 
-//                           ? `${selectedFirm.firm_name} - ${t("dashboard.productDistribution")}`
-//                           : t("dashboard.productDistribution")}
-//                       </h3>
-//                     </div>
-//                     <div className="text-sm text-gray-500 dark:text-gray-400">
-//                       {`${t("dashboard.totalQuantity")}: ${
-//                         firmProductData.reduce((sum, item) => sum + item.value, 0)
-//                       }`}
-//                     </div>
-//                   </div>
-//                   <div className="h-[300px]">
-//                     <ResponsiveContainer width="100%" height="100%">
-//                       <PieChart>
-//                         <Pie
-//                           data={firmProductData}
-//                           dataKey="value"
-//                           nameKey="name"
-//                           cx="50%"
-//                           cy="50%"
-//                           outerRadius={100}
-//                           label={({ name, percent }) => 
-//                             percent > 0.05 ? `${name} (${(percent * 100).toFixed(1)}%)` : ''
-//                           }
-//                           className="drop-shadow-lg"
-//                           labelLine={({ percent }) => percent > 0.05}
-//                         >
-//                           {firmProductData.map((_entry, index) => (
-//                             <Cell
-//                               key={`cell-${index}`}
-//                               fill={COLORS[index % COLORS.length]}
-//                               className="hover:opacity-80 transition-opacity"
-//                             />
-//                           ))}
-//                         </Pie>
-//                         <Tooltip
-//                           contentStyle={{
-//                             backgroundColor: "white",
-//                             borderRadius: "8px",
-//                             padding: "8px",
-//                             border: "1px solid #e2e8f0",
-//                           }}
-//                           formatter={(value, name, entry) => {
-//                             const item = entry.payload;
-//                             const percent = (item.value / firmProductData.reduce((sum, i) => sum + i.value, 0) * 100).toFixed(1);
-                            
-//                             if (item.items) { // This is the "Others" category
-//                               return [
-//                                 <div key="tooltip" className="space-y-2">
-//                                   <div className="font-semibold">{`${t("dashboard.others")} (${item.items.length} ${t("dashboard.products")})`}</div>
-//                                   <div>{`${t("dashboard.totalQuantity")}: ${formatNumber(value)}`}</div>
-//                                   <div>{`${t("dashboard.percentage")}: ${percent}%`}</div>
-//                                   <div className="text-sm max-h-40 overflow-y-auto">
-//                                     {item.items.map((subItem: any, idx: number) => (
-//                                       <div key={idx} className="flex justify-between gap-4">
-//                                         <span>{subItem.name}:</span>
-//                                         <span>{formatNumber(subItem.value)}</span>
-//                                       </div>
-//                                     ))}
-//                                   </div>
-//                                 </div>
-//                               ];
-//                             }
-                            
-//                             return [
-//                               <div key="tooltip">
-//                                 <div>{`${t("dashboard.quantity")}: ${formatNumber(value)}`}</div>
-//                                 <div>{`${t("dashboard.percentage")}: ${percent}%`}</div>
-//                                 <div>{`${t("dashboard.product")}: ${name}`}</div>
-//                                 <div>{`${t("dashboard.applications")}: ${item.applicationCount}`}</div>
-//                               </div>
-//                             ];
-//                           }}
-//                         />
-//                         <Legend />
-//                       </PieChart>
-//                     </ResponsiveContainer>
-//                   </div>
-//                 </div>
-
-//                 <div className="col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-//                     <div className="flex items-center">
-//                       <Package className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
-//                       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-//                         {t("dashboard.productDistribution")}
-//                       </h3>
-//                     </div>
-
-//                     <div className="flex flex-wrap gap-3">
-//                       <select
-//                         className="rounded-lg border border-gray-300 px-4 py-2 text-sm bg-white dark:bg-gray-700 dark:border-gray-600"
-//                         value={sortBy}
-//                         onChange={(e) =>
-//                           setSortBy(e.target.value as "quantity" | "name")
-//                         }
-//                       >
-//                         <option value="quantity">
-//                           {t("dashboard.sortByQuantity")}
-//                         </option>
-//                         <option value="name">
-//                           {t("dashboard.sortByName")}
-//                         </option>
-//                       </select>
-
-//                       <select
-//                         className="rounded-lg border border-gray-300 px-4 py-2 text-sm bg-white dark:bg-gray-700 dark:border-gray-600"
-//                         value={productDisplayLimit}
-//                         onChange={(e) =>
-//                           setProductDisplayLimit(Number(e.target.value))
-//                         }
-//                       >
-//                         <option value="2">Top 2</option>
-//                         <option value="10">Top 10</option>
-//                         <option value="20">Top 20</option>
-//                         <option value="50">Top 50</option>
-//                         <option value={productData.length}>All</option>
-//                       </select>
-//                     </div>
-//                   </div>
-
-//                   <div className="h-[400px]">
-//                     <ResponsiveContainer width="100%" height="100%">
-//                       <BarChart data={getFilteredProductData()}>
-//                         <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-//                         <XAxis
-//                           dataKey="name"
-//                           angle={-45}
-//                           textAnchor="end"
-//                           height={100}
-//                           interval={0}
-//                           tick={{ fontSize: 12, fill: "#4b5563" }}
-//                         />
-//                         <YAxis
-//                           tickFormatter={formatNumber}
-//                           tick={{ fill: "#4b5563" }}
-//                         />
-//                         <Tooltip
-//                           contentStyle={{
-//                             backgroundColor: "white",
-//                             borderRadius: "8px",
-//                             padding: "8px",
-//                             border: "1px solid #e2e8f0",
-//                           }}
-//                           formatter={(value) => formatNumber(Number(value))}
-//                         />
-//                         <Bar
-//                           dataKey="quantity"
-//                           fill="#6C5DD3"
-//                           radius={[4, 4, 0, 0]}
-//                           className="hover:opacity-80 transition-opacity"
-//                         />
-//                       </BarChart>
-//                     </ResponsiveContainer>
-//                   </div>
-
-//                   <div className="mt-8 overflow-x-auto">
-//                     <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-//                       <thead>
-//                         <tr>
-//                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-//                             {t("dashboard.productName")}
-//                           </th>
-//                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-//                             {t("dashboard.quantity")}
-//                           </th>
-//                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-//                             {t("dashboard.applications")}
-//                           </th>
-//                           <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-//                             {t("dashboard.storage")}
-//                           </th>
-//                         </tr>
-//                       </thead>
-//                       <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-//                         {getFilteredProductData().map((product, index) => (
-//                           <tr
-//                             key={index}
-//                             className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-//                           >
-//                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-//                               {product.name}
-//                             </td>
-//                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-//                               {formatNumber(product.quantity)}
-//                             </td>
-//                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-//                               {firmProductData.find(item => item.name === product.name)?.applicationCount || 0}
-//                             </td>
-//                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-//                               {product.storage}
-//                             </td>
-//                           </tr>
-//                         ))}
-//                       </tbody>
-//                     </table>
-//                   </div>
-//                 </div>
-//               </div>
-//             </>
-//           )}
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="p-4 bg-gray-50 dark:bg-gray-900 min-h-screen">
-//       <div className="max-w-7xl mx-auto space-y-6">
-//         <div className="grid grid-cols-1 gap-6">
-//           <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-center">
-//               <div>
-//                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-//                   {t("dashboard.title")}
-//                 </h1>
-//                 <p className="mt-2 text-gray-600 dark:text-gray-400">
-//                   {t("dashboard.subtitle")}
-//                 </p>
-//               </div>
-
-//               <div className="relative">
-//                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-//                   {t("dashboard.selectFirm")}
-//                 </label>
-//                 <input
-//                   type="text"
-//                   value={firmSearchQuery}
-//                   onChange={(e) => setFirmSearchQuery(e.target.value)}
-//                   placeholder={t("dashboard.searchFirm")}
-//                   className="w-full p-3 border rounded-lg"
-//                 />
-//                 {firms.length > 0 && (
-//                   <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-700 border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-//                     {firms.map((firm) => (
-//                       <div
-//                         key={firm.id}
-//                         onClick={() => handleFirmSelect(firm)}
-//                         className="p-3 hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer border-b last:border-b-0 dark:border-gray-600"
-//                       >
-//                         <div className="font-medium">{firm.firm_name}</div>
-//                         <div className="text-sm text-gray-500 dark:text-gray-400">
-//                           INN: {firm.INN}
-//                         </div>
-//                       </div>
-//                     ))}
-//                   </div>
-//                 )}
-//                 {selectedFirm && (
-//                   <div className="mt-2 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-lg flex justify-between items-center">
-//                     <div>
-//                       <div className="font-medium text-blue-700 dark:text-blue-300">
-//                         {selectedFirm.firm_name}
-//                       </div>
-//                       <div className="text-sm text-blue-600 dark:text-blue-400">
-//                         INN: {selectedFirm.INN}
-//                       </div>
-//                     </div>
-//                     <button
-//                       onClick={handleFirmReset}
-//                       className="p-1 hover:bg-blue-100 dark:hover:bg-blue-800 rounded-full"
-//                     >
-//                       <svg
-//                         className="w-5 h-5 text-blue-700 dark:text-blue-300"
-//                         fill="none"
-//                         stroke="currentColor"
-//                         viewBox="0 0 24 24"
-//                       >
-//                         <path
-//                           strokeLinecap="round"
-//                           strokeLinejoin="round"
-//                           strokeWidth={2}
-//                           d="M6 18L18 6M6 6l12 12"
-//                         />
-//                       </svg>
-//                     </button>
-//                   </div>
-//                 )}
-//               </div>
-
-//               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-//                     {t("dashboard.dateFrom")}
-//                   </label>
-//                   <input
-//                     type="date"
-//                     value={dateFrom}
-//                     onChange={(e) => {
-//                       const newDate = e.target.value;
-//                       setDateFrom(newDate);
-//                       handleDateChange(newDate, dateTo);
-//                     }}
-//                     className="w-full p-3 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600"
-//                   />
-//                 </div>
-//                 <div>
-//                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-//                     {t("dashboard.dateTo")}
-//                   </label>
-//                   <input
-//                     type="date"
-//                     value={dateTo}
-//                     onChange={(e) => {
-//                       const newDate = e.target.value;
-//                       setDateTo(newDate);
-//                       handleDateChange(dateFrom, newDate);
-//                     }}
-//                     className="w-full p-3 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600"
-//                   />
-//                 </div>
-//               </div>
-
-//               <div className="relative">
-//                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-//                   {t("dashboard.selectProduct")}
-//                 </label>
-//                 <select
-//                   value={selectedProduct?.id || ""}
-//                   onChange={(e) => {
-//                     const product = products.find(
-//                       (p) => p.id === Number(e.target.value)
-//                     );
-//                     setSelectedProduct(product || null);
-//                   }}
-//                   className="w-full p-3 border rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600"
-//                 >
-//                   <option value="">{t("dashboard.allProducts")}</option>
-//                   {products.map((product) => (
-//                     <option key={product.id} value={product.id}>
-//                       {product.name}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-//             </div>
-
-//             {loading && (
-//               <div className="mt-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg p-4">
-//                 <div className="flex items-center gap-3">
-//                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 dark:border-blue-400"></div>
-//                   <div className="text-gray-600 dark:text-gray-400">
-//                     {selectedFirm ? (
-//                       <div className="flex flex-col">
-//                         <span className="font-medium">{`Loading ${selectedFirm.firm_name} data...`}</span>
-//                         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 mt-2">
-//                           <div
-//                             className="bg-blue-600 dark:bg-blue-400 h-2.5 rounded-full transition-all duration-300"
-//                             style={{
-//                               width: `${Math.round(loadingProgress)}%`,
-//                             }}
-//                           ></div>
-//                         </div>
-//                         <span className="text-sm mt-1">{`${Math.round(
-//                           loadingProgress
-//                         )}% complete`}</span>
-//                       </div>
-//                     ) : (
-//                       "Loading data..."
-//                     )}
-//                   </div>
-//                 </div>
-//               </div>
-//             )}
-//           </div>
-//         </div>
-
-//         {!loading && (
-//           <>
-//             <div className="grid grid-cols-1 gap-6">
-//               {Object.entries(statsGroups).map(([key, group]) => (
-//                 <div
-//                   key={key}
-//                   className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6"
-//                 >
-//                   <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-//                     {group.title}
-//                   </h2>
-//                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-//                     {group.stats.map((stat, index) => (
-//                       <div
-//                         key={index}
-//                         className={`
-//                           p-6 rounded-lg border
-//                           bg-gradient-to-br from-${stat.color}-50 to-white dark:from-gray-800 dark:to-gray-800
-//                           transition-all duration-300 hover:shadow-md hover:scale-[1.02]
-//                           flex items-center space-x-4
-//                         `}
-//                       >
-//                         <div
-//                           className={`p-3 rounded-lg bg-${stat.color}-100 dark:bg-${stat.color}-900 flex-shrink-0`}
-//                         >
-//                           {stat.icon}
-//                         </div>
-//                         <div>
-//                           <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-//                             {stat.title}
-//                           </p>
-//                           <p
-//                             className={`text-2xl font-bold text-${stat.color}-600 dark:text-${stat.color}-400`}
-//                           >
-//                             {stat.value}
-//                           </p>
-//                         </div>
-//                       </div>
-//                     ))}
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-
-//             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-//               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//                 <div className="flex items-center mb-6">
-//                   <ChartBar className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
-//                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-//                     {selectedFirm
-//                       ? `${selectedFirm.firm_name} - ${t(
-//                           "dashboard.applicationStatus"
-//                         )}`
-//                       : t("dashboard.applicationStatus")}
-//                   </h3>
-//                 </div>
-//                 <div className="h-[300px]">
-//                   <ResponsiveContainer width="100%" height="100%">
-//                     <PieChart>
-//                       <Pie
-//                         data={statusData}
-//                         dataKey="value"
-//                         nameKey="name"
-//                         cx="50%"
-//                         cy="50%"
-//                         outerRadius={100}
-//                         label
-//                         className="drop-shadow-lg"
-//                       >
-//                         {statusData.map((_entry, index) => (
-//                           <Cell
-//                             key={`cell-${index}`}
-//                             fill={COLORS[index % COLORS.length]}
-//                             className="hover:opacity-80 transition-opacity"
-//                           />
-//                         ))}
-//                       </Pie>
-//                       <Tooltip
-//                         contentStyle={{
-//                           backgroundColor: "white",
-//                           borderRadius: "8px",
-//                           padding: "8px",
-//                           border: "1px solid #e2e8f0",
-//                         }}
-//                       />
-//                       <Legend />
-//                     </PieChart>
-//                   </ResponsiveContainer>
-//                 </div>
-//               </div>
-
-//               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//                 <div className="flex items-center mb-6">
-//                   <Building2 className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
-//                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-//                     {t("dashboard.topFirms")}
-//                   </h3>
-//                 </div>
-//                 <div className="h-[300px]">
-//                   <ResponsiveContainer width="100%" height="100%">
-//                     <BarChart data={topFirmsData} layout="vertical">
-//                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-//                       <XAxis
-//                         type="number"
-//                         tickFormatter={(value) => formatNumber(value)}
-//                       />
-//                       <YAxis
-//                         dataKey="name"
-//                         type="category"
-//                         width={150}
-//                         tick={{ fill: "#4b5563", fontSize: 12 }}
-//                       />
-//                       <Tooltip
-//                         contentStyle={{
-//                           backgroundColor: "white",
-//                           borderRadius: "8px",
-//                           padding: "8px",
-//                           border: "1px solid #e2e8f0",
-//                         }}
-//                         formatter={(value) =>
-//                           `${formatNumber(Number(value))} sum`
-//                         }
-//                       />
-//                       <Bar
-//                         dataKey="value"
-//                         fill="#6C5DD3"
-//                         radius={[0, 4, 4, 0]}
-//                         className="hover:opacity-80 transition-opacity"
-//                       />
-//                     </BarChart>
-//                   </ResponsiveContainer>
-//                 </div>
-//               </div>
-
-//               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//                 <div className="flex items-center mb-6">
-//                   <svg
-//                     className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2"
-//                     fill="none"
-//                     stroke="currentColor"
-//                     viewBox="0 0 24 24"
-//                   >
-//                     <path
-//                       strokeLinecap="round"
-//                       strokeLinejoin="round"
-//                       strokeWidth={2}
-//                       d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l3-3m-3 3L9 8m-5 5h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 00.707.293h3.172a1 1 0 00.707-.293l2.414-2.414a1 1 0 01.707-.293H20"
-//                     />
-//                   </svg>
-//                   <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-//                     {t("dashboard.transportDistribution")}
-//                   </h3>
-//                 </div>
-//                 <div className="h-[300px]">
-//                   <ResponsiveContainer width="100%" height="100%">
-//                     <PieChart>
-//                       <Pie
-//                         data={transportData}
-//                         dataKey="value"
-//                         nameKey="name"
-//                         cx="50%"
-//                         cy="50%"
-//                         outerRadius={100}
-//                         label
-//                         className="drop-shadow-lg"
-//                       >
-//                         {transportData.map((_entry, index) => (
-//                           <Cell
-//                             key={`cell-${index}`}
-//                             fill={COLORS[index % COLORS.length]}
-//                             className="hover:opacity-80 transition-opacity"
-//                           />
-//                         ))}
-//                       </Pie>
-//                       <Tooltip
-//                         contentStyle={{
-//                           backgroundColor: "white",
-//                           borderRadius: "8px",
-//                           padding: "8px",
-//                           border: "1px solid #e2e8f0",
-//                         }}
-//                         formatter={(value) => formatNumber(Number(value))}
-//                       />
-//                       <Legend />
-//                     </PieChart>
-//                   </ResponsiveContainer>
-//                 </div>
-//               </div>
-
-//               <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//                 <div className="flex items-center justify-between mb-6">
-//                   <div className="flex items-center">
-//                     <Package className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
-//                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-//                       {selectedFirm 
-//                         ? `${selectedFirm.firm_name} - ${t("dashboard.productDistribution")}`
-//                         : t("dashboard.productDistribution")}
-//                     </h3>
-//                   </div>
-//                   <div className="text-sm text-gray-500 dark:text-gray-400">
-//                     {`${t("dashboard.totalQuantity")}: ${
-//                       firmProductData.reduce((sum, item) => sum + item.value, 0)
-//                     }`}
-//                   </div>
-//                 </div>
-//                 <div className="h-[300px]">
-//                   <ResponsiveContainer width="100%" height="100%">
-//                     <PieChart>
-//                       <Pie
-//                         data={firmProductData}
-//                         dataKey="value"
-//                         nameKey="name"
-//                         cx="50%"
-//                         cy="50%"
-//                         outerRadius={100}
-//                         label={({ name, percent }) => 
-//                           percent > 0.05 ? `${name} (${(percent * 100).toFixed(1)}%)` : ''
-//                         }
-//                         className="drop-shadow-lg"
-//                         labelLine={({ percent }) => percent > 0.05}
-//                       >
-//                         {firmProductData.map((_entry, index) => (
-//                           <Cell
-//                             key={`cell-${index}`}
-//                             fill={COLORS[index % COLORS.length]}
-//                             className="hover:opacity-80 transition-opacity"
-//                           />
-//                         ))}
-//                       </Pie>
-//                       <Tooltip
-//                         contentStyle={{
-//                           backgroundColor: "white",
-//                           borderRadius: "8px",
-//                           padding: "8px",
-//                           border: "1px solid #e2e8f0",
-//                         }}
-//                         formatter={(value, name, entry) => {
-//                           const item = entry.payload;
-//                           const percent = (item.value / firmProductData.reduce((sum, i) => sum + i.value, 0) * 100).toFixed(1);
-                          
-//                           if (item.items) { // This is the "Others" category
-//                             return [
-//                               <div key="tooltip" className="space-y-2">
-//                                 <div className="font-semibold">{`${t("dashboard.others")} (${item.items.length} ${t("dashboard.products")})`}</div>
-//                                 <div>{`${t("dashboard.totalQuantity")}: ${formatNumber(value)}`}</div>
-//                                 <div>{`${t("dashboard.percentage")}: ${percent}%`}</div>
-//                                 <div className="text-sm max-h-40 overflow-y-auto">
-//                                   {item.items.map((subItem: any, idx: number) => (
-//                                     <div key={idx} className="flex justify-between gap-4">
-//                                       <span>{subItem.name}:</span>
-//                                       <span>{formatNumber(subItem.value)}</span>
-//                                     </div>
-//                                   ))}
-//                                 </div>
-//                               </div>
-//                             ];
-//                           }
-                          
-//                           return [
-//                             <div key="tooltip">
-//                               <div>{`${t("dashboard.quantity")}: ${formatNumber(value)}`}</div>
-//                               <div>{`${t("dashboard.percentage")}: ${percent}%`}</div>
-//                               <div>{`${t("dashboard.product")}: ${name}`}</div>
-//                               <div>{`${t("dashboard.applications")}: ${item.applicationCount}`}</div>
-//                             </div>
-//                           ];
-//                         }}
-//                       />
-//                       <Legend />
-//                     </PieChart>
-//                   </ResponsiveContainer>
-//                 </div>
-//               </div>
-
-//               <div className="col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-//                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-//                   <div className="flex items-center">
-//                     <Package className="h-5 w-5 text-gray-500 dark:text-gray-400 mr-2" />
-//                     <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-//                       {t("dashboard.productDistribution")}
-//                     </h3>
-//                   </div>
-
-//                   <div className="flex flex-wrap gap-3">
-//                     <select
-//                       className="rounded-lg border border-gray-300 px-4 py-2 text-sm bg-white dark:bg-gray-700 dark:border-gray-600"
-//                       value={sortBy}
-//                       onChange={(e) =>
-//                         setSortBy(e.target.value as "quantity" | "name")
-//                       }
-//                     >
-//                       <option value="quantity">
-//                         {t("dashboard.sortByQuantity")}
-//                       </option>
-//                       <option value="name">
-//                         {t("dashboard.sortByName")}
-//                       </option>
-//                     </select>
-
-//                     <select
-//                       className="rounded-lg border border-gray-300 px-4 py-2 text-sm bg-white dark:bg-gray-700 dark:border-gray-600"
-//                       value={productDisplayLimit}
-//                       onChange={(e) =>
-//                         setProductDisplayLimit(Number(e.target.value))
-//                       }
-//                     >
-//                       <option value="2">Top 2</option>
-//                       <option value="10">Top 10</option>
-//                       <option value="20">Top 20</option>
-//                       <option value="50">Top 50</option>
-//                       <option value={productData.length}>All</option>
-//                     </select>
-//                   </div>
-//                 </div>
-
-//                 <div className="h-[400px]">
-//                   <ResponsiveContainer width="100%" height="100%">
-//                     <BarChart data={getFilteredProductData()}>
-//                       <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-//                       <XAxis
-//                         dataKey="name"
-//                         angle={-45}
-//                         textAnchor="end"
-//                         height={100}
-//                         interval={0}
-//                         tick={{ fontSize: 12, fill: "#4b5563" }}
-//                       />
-//                       <YAxis
-//                         tickFormatter={formatNumber}
-//                         tick={{ fill: "#4b5563" }}
-//                       />
-//                       <Tooltip
-//                         contentStyle={{
-//                           backgroundColor: "white",
-//                           borderRadius: "8px",
-//                           padding: "8px",
-//                           border: "1px solid #e2e8f0",
-//                         }}
-//                         formatter={(value) => formatNumber(Number(value))}
-//                       />
-//                       <Bar
-//                         dataKey="quantity"
-//                         fill="#6C5DD3"
-//                         radius={[4, 4, 0, 0]}
-//                         className="hover:opacity-80 transition-opacity"
-//                       />
-//                     </BarChart>
-//                   </ResponsiveContainer>
-//                 </div>
-
-//                 <div className="mt-8 overflow-x-auto">
-//                   <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-//                     <thead>
-//                       <tr>
-//                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-//                           {t("dashboard.productName")}
-//                         </th>
-//                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-//                           {t("dashboard.quantity")}
-//                         </th>
-//                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-//                           {t("dashboard.applications")}
-//                         </th>
-//                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-//                           {t("dashboard.storage")}
-//                         </th>
-//                       </tr>
-//                     </thead>
-//                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-//                       {getFilteredProductData().map((product, index) => (
-//                         <tr
-//                           key={index}
-//                           className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-//                         >
-//                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-//                             {product.name}
-//                           </td>
-//                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-//                             {formatNumber(product.quantity)}
-//                           </td>
-//                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-//                             {firmProductData.find(item => item.name === product.name)?.applicationCount || 0}
-//                           </td>
-//                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
-//                             {product.storage}
-//                           </td>
-//                         </tr>
-//                       ))}
-//                     </tbody>
-//                   </table>
-//                 </div>
-//               </div>
-//             </div>
-//           </>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
+export default Dashboard;

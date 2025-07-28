@@ -1,4 +1,5 @@
 {
+ 
   "createFirm": {
     "title": "Создать Новую Организацию",
     "subtitle": "Пожалуйста, заполните всю необходимую информацию для регистрации новой компании",
@@ -818,8 +819,25 @@
     "phoneNumber": "Номер Телефона"
   },
   "dashboard": {
+    "firmName":"Название Организации",
+    "enterFirmName": "Введите название организации",
     "quantity": "Количество",
+    "applyFilters": "Применить Фильтры",
+    "topProducts":"Топ продуктов",
     "transport": "Транспорт",
+    "totalIncome":"Общий доход",
+    "dateFilters": "Фильтры по Дате",
+    "createdDateRange": "Диапазон Дат Создания",
+    "comingDateRange":"Диапазон дат прибытия",
+    "to": "до",
+    "all":"Все",
+    "completed":"Завершенные",
+    "active":"Активные",
+
+    "from": "от",
+    "topOrganizations":"Топ организаций",
+    "topOrganizationsByAmount": "Топ организаций по количеству",
+    "topOrganizationsByRevenue": "Топ организаций по доходу",
     "title": "Панель управления",
     "subtitle": "Аналитика и статистика",
     "selectFirm": "Выберите организацию",
