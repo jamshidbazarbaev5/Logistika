@@ -22,12 +22,12 @@ export default function EditApplication() {
   const { id } = useParams<{ id: string }>();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
-  
+
   const [formData, setFormData] = useState<EditApplicationFormState>({
     firm_id: 0,
     number_of_application: '',
@@ -97,7 +97,7 @@ export default function EditApplication() {
           api.get('/storage/'),
           api.get('/items/product/'),
           api.get('/modes/modes/')
-        ]); 
+        ]);
 
         // Fetch all firms data with pagination
         let allFirms: Array<{ id: number; firm_name: string }> = [];
@@ -110,7 +110,7 @@ export default function EditApplication() {
         }
 
         const applicationData = applicationRes.data;
-        
+
         // Ensure firm_id is set properly
         applicationData.firm_id = applicationData.firm?.id || applicationData.firm_id || 0;
 
@@ -157,13 +157,13 @@ export default function EditApplication() {
         setWorkingServices(workingServicesTariffRes.data.results);
         setTransportTypes(transportTypesRes.data.results);
         setStorages(storagesRes.data.results);
-        
+
         const productsWithDefaults = productsRes.data.results.map((product:any) => ({
           ...product,
           measurement_id: product.measurement_id || 0,
           category_id: product.category_id || 0,
         }));
-        
+
         setProducts(productsWithDefaults);
         setAvailableModes(modesRes.data.results);
         setLoading(false);
@@ -180,7 +180,7 @@ export default function EditApplication() {
   const handleSubmit = async () => {
     try {
       const formDataToSend = new FormData();
-      
+
       // Create upload_transport array from transport data
       const upload_transport = formData.transport.map(t => ({
         transport_number: t.transport_number,
@@ -224,12 +224,10 @@ export default function EditApplication() {
           'Authorization': `Bearer ${localStorage.getItem('accessToken')}`,
         },
       });
-      
+
       if (response.status === 200) {
         setModalMessage(t('editApplication.successMessage'));
         setShowSuccessModal(true);
-        navigate('/application-list')
-        
       }
     } catch (error: any) {
       console.error('Error updating application:', error);
@@ -241,7 +239,7 @@ export default function EditApplication() {
         }, 1500);
         return;
       }
-      
+
       let errorMessages = '';
       if (error.response?.data) {
         errorMessages = Object.entries(error.response.data)
@@ -262,11 +260,22 @@ export default function EditApplication() {
 
     setModalMessage(t('editApplication.declarationAdded'));
     setShowSuccessModal(true);
-    
+
     setTimeout(() => {
       setSelectedTab(5);
     }, 1500);
   };
+
+  // Set current date for declaration when tab changes to declaration tab
+  useEffect(() => {
+    if (selectedTab === 4 && !formData.decloration_date) {
+      const today = new Date().toISOString().split('T')[0];
+      setFormData(prev => ({
+        ...prev,
+        decloration_date: today
+      }));
+    }
+  }, [selectedTab]);
 
   const validateDate = (dateString: string): boolean => {
     const date = new Date(dateString);
@@ -301,10 +310,10 @@ export default function EditApplication() {
     return classes.filter(Boolean).join(' ');
   };
 
-  const inputClassName = `mt-1 block w-full rounded-md border border-gray-300 
-    dark:border-gray-600 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm 
-    focus:border-[#6C5DD3] focus:outline-none focus:ring-1 
-    focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 
+  const inputClassName = `mt-1 block w-full rounded-md border border-gray-300
+    dark:border-gray-600 px-2 py-1.5 sm:px-3 sm:py-2 text-xs sm:text-sm
+    focus:border-[#6C5DD3] focus:outline-none focus:ring-1
+    focus:ring-[#6C5DD3] bg-white dark:bg-gray-700
     text-gray-900 dark:text-gray-100 transition-colors`;
 
   const TransportSection = () => {
@@ -354,7 +363,7 @@ export default function EditApplication() {
           <h3 className="text-base font-medium text-gray-900 dark:text-gray-100">
             {t('editApplication.transportInfo')}
           </h3>
-          
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-1 sm:space-y-2">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
@@ -363,9 +372,9 @@ export default function EditApplication() {
               <select
                 value={transportTypeId}
                 onChange={(e) => setTransportTypeId(Number(e.target.value))}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 
-                  px-4 py-2.5 text-sm focus:border-[#6C5DD3] focus:ring-1 
-                  focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 
+                className="w-full rounded-lg border border-gray-300 dark:border-gray-600
+                  px-4 py-2.5 text-sm focus:border-[#6C5DD3] focus:ring-1
+                  focus:ring-[#6C5DD3] bg-white dark:bg-gray-700
                   text-gray-900 dark:text-gray-100 transition-colors"
               >
                 <option value={0}>
@@ -388,18 +397,18 @@ export default function EditApplication() {
                   type="text"
                   value={transportNumber}
                   onChange={(e) => setTransportNumber(e.target.value)}
-                  className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 
-                    px-3 sm:px-4 py-2 sm:py-2.5 text-sm focus:border-[#6C5DD3] focus:ring-1 
-                    focus:ring-[#6C5DD3] bg-white dark:bg-gray-700 
+                  className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600
+                    px-3 sm:px-4 py-2 sm:py-2.5 text-sm focus:border-[#6C5DD3] focus:ring-1
+                    focus:ring-[#6C5DD3] bg-white dark:bg-gray-700
                     text-gray-900 dark:text-gray-100 transition-colors"
                   placeholder={t('editApplication.transportNumber')}
                 />
                 <button
                   onClick={handleAddTransport}
                   disabled={!transportNumber || !transportTypeId}
-                  className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-[#6C5DD3] text-white 
-                    rounded-lg font-medium hover:bg-[#5b4eb3] disabled:opacity-50 
-                    disabled:cursor-not-allowed transition-colors duration-200 ease-in-out 
+                  className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-[#6C5DD3] text-white
+                    rounded-lg font-medium hover:bg-[#5b4eb3] disabled:opacity-50
+                    disabled:cursor-not-allowed transition-colors duration-200 ease-in-out
                     shadow-sm whitespace-nowrap text-sm"
                 >
                   {t('editApplication.addTransport')}
@@ -415,11 +424,11 @@ export default function EditApplication() {
               </h4>
               <div className="grid gap-2 sm:gap-3 grid-cols-1 sm:grid-cols-2">
                 {typedFormData.transport.map((transport:any, index:number) => (
-                  <div 
-                    key={index} 
-                    className="flex justify-between items-center bg-gray-50 
-                      dark:bg-gray-800 p-4 rounded-lg border border-gray-200 
-                      dark:border-gray-700 hover:border-gray-300 
+                  <div
+                    key={index}
+                    className="flex justify-between items-center bg-gray-50
+                      dark:bg-gray-800 p-4 rounded-lg border border-gray-200
+                      dark:border-gray-700 hover:border-gray-300
                       dark:hover:border-gray-600 transition-colors"
                   >
                     <div className="flex-1">
@@ -433,7 +442,7 @@ export default function EditApplication() {
                     </div>
                     <button
                       onClick={() => handleRemoveTransport(index)}
-                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 
+                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50
                         dark:hover:bg-red-900/20 rounded-lg transition-colors"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -453,11 +462,11 @@ export default function EditApplication() {
   const truncateFileName = (url: string, maxLength: number = 30) => {
     const fileName = url.split('/').pop() || '';
     if (fileName.length <= maxLength) return fileName;
-    
+
     const extension = fileName.split('.').pop() || '';
     const nameWithoutExt = fileName.slice(0, fileName.lastIndexOf('.'));
-    
-    const truncatedName = nameWithoutExt.slice(0, maxLength - extension.length - 4) + '...'; 
+
+    const truncatedName = nameWithoutExt.slice(0, maxLength - extension.length - 4) + '...';
     return `${truncatedName}.${extension}`;
   };
 
@@ -495,14 +504,14 @@ export default function EditApplication() {
   }
 
   return (
-    <FormContext.Provider value={{ 
-      formData: formData as ApplicationFormData, 
+    <FormContext.Provider value={{
+      formData: formData as ApplicationFormData,
       setFormData: setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>
     }}>
       <div className="p-2 sm:p-4 md:p-6 max-w-7xl mx-auto">
         <Tab.Group selectedIndex={selectedTab} onChange={handleTabChange}>
-          <Tab.List className="flex space-x-1 rounded-xl bg-gray-100 dark:bg-gray-800 p-1 
-            overflow-x-auto sticky top-0 z-10 mb-4 -mx-2 sm:mx-0 
+          <Tab.List className="flex space-x-1 rounded-xl bg-gray-100 dark:bg-gray-800 p-1
+            overflow-x-auto sticky top-0 z-10 mb-4 -mx-2 sm:mx-0
             scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
             <Tab
               className={({ selected }) =>
@@ -608,7 +617,7 @@ export default function EditApplication() {
                       <button
                         type="button"
                         onClick={() => setFormData(prev => ({ ...prev, vip_application: !prev.vip_application }))}
-                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 
+                        className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2
                           border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
                           formData.vip_application ? 'bg-[#6C5DD3]' : 'bg-gray-200 dark:bg-gray-700'
                         }`}
@@ -617,7 +626,7 @@ export default function EditApplication() {
                       >
                         <span
                           aria-hidden="true"
-                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full 
+                          className={`pointer-events-none inline-block h-5 w-5 transform rounded-full
                             bg-white shadow ring-0 transition duration-200 ease-in-out ${
                             formData.vip_application ? 'translate-x-5' : 'translate-x-0'
                           }`}
@@ -712,7 +721,7 @@ export default function EditApplication() {
                   <button
                     type="button"
                     onClick={() => setSelectedTab(1)}
-                    className="w-full sm:w-auto bg-[#6C5DD3] text-white px-6 py-2.5 rounded-lg 
+                    className="w-full sm:w-auto bg-[#6C5DD3] text-white px-6 py-2.5 rounded-lg
                       hover:bg-[#5b4eb3] transition-colors duration-200 ease-in-out
                       text-sm font-medium shadow-sm"
                   >
@@ -723,7 +732,7 @@ export default function EditApplication() {
             </Tab.Panel>
 
             <Tab.Panel>
-              <ServicesTab 
+              <ServicesTab
                 formData={formData as ApplicationFormData}
                 setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
                 keepingServices={keepingServices}
@@ -733,7 +742,7 @@ export default function EditApplication() {
             </Tab.Panel>
 
             <Tab.Panel>
-              <PhotoReportTab 
+              <PhotoReportTab
                 formData={formData as ApplicationFormData}
                 setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
                 onSuccess={() => setSelectedTab(3)}
@@ -742,7 +751,7 @@ export default function EditApplication() {
             </Tab.Panel>
 
             <Tab.Panel>
-              <ProductsTab 
+              <ProductsTab
                 formData={formData as ApplicationFormData}
                 setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
                 products={products}
@@ -811,13 +820,13 @@ export default function EditApplication() {
                     )}
 
                     <div className="flex items-center justify-center w-full">
-                      <label className="flex flex-col items-center justify-center w-full h-24 sm:h-32 
-                        border-2 border-gray-300 border-dashed rounded-lg cursor-pointer 
+                      <label className="flex flex-col items-center justify-center w-full h-24 sm:h-32
+                        border-2 border-gray-300 border-dashed rounded-lg cursor-pointer
                         bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700">
                         <div className="flex flex-col items-center justify-center pt-4 pb-5 sm:pt-5 sm:pb-6">
-                          <svg className="w-6 h-6 sm:w-8 sm:h-8 mb-2 sm:mb-4 text-gray-500 dark:text-gray-400" 
+                          <svg className="w-6 h-6 sm:w-8 sm:h-8 mb-2 sm:mb-4 text-gray-500 dark:text-gray-400"
                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} 
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                               d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                           </svg>
                           <p className="mb-1 sm:mb-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
@@ -827,11 +836,11 @@ export default function EditApplication() {
                             PDF, JPG, PNG (MAX. 10MB)
                           </p>
                         </div>
-                        <input type="file" className="hidden" onChange={handleFileChange} 
+                        <input type="file" className="hidden" onChange={handleFileChange}
                           accept=".pdf,.jpg,.jpeg,.png" />
                       </label>
                     </div>
-                    
+
                     {formData.decloration_file instanceof File && (
                       <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
                       {t('editApplication.selectedFile')}: {formData.decloration_file.name}
@@ -844,7 +853,7 @@ export default function EditApplication() {
                   <button
                     type="button"
                     onClick={() => setSelectedTab(3)}
-                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 border border-gray-300 
+                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 border border-gray-300
                       rounded-lg text-gray-700 hover:bg-gray-50 text-sm font-medium"
                   >
                     {t('editApplication.back')}
@@ -852,7 +861,7 @@ export default function EditApplication() {
                   <button
                     type="button"
                     onClick={handleDeclarationSubmit}
-                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-[#6C5DD3] 
+                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 bg-[#6C5DD3]
                       text-white rounded-lg hover:bg-[#5b4eb3] text-sm font-medium"
                   >
                     {t('editApplication.addDeclaration')}
@@ -863,19 +872,19 @@ export default function EditApplication() {
 
             <Tab.Panel>
               <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow-sm">
-                <ModesTab 
+                <ModesTab
                   formData={formData as ApplicationFormData}
                   setFormData={setFormData as React.Dispatch<React.SetStateAction<ApplicationFormData>>}
                   onSubmit={handleSubmit}
                   availableModes={availableModes}
                   inputClassName={inputClassName}
                 />
-                
+
                 <div className="mt-6 flex flex-col sm:flex-row justify-end gap-2 sm:gap-4">
                   <button
                     type="button"
                     onClick={() => setSelectedTab(4)}
-                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 border border-gray-300 
+                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 border border-gray-300
                       rounded-lg text-gray-700 hover:bg-gray-50 text-sm font-medium"
                   >
                     {t('editApplication.back')}
@@ -883,12 +892,12 @@ export default function EditApplication() {
                   <button
                     type="button"
                     onClick={() => navigate(`/calculate-services/${id}`)}
-                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 border border-[#6C5DD3] 
+                    className="w-full sm:w-auto px-4 sm:px-6 py-2 sm:py-2.5 border border-[#6C5DD3]
                       text-[#6C5DD3] rounded-lg hover:bg-[#6C5DD3]/10 text-sm font-medium"
                   >
                     {t('editApplication.calculate')}
                   </button>
-                
+
                 </div>
               </div>
             </Tab.Panel>
