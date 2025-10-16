@@ -310,6 +310,7 @@ export default function ApplicationList() {
         { value: '', label: t('applicationList.status.all', 'All') },
         { value: 'active', label: t('applicationList.status.active', 'Active') },
         { value: 'unpaid', label: t('applicationList.status.unpaid', 'Unpaid') }
+        // Removed completed status option
       ],
       className: 'col-span-12 sm:col-span-12 lg:col-span-4',
     },
@@ -319,15 +320,19 @@ export default function ApplicationList() {
     try {
       const params = new URLSearchParams();
       
+      // Add status filter defaulting to active
+      params.append('status', searchParams.status || 'active');
+
+      // Add other search params
       Object.entries(searchParams).forEach(([key, value]) => {
-        if (value) {
+        if (value && key !== 'status') {  // Skip status as we handled it above
           params.append(key, value);
         }
       });
       
       params.append('page', currentPage.toString());
 
-      // First get all firms by fetching all pages
+    
       const firmsMap: Record<number, string> = {};
       let nextFirmsPage = 1;
       let hasMoreFirms = true;
@@ -611,15 +616,11 @@ export default function ApplicationList() {
 
   const filteredApplications = applications
     .filter(app => {
-      // First filter out completed statuses
-      if (app.status === 'completed') {
-        return false;
-      }
-      // Then apply status filter if one is selected
+      // Only filter by status if a status is selected in search params
       if (searchParams.status) {
         return app.status === searchParams.status;
       }
-      return true; // Show all non-completed if no status filter
+      return true; // Show all applications if no status filter
     })
     .sort((a, b) => {
       // Sort by coming_date in descending order (newest first)
@@ -721,7 +722,7 @@ export default function ApplicationList() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     <div className="flex items-center">
-                      {application.number_of_application}
+                      <span className="font-medium">{application.number_of_application || t("applicationList.noNumber", "No Number")}</span>
                       {expandedApplications.includes(application.id) ? (
                         <ChevronUpIcon className="h-4 w-4 ml-1 text-[#6C5DD3]" />
                       ) : (

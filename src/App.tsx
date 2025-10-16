@@ -1,10 +1,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
-  BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
-} from "react-router-dom";
+} from "react-router";
 import Layout from "../src/layout/layout";
 import TransportForm from "./pages/TransportForm";
 import "./App.css";
@@ -56,7 +55,6 @@ function App() {
     <div className="min-h-screen bg-white dark:bg-gray-900 transition-colors duration-200">
       <Provider store={store}>
         <QueryClientProvider client={queryClient}>
-          <Router>
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route
@@ -106,7 +104,6 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard/>}/>
               </Route>
             </Routes>
-          </Router>
         </QueryClientProvider>
       </Provider>
     </div>
