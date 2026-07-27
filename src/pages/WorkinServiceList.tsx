@@ -46,8 +46,8 @@ export default function WorkingServiceList() {
         .sort((a: WorkingService, b: WorkingService) => a.id - b.id);
 
       const yearsFromServices = [...new Set(services.map((service: any) => service.year))];
-      const uniqueYears:any = [...new Set([currentYear, ...yearsFromServices])];
-      setAvailableYears(uniqueYears.sort((a:any, b:any) => b - a));
+      const uniqueYears:any = [...new Set([2025, currentYear, ...yearsFromServices])];
+      setAvailableYears(uniqueYears.sort((a:any, b:any) => a - b));
 
       setServices(servicesWithNames);
       setLoading(false);

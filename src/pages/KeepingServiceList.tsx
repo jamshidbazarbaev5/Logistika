@@ -104,8 +104,8 @@ export default function KeepingServiceList() {
       const prices = (pricesResponse?.data as PaginatedResponse<KeepingServicePrice>)?.results || [];
 
       const yearsFromServices = [...new Set(prices.map(price => price.year))] as number[];
-      const uniqueYears = [...new Set([currentYear, ...yearsFromServices])];
-      setAvailableYears(uniqueYears.sort((a, b) => b - a));
+      const uniqueYears = [...new Set([2025, currentYear, ...yearsFromServices])];
+      setAvailableYears(uniqueYears.sort((a, b) => a - b));
 
       const currentSelectedYear = selectedYear || (yearsFromServices.length > 0 ? Math.max(...yearsFromServices) : currentYear);
       setSelectedYear(currentSelectedYear);
@@ -289,7 +289,6 @@ export default function KeepingServiceList() {
         <div className="border-b border-gray-200 dark:border-gray-700">
           <nav className="-mb-px flex space-x-4" aria-label="Tabs">
             {availableYears
-              .sort((a, b) => a-b)
               .map((year) => (
                 <button
                   key={year}
